@@ -3,250 +3,238 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>General Chat — Clocktower Theme</title>
+<title>General Chat — WA Style</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
-  body{margin:0;padding:0;font-family:'Roboto',sans-serif;background:url('https://images.unsplash.com/photo-1505232070786-5d27e7d20f31?auto=format&fit=crop&w=1950&q=80') no-repeat center/cover;display:flex;justify-content:center;align-items:center;height:100vh;color:#fff;}
-  #app{width:100%;max-width:480px;background:rgba(0,0,0,0.65);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;height:90vh;}
-  .header{padding:12px;background:rgba(0,0,0,0.75);text-align:center;font-weight:700;font-size:18px;}
-  .content{flex:1;padding:10px;overflow-y:auto;display:flex;flex-direction:column-reverse;gap:10px;}
-  .message{display:flex;gap:8px;align-items:flex-end;}
-  .msg-pfp{width:36px;height:36px;border-radius:50%;object-fit:cover;}
-  .msg-text{background:rgba(255,255,255,0.1);padding:8px 12px;border-radius:10px;max-width:70%;word-break:break-word;animation:fadeIn 0.3s;}
-  @keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
-  .inputBox{display:flex;padding:10px;background:rgba(0,0,0,0.75);}
-  .inputBox input[type=text]{flex:1;padding:8px;border-radius:8px;border:none;margin-right:6px;background:rgba(255,255,255,0.1);color:#fff;}
-  .inputBox input[type=file]{display:none;}
-  .inputBox button{padding:8px 12px;border:none;border-radius:8px;background:#10b981;color:#000;font-weight:600;cursor:pointer;}
-  .loginModal{position:absolute;inset:0;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;z-index:10;}
-  .loginCard{background:#111827;padding:22px;border-radius:12px;width:90%;max-width:380px;text-align:center;}
-  .loginCard input{width:100%;padding:8px;margin:6px 0;border-radius:6px;border:none;background:rgba(255,255,255,0.1);color:#fff;}
-  .loginCard button{padding:8px 12px;border:none;border-radius:8px;background:#10b981;color:#000;font-weight:600;cursor:pointer;margin-top:6px;width:100%;}
-  .typing{font-size:12px;color:#ccc;margin-left:44px;font-style:italic;}
-  .setProfile{position:absolute;inset:0;background:rgba(0,0,0,0.9);display:flex;align-items:center;justify-content:center;z-index:11;}
-  .profileCard{background:#111827;padding:22px;border-radius:12px;width:90%;max-width:380px;text-align:center;}
-  .profileCard input{width:100%;padding:8px;margin:6px 0;border-radius:6px;border:none;background:rgba(255,255,255,0.1);color:#fff;}
-  .profileCard img{width:60px;height:60px;border-radius:50%;object-fit:cover;margin-bottom:10px;}
+  @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+  body, html {margin:0;padding:0;font-family:Roboto;background:#1e1e2f;color:white;height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+  .screen {flex:1;display:none;flex-direction:column;align-items:center;justify-content:center;padding:12px;}
+  .active{display:flex;}
+  input, button{padding:10px;border-radius:6px;border:none;margin:4px 0;}
+  button{cursor:pointer;background:#10b981;color:white;font-weight:bold;}
+  .chat-container{flex:1;width:100%;display:flex;flex-direction:column;justify-content:flex-end;padding:12px;overflow-y:auto;background:url('https://images.unsplash.com/photo-1557682250-5e8897f7e9f5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwyNjQ1MjB8MHwxfGFsbHwxfHxjbG9ja3Rvd2VyfGVufDB8fHx8MTY5NjY1MzEzOA&ixlib=rb-4.0.3&q=80&w=1080') no-repeat center center/cover;}
+  .message{margin:6px 0;display:flex;align-items:flex-end;gap:8px;max-width:80%;}
+  .message .content{padding:8px 12px;border-radius:12px;background:rgba(16,185,129,0.8);animation:fadeIn 0.3s;}
+  .message .meta{font-size:10px;color:#ccc;}
+  .input-area{display:flex;gap:6px;padding:6px;background:#111426;}
+  .input-area input{flex:1;border-radius:12px;}
+  .avatar{width:32px;height:32px;border-radius:50%;object-fit:cover;}
+  .typing{font-size:12px;color:#ccc;margin:4px 0;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+  .chat-header{width:100%;display:flex;align-items:center;gap:8px;padding:8px;background:rgba(0,0,0,0.5);}
+  .back-btn{cursor:pointer;font-size:20px;}
 </style>
 </head>
 <body>
-<div id="app">
-  <div class="header">General Chat</div>
-  <div class="content" id="chatContent"></div>
+
+<!-- Phone Login -->
+<div class="screen active" id="loginScreen">
+  <h2>Login with Phone</h2>
+  <input type="text" id="phoneInput" placeholder="+91xxxxxxxxxx">
+  <button id="sendOTP">Send OTP</button>
+  <input type="text" id="otpInput" placeholder="Enter OTP" style="display:none;">
+  <button id="verifyOTP" style="display:none;">Verify OTP</button>
+</div>
+
+<!-- Profile Setup -->
+<div class="screen" id="profileScreen">
+  <h2>Set Your Profile</h2>
+  <input type="text" id="usernameInput" placeholder="Username">
+  <input type="file" id="pfpInput" accept="image/*">
+  <button id="saveProfile">Save Profile</button>
+</div>
+
+<!-- Chat Selection -->
+<div class="screen" id="chatMenu">
+  <h2>General Chat</h2>
+  <button id="enterChat">Enter Chat</button>
+</div>
+
+<!-- Chat Screen -->
+<div class="screen" id="chatScreen">
+  <div class="chat-header">
+    <span class="back-btn" id="backMenu">&#8592;</span>
+    <h3>General Chat</h3>
+  </div>
+  <div class="chat-container" id="messages"></div>
   <div class="typing" id="typingIndicator"></div>
-  <div class="inputBox">
-    <input type="text" id="msgInput" placeholder="Type message..." disabled>
-    <input type="file" id="photoInput" accept="image/*">
-    <button id="sendBtn" disabled>Send</button>
-    <button id="photoBtn">📷</button>
-  </div>
-</div>
-
-<!-- Login Modal -->
-<div id="loginModal" class="loginModal">
-  <div class="loginCard">
-    <h3>Login</h3>
-    <input type="email" id="email" placeholder="Email">
-    <input type="password" id="password" placeholder="Password">
-    <button id="emailLoginBtn">Login with Email</button>
-    <hr style="margin:10px 0;border-color:#333">
-    <input type="tel" id="phone" placeholder="Phone (+1234567890)">
-    <button id="phoneLoginBtn">Send OTP</button>
-    <input type="text" id="otpInput" placeholder="Enter OTP" style="display:none;">
-    <button id="verifyOtpBtn" style="display:none;">Verify OTP</button>
-  </div>
-</div>
-
-<!-- Profile Setup Modal -->
-<div id="profileModal" class="setProfile" style="display:none">
-  <div class="profileCard">
-    <h3>Set Profile</h3>
-    <img id="pfpPreview" src="https://via.placeholder.com/60">
-    <input type="text" id="usernameInput" placeholder="Username">
-    <input type="file" id="pfpInput" accept="image/*">
-    <button id="saveProfileBtn">Save Profile</button>
+  <div class="input-area">
+    <input type="text" id="chatInput" placeholder="Type a message">
+    <input type="file" id="chatImage" accept="image/*">
+    <button id="sendMsg">Send</button>
   </div>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getDatabase, ref, set, push, onValue, update, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { getStorage, ref as sref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
+import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { getDatabase, ref, set, push, onValue, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
+/* ----------------- Firebase Config ----------------- */
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  databaseURL: "YOUR_DB_URL",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_STORAGE_BUCKET",
-  messagingSenderId: "YOUR_MSG_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyDFPMf8HLMpS6DbZkdCR6T7GAm5sfz-TOw",
+  authDomain: "urbrokhan-f631c.firebaseapp.com",
+  databaseURL: "https://urbrokhan-f631c-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "urbrokhan-f631c",
+  storageBucket: "urbrokhan-f631c.firebasestorage.app",
+  messagingSenderId: "533086015351",
+  appId: "1:533086015351:web:a12328fbc4906e4f5c9b72",
+  measurementId: "G-TGT66KJV02"
 };
 
+/* ----------------- Initialize Firebase ----------------- */
 const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
 const auth = getAuth(app);
-const storage = getStorage(app);
+const db = getDatabase(app);
 
-const chatContent = document.getElementById('chatContent');
-const msgInput = document.getElementById('msgInput');
-const sendBtn = document.getElementById('sendBtn');
-const photoBtn = document.getElementById('photoBtn');
-const photoInput = document.getElementById('photoInput');
-const loginModal = document.getElementById('loginModal');
-const profileModal = document.getElementById('profileModal');
-const usernameInput = document.getElementById('usernameInput');
-const saveProfileBtn = document.getElementById('saveProfileBtn');
-const pfpInput = document.getElementById('pfpInput');
-const pfpPreview = document.getElementById('pfpPreview');
-const typingIndicator = document.getElementById('typingIndicator');
+/* Screens */
+const loginScreen=document.getElementById('loginScreen');
+const profileScreen=document.getElementById('profileScreen');
+const chatMenu=document.getElementById('chatMenu');
+const chatScreen=document.getElementById('chatScreen');
 
-// ----------------- AUTH -----------------
-const emailLoginBtn = document.getElementById('emailLoginBtn');
-const phoneLoginBtn = document.getElementById('phoneLoginBtn');
-const otpInput = document.getElementById('otpInput');
-const verifyOtpBtn = document.getElementById('verifyOtpBtn');
-const emailInput = document.getElementById('email');
-const passwordInput = document.getElementById('password');
-const phoneInput = document.getElementById('phone');
+/* Login Elements */
+const phoneInput=document.getElementById('phoneInput');
+const sendOTP=document.getElementById('sendOTP');
+const otpInput=document.getElementById('otpInput');
+const verifyOTP=document.getElementById('verifyOTP');
 
-let currentUser = null;
+/* Profile Elements */
+const usernameInput=document.getElementById('usernameInput');
+const pfpInput=document.getElementById('pfpInput');
+const saveProfile=document.getElementById('saveProfile');
 
-// Email login
-emailLoginBtn.addEventListener('click', async()=>{
-  try{
-    const userCredential = await signInWithEmailAndPassword(auth,emailInput.value,passwordInput.value);
-  }catch(err){
-    try{
-      await createUserWithEmailAndPassword(auth,emailInput.value,passwordInput.value);
-    }catch(e){ alert(e.message); }
-  }
+/* Chat Elements */
+const enterChat=document.getElementById('enterChat');
+const backMenu=document.getElementById('backMenu');
+const chatInput=document.getElementById('chatInput');
+const chatImage=document.getElementById('chatImage');
+const sendMsg=document.getElementById('sendMsg');
+const messages=document.getElementById('messages');
+const typingIndicator=document.getElementById('typingIndicator');
+
+let currentUser=null;
+
+/* ------------------- Phone Login ------------------- */
+window.recaptchaVerifier = new RecaptchaVerifier('sendOTP', { 'size': 'invisible' }, auth);
+
+let confirmationResult;
+
+sendOTP.addEventListener('click',()=>{
+  const phone = phoneInput.value.trim();
+  if(!phone){alert('Enter phone number');return;}
+  signInWithPhoneNumber(auth, phone, window.recaptchaVerifier)
+    .then(res=>{
+      confirmationResult=res;
+      otpInput.style.display='block';
+      verifyOTP.style.display='block';
+    }).catch(e=>alert('OTP send failed:'+e));
 });
 
-// Phone login
-window.recaptchaVerifier = new RecaptchaVerifier('phoneLoginBtn', { 'size':'invisible' }, auth);
-
-phoneLoginBtn.addEventListener('click', async()=>{
-  const phoneNumber = phoneInput.value;
-  const appVerifier = window.recaptchaVerifier;
-  try{
-    const confirmationResult = await signInWithPhoneNumber(auth,phoneNumber,appVerifier);
-    window.confirmationResult = confirmationResult;
-    otpInput.style.display='block';
-    verifyOtpBtn.style.display='block';
-  }catch(e){ alert(e.message); }
-});
-
-verifyOtpBtn.addEventListener('click', async()=>{
-  try{
-    const result = await window.confirmationResult.confirm(otpInput.value);
-  }catch(e){ alert(e.message); }
-});
-
-// On auth change
-onAuthStateChanged(auth,user=>{
-  if(user){
-    currentUser=user;
-    loginModal.style.display='none';
+verifyOTP.addEventListener('click',()=>{
+  const code=otpInput.value.trim();
+  if(!code){alert('Enter OTP');return;}
+  confirmationResult.confirm(code).then(res=>{
+    currentUser=res.user;
     checkProfile();
-  }else{
-    loginModal.style.display='flex';
-  }
+  }).catch(e=>alert('OTP verification failed'));
 });
 
-// ---------------- PROFILE ----------------
-async function checkProfile(){
-  const uref = ref(db,'users/'+currentUser.uid);
-  const snap = await get(uref);
-  if(!snap.exists() || !snap.val().username){
-    profileModal.style.display='flex';
-  }else{
-    profileModal.style.display='none';
-    enableChat();
-  }
+/* ------------------- Profile Setup ------------------- */
+function showScreen(screen){
+  [loginScreen,profileScreen,chatMenu,chatScreen].forEach(s=>s.classList.remove('active'));
+  screen.classList.add('active');
 }
 
-pfpInput.addEventListener('change',()=>{
-  const file = pfpInput.files[0];
-  if(file){
-    const url = URL.createObjectURL(file);
-    pfpPreview.src=url;
-  }
+function checkProfile(){
+  const userRef = ref(db,'users/'+currentUser.uid);
+  onValue(userRef,snap=>{
+    if(snap.exists()){
+      const data = snap.val();
+      if(data.username && data.pfp){
+        showScreen(chatMenu);
+      }else{
+        showScreen(profileScreen);
+      }
+    }else{
+      showScreen(profileScreen);
+    }
+  },{onlyOnce:true});
+}
+
+saveProfile.addEventListener('click',()=>{
+  const username=usernameInput.value.trim();
+  const file=pfpInput.files[0];
+  if(!username || !file){alert('Set username and profile pic');return;}
+  const reader = new FileReader();
+  reader.onload = ()=>{
+    set(ref(db,'users/'+currentUser.uid),{
+      username,
+      pfp:reader.result
+    }).then(()=>showScreen(chatMenu));
+  };
+  reader.readAsDataURL(file);
 });
 
-saveProfileBtn.addEventListener('click', async()=>{
-  const username = usernameInput.value.trim();
-  if(!username){ alert('Enter username'); return; }
-  let pfpURL = pfpPreview.src;
-  if(pfpInput.files[0]){
-    const file = pfpInput.files[0];
-    const storageRef = sref(storage,'pfp/'+currentUser.uid);
-    await uploadBytes(storageRef,file);
-    pfpURL = await getDownloadURL(storageRef);
+/* ------------------- Chat Screen ------------------- */
+enterChat.addEventListener('click',()=>showScreen(chatScreen));
+backMenu.addEventListener('click',()=>showScreen(chatMenu));
+
+sendMsg.addEventListener('click',()=>{
+  const text=chatInput.value.trim();
+  if(!text && !chatImage.files[0]) return;
+  const msgData = {
+    uid: currentUser.uid,
+    username: usernameInput.value.trim() || 'Anonymous',
+    pfp:'',
+    text:text||'',
+    image:''
+  };
+  if(chatImage.files[0]){
+    const reader = new FileReader();
+    reader.onload = ()=>{
+      msgData.image=reader.result;
+      push(ref(db,'messages'),msgData);
+    }
+    reader.readAsDataURL(chatImage.files[0]);
+  }else{
+    push(ref(db,'messages'),msgData);
   }
-  await set(ref(db,'users/'+currentUser.uid),{ username, pfp:pfpURL });
-  profileModal.style.display='none';
-  enableChat();
+  chatInput.value='';
+  chatImage.value='';
 });
 
-// ---------------- CHAT ----------------
-function enableChat(){
-  msgInput.disabled=false;
-  sendBtn.disabled=false;
-  photoBtn.addEventListener('click',()=>photoInput.click());
-  sendBtn.addEventListener('click',sendMessage);
-  photoInput.addEventListener('change',sendMessage);
-  msgInput.addEventListener('input',()=>{
-    const typingRef = ref(db,'typing/'+currentUser.uid);
-    set(typingRef,true);
-    setTimeout(()=>set(typingRef,false),1000);
-  });
-  const chatRef = ref(db,'messages');
-  onValue(chatRef,snap=>{
-    chatContent.innerHTML='';
-    snap.forEach(s=>{
-      const data = s.val();
-      const div = document.createElement('div');
-      div.className='message';
+/* Render messages in real-time */
+const msgsRef = ref(db,'messages');
+onValue(msgsRef,snap=>{
+  messages.innerHTML='';
+  snap.forEach(child=>{
+    const m = child.val();
+    const div=document.createElement('div');
+    div.className='message';
+    const avatar = document.createElement('img');
+    avatar.src = m.pfp||'https://via.placeholder.com/32';
+    avatar.className='avatar';
+    const content=document.createElement('div');
+    content.className='content';
+    if(m.text) content.textContent=m.text;
+    if(m.image){
       const img = document.createElement('img');
-      img.className='msg-pfp';
-      img.src=data.pfp||'https://via.placeholder.com/36';
-      const msgDiv = document.createElement('div');
-      msgDiv.className='msg-text';
-      msgDiv.textContent=data.text;
-      if(data.photo) msgDiv.innerHTML=`<img src="${data.photo}" style="max-width:120px;border-radius:8px;"><br>`+msgDiv.textContent;
-      div.append(img,msgDiv);
-      chatContent.appendChild(div);
-    });
-    chatContent.scrollTop=chatContent.scrollHeight;
+      img.src=m.image;
+      img.style.maxWidth='150px';
+      img.style.borderRadius='8px';
+      content.appendChild(img);
+    }
+    const meta=document.createElement('div');
+    meta.className='meta';
+    meta.textContent=m.username;
+    div.appendChild(avatar);
+    div.appendChild(content);
+    div.appendChild(meta);
+    messages.appendChild(div);
+    messages.scrollTop=messages.scrollHeight;
   });
-  // Typing indicator
-  const typingRef = ref(db,'typing');
-  onValue(typingRef,snap=>{
-    const val = snap.val()||{};
-    const typingUsers = Object.keys(val).filter(k=>val[k] && k!==currentUser.uid);
-    typingIndicator.textContent = typingUsers.length ? 'Someone is typing...' : '';
-  });
-}
+});
 
-async function sendMessage(){
-  let text = msgInput.value;
-  let photoFile = photoInput.files[0];
-  let photoURL = '';
-  if(photoFile){
-    const storageRef = sref(storage,'photos/'+Date.now());
-    await uploadBytes(storageRef,photoFile);
-    photoURL = await getDownloadURL(storageRef);
-  }
-  if(!text && !photoURL) return;
-  const userSnap = await get(ref(db,'users/'+currentUser.uid));
-  const userData = userSnap.val();
-  const msgRef = push(ref(db,'messages'));
-  await set(msgRef,{ uid:currentUser.uid, username:userData.username, pfp:userData.pfp||'', text, photo:photoURL, timestamp:Date.now() });
-  msgInput.value='';
-  photoInput.value='';
-}
 </script>
 </body>
 </html>
