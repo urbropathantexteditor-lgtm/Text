@@ -3,261 +3,234 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>General Chat — Clocktower Theme</title>
+<title>Ur Bro — Group Chat</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
-
-  body, html { margin:0; padding:0; font-family: 'Roboto', sans-serif; height:100%; background:#0b1220; color:#f1f5f9; display:flex; justify-content:center; align-items:center; }
-  body { background: url('https://i.ibb.co/CKcC8D7/clocktower-bg.jpg') no-repeat center center fixed; background-size: cover; }
-
-  .chat-app { width:100%; max-width:450px; height:90%; background:rgba(11,18,32,0.85); border-radius:12px; display:flex; flex-direction:column; overflow:hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.6);}
-  
-  .header { padding:12px; background:rgba(16,185,129,0.9); display:flex; justify-content:space-between; align-items:center; color:#fff; font-weight:700; }
-  .header h2 { margin:0; font-size:18px; }
-  .header button { background:transparent; border:none; color:#fff; font-weight:700; cursor:pointer; }
-
-  .chat-messages { flex:1; padding:12px; overflow-y:auto; display:flex; flex-direction:column; gap:8px; }
-  .message { display:flex; gap:8px; align-items:flex-start; animation:fadeIn 0.3s ease; }
-  .message .pfp { width:36px; height:36px; border-radius:50%; object-fit:cover; }
-  .message .content { max-width:75%; background:rgba(255,255,255,0.05); padding:8px 10px; border-radius:10px; word-break:break-word; }
-  .message .username { font-size:12px; color:#a1aab8; font-weight:600; margin-bottom:2px; }
-
-  .typing { font-size:12px; color:#10b981; font-style:italic; margin-left:44px; }
-  
-  .chat-input { display:flex; padding:8px; gap:6px; background:rgba(0,0,0,0.4);}
-  .chat-input input[type="text"] { flex:1; padding:10px; border-radius:8px; border:none; outline:none; }
-  .chat-input input[type="file"] { display:none; }
-  .chat-input button { padding:8px 12px; background:#10b981; border:none; border-radius:8px; color:#fff; cursor:pointer; }
-
-  .overlay { position:fixed; inset:0; background:rgba(0,0,0,0.7); display:flex; align-items:center; justify-content:center; z-index:2000; }
-  .loginModal, .profileModal { background:#071025; padding:22px; border-radius:12px; width:90%; max-width:400px; text-align:center; }
-  .loginModal button, .profileModal button { margin-top:12px; width:100%; padding:10px; border:none; border-radius:8px; background:#10b981; color:#fff; cursor:pointer; font-weight:600; }
-
-  .user-list { position:absolute; top:50px; right:12px; background:rgba(0,0,0,0.7); padding:8px; border-radius:8px; max-height:200px; overflow-y:auto; display:none; }
-  .user-item { display:flex; align-items:center; gap:6px; margin-bottom:6px; }
-  .user-item img { width:24px; height:24px; border-radius:50%; }
-
-  @keyframes fadeIn { 0% {opacity:0;} 100% {opacity:1;} }
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+  body{margin:0;font-family:'Inter',sans-serif;background:url('https://images.unsplash.com/photo-1603063747545-4f0d1c8f7b70?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8Y2xvY2t0b3dlcnx8fHx8fDE2OTY2OTk3OTU&ixlib=rb-4.0.3&q=80&w=1080') no-repeat center center fixed;background-size:cover;color:#fff;display:flex;justify-content:center;align-items:flex-start;padding:0;}
+  .chat-app{width:100%;max-width:600px;margin-top:40px;background:rgba(0,0,0,0.6);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;min-height:80vh;}
+  .header{background:rgba(0,0,0,0.7);padding:12px;display:flex;justify-content:space-between;align-items:center;}
+  .header h2{margin:0;font-weight:600;}
+  .user-list-btn{cursor:pointer;background:#10b981;padding:6px 10px;border:none;border-radius:6px;font-weight:600;}
+  #userListPanel{position:fixed;top:0;right:-300px;width:280px;height:100%;background:rgba(0,0,0,0.9);transition:0.3s;padding:12px;overflow-y:auto;z-index:1000;}
+  #userListPanel.show{right:0;}
+  .user-item{display:flex;align-items:center;margin-bottom:8px;}
+  .user-item img{width:30px;height:30px;border-radius:50%;margin-right:8px;}
+  .chat-messages{flex:1;padding:12px;overflow-y:auto;display:flex;flex-direction:column;}
+  .message{margin-bottom:12px;animation:fadeIn 0.5s ease;}
+  .message .meta{font-size:12px;color:#aaa;}
+  .message .text{font-size:16px;margin-top:2px;}
+  .message img{max-width:200px;border-radius:8px;margin-top:4px;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+  .typing-indicator{font-size:12px;color:#aaa;font-style:italic;margin-bottom:8px;}
+  .input-panel{display:flex;gap:6px;padding:10px;background:rgba(0,0,0,0.7);}
+  .input-panel input[type="text"]{flex:1;padding:8px;border-radius:6px;border:none;background:#1a1a1a;color:#fff;}
+  .input-panel input[type="file"]{display:none;}
+  .input-panel button{background:#10b981;padding:6px 10px;border:none;border-radius:6px;color:#000;font-weight:600;cursor:pointer;}
+  .overlay{position:fixed;inset:0;background:rgba(0,0,0,0.8);display:flex;justify-content:center;align-items:center;z-index:2000;}
+  .overlay-content{background:#071025;padding:20px;border-radius:12px;width:90%;max-width:360px;text-align:center;}
+  .overlay-content input{width:100%;padding:8px;margin:8px 0;border-radius:6px;border:none;}
+  .overlay-content img{width:80px;height:80px;border-radius:50%;object-fit:cover;margin-bottom:8px;}
 </style>
 </head>
 <body>
 
-<div class="chat-app">
+<div class="chat-app" id="chatApp">
   <div class="header">
-    <h2>General Chat</h2>
-    <button id="userListBtn">Users</button>
+    <h2>Ur Bro — Group Chat</h2>
+    <button class="user-list-btn" id="showUsersBtn">Users</button>
   </div>
-
   <div class="chat-messages" id="messages"></div>
-  <div class="typing" id="typingIndicator" style="display:none;">Someone is typing...</div>
-
-  <div class="chat-input">
-    <input type="text" id="msgInput" placeholder="Type a message" disabled>
-    <button id="sendBtn">Send</button>
-    <button id="photoBtn">📷</button>
+  <div class="typing-indicator" id="typingIndicator"></div>
+  <div class="input-panel">
+    <input type="text" id="msgInput" placeholder="Type a message...">
     <input type="file" id="photoInput" accept="image/*">
-  </div>
-
-  <div class="user-list" id="userList"></div>
-</div>
-
-<div id="overlay" class="overlay">
-  <div class="loginModal">
-    <h3>Login Required</h3>
-    <p>You must sign in with Google to continue</p>
-    <button id="loginBtn">Login with Google</button>
+    <button id="sendPhotoBtn">📷</button>
+    <button id="sendBtn">Send</button>
   </div>
 </div>
 
-<div id="profileOverlay" class="overlay" style="display:none">
-  <div class="profileModal">
-    <h3>Set Your Profile</h3>
-    <input type="text" id="usernameInput" placeholder="Enter username" style="width:100%;padding:10px;border-radius:8px;border:none;margin-top:10px;">
-    <input type="file" id="pfpInput" accept="image/*" style="margin-top:10px;">
-    <button id="saveProfileBtn">Save Profile</button>
+<div id="userListPanel">
+  <h3>Active Users</h3>
+  <div id="userList"></div>
+</div>
+
+<div class="overlay" id="loginOverlay">
+  <div class="overlay-content">
+    <h3>Login & Set Profile</h3>
+    <button id="googleLoginBtn">Login with Google</button>
+    <div id="profileSetup" style="display:none;">
+      <img id="pfpPreview" src="" alt="Profile Picture">
+      <input type="text" id="usernameInput" placeholder="Choose a username">
+      <input type="file" id="pfpInput" accept="image/*">
+      <button id="saveProfileBtn">Save Profile</button>
+    </div>
   </div>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getDatabase, ref, push, onChildAdded, set, get, update, child } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { getDatabase, ref, set, get, onValue, update, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  databaseURL: "YOUR_DB_URL",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_STORAGE_BUCKET",
-  messagingSenderId: "YOUR_MSG_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyDFPMf8HLMpS6DbZkdCR6T7GAm5sfz-TOw",
+  authDomain: "urbrokhan-f631c.firebaseapp.com",
+  databaseURL: "https://urbrokhan-f631c-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "urbrokhan-f631c",
+  storageBucket: "urbrokhan-f631c.appspot.com",
+  messagingSenderId: "533086015351",
+  appId: "1:533086015351:web:a12328fbc4906e4f5c9b72"
 };
 
 const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
 const auth = getAuth(app);
+const db = getDatabase(app);
 const provider = new GoogleAuthProvider();
 
-const overlay = document.getElementById('overlay');
-const loginBtn = document.getElementById('loginBtn');
-const profileOverlay = document.getElementById('profileOverlay');
-const usernameInput = document.getElementById('usernameInput');
+/* ---------------- Elements ---------------- */
+const loginOverlay = document.getElementById('loginOverlay');
+const googleLoginBtn = document.getElementById('googleLoginBtn');
+const profileSetup = document.getElementById('profileSetup');
 const pfpInput = document.getElementById('pfpInput');
+const pfpPreview = document.getElementById('pfpPreview');
+const usernameInput = document.getElementById('usernameInput');
 const saveProfileBtn = document.getElementById('saveProfileBtn');
-
+const messagesEl = document.getElementById('messages');
 const msgInput = document.getElementById('msgInput');
 const sendBtn = document.getElementById('sendBtn');
-const messagesEl = document.getElementById('messages');
-const typingIndicator = document.getElementById('typingIndicator');
-
-const photoBtn = document.getElementById('photoBtn');
 const photoInput = document.getElementById('photoInput');
-
-const userListBtn = document.getElementById('userListBtn');
+const sendPhotoBtn = document.getElementById('sendPhotoBtn');
+const typingIndicator = document.getElementById('typingIndicator');
+const showUsersBtn = document.getElementById('showUsersBtn');
+const userListPanel = document.getElementById('userListPanel');
 const userListEl = document.getElementById('userList');
 
 let currentUser = null;
-let currentProfile = null;
+let currentUid = null;
+let currentData = null;
+let typingTimeout = null;
 
-// Login
-loginBtn.addEventListener('click', async()=>{
-  try{
-    await signInWithPopup(auth, provider);
-  }catch(e){ console.error(e); alert("Login failed."); }
-});
+/* ---------------- Auth & Profile ---------------- */
+googleLoginBtn.onclick = async () => {
+  try {
+    const result = await signInWithPopup(auth, provider);
+  } catch(err){ console.error(err); alert('Login failed'); }
+};
 
-onAuthStateChanged(auth, async(user)=>{
+onAuthStateChanged(auth, async user => {
   if(user){
     currentUser = user;
-    overlay.style.display='none';
-    checkProfile();
+    currentUid = user.uid;
+    // check if profile exists
+    const snap = await get(ref(db,'users/'+currentUid));
+    if(!snap.exists() || !snap.val().username || !snap.val().pfp){
+      loginOverlay.style.display='flex';
+      profileSetup.style.display='block';
+    } else {
+      currentData = snap.val();
+      loginOverlay.style.display='none';
+      initChat();
+    }
   } else {
-    overlay.style.display='flex';
-    msgInput.disabled=true;
+    currentUser = null;
+    currentUid = null;
+    currentData = null;
+    loginOverlay.style.display='flex';
+    profileSetup.style.display='none';
   }
 });
 
-// Check if profile exists
-async function checkProfile(){
-  const snap = await get(ref(db,'profiles/'+currentUser.uid));
-  if(!snap.exists()){
-    profileOverlay.style.display='flex';
-  } else {
-    currentProfile = snap.val();
-    msgInput.disabled=false;
-    loadMessages();
-    loadUsers();
-  }
+pfpInput.onchange = e => {
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = () => { pfpPreview.src = reader.result; }
+  reader.readAsDataURL(file);
+};
+
+saveProfileBtn.onclick = async () => {
+  const uname = usernameInput.value.trim();
+  const pfp = pfpPreview.src;
+  if(!uname || !pfp){ alert('Set username and profile picture'); return; }
+  await set(ref(db,'users/'+currentUid),{username:uname,pfp:pfp});
+  currentData = {username:uname,pfp:pfp};
+  loginOverlay.style.display='none';
+  initChat();
+};
+
+/* ---------------- Chat ---------------- */
+function initChat(){
+  // display messages in real-time
+  const msgRef = ref(db,'messages');
+  onValue(msgRef,snap=>{
+    messagesEl.innerHTML='';
+    snap.forEach(child=>{
+      const m = child.val();
+      const div = document.createElement('div');
+      div.className='message';
+      div.innerHTML=`<div class="meta"><img src="${m.pfp}" style="width:24px;height:24px;border-radius:50%;vertical-align:middle;margin-right:4px">${m.username}</div><div class="text">${m.text || ''}${m.photo ? '<br><img src="'+m.photo+'">' : ''}</div>`;
+      messagesEl.appendChild(div);
+    });
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  });
+
+  // typing indicator
+  msgInput.addEventListener('input',()=>{
+    const typingRef = ref(db,'typing/'+currentUid);
+    set(typingRef,{username:currentData.username});
+    if(typingTimeout) clearTimeout(typingTimeout);
+    typingTimeout = setTimeout(()=>{ set(typingRef,null); },1000);
+  });
+
+  // show who is typing
+  const typingRefAll = ref(db,'typing');
+  onValue(typingRefAll,snap=>{
+    let names = [];
+    snap.forEach(child=>{ if(child.key !== currentUid) names.push(child.val().username); });
+    typingIndicator.textContent = names.length ? names.join(', ')+' is typing...' : '';
+  });
+
+  sendBtn.onclick = sendMessage;
+  sendPhotoBtn.onclick = ()=> photoInput.click();
+  photoInput.onchange = async e=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = async () => {
+      await push(ref(db,'messages'),{username:currentData.username,pfp:currentData.pfp,photo:reader.result,timestamp:Date.now()});
+      photoInput.value='';
+    };
+    reader.readAsDataURL(file);
+  };
 }
 
-// Save profile
-saveProfileBtn.addEventListener('click', async()=>{
-  const username = usernameInput.value.trim();
-  if(!username){ alert('Enter username'); return; }
-  let pfpUrl = '';
-  if(pfpInput.files[0]){
-    const reader = new FileReader();
-    reader.onload = async(e)=>{
-      pfpUrl = e.target.result;
-      await set(ref(db,'profiles/'+currentUser.uid), {username, pfp:pfpUrl});
-      currentProfile={username,pfp:pfpUrl};
-      profileOverlay.style.display='none';
-      msgInput.disabled=false;
-      loadMessages();
-      loadUsers();
-    }
-    reader.readAsDataURL(pfpInput.files[0]);
-  } else {
-    await set(ref(db,'profiles/'+currentUser.uid), {username, pfp:''});
-    currentProfile={username,pfp:''};
-    profileOverlay.style.display='none';
-    msgInput.disabled=false;
-    loadMessages();
-    loadUsers();
-  }
-});
-
-// Send message
-sendBtn.addEventListener('click', sendMsg);
-msgInput.addEventListener('keypress', (e)=>{
-  if(e.key==='Enter') sendMsg();
-});
-
-function sendMsg(){
-  const text = msgInput.value.trim();
-  if(!text) return;
-  const msgRef = ref(db,'messages');
-  push(msgRef, {uid:currentUser.uid, username:currentProfile.username, pfp:currentProfile.pfp, text, ts:Date.now()});
+function sendMessage(){
+  const txt = msgInput.value.trim();
+  if(!txt) return;
+  push(ref(db,'messages'),{username:currentData.username,pfp:currentData.pfp,text:txt,timestamp:Date.now()});
   msgInput.value='';
 }
 
-// Photo
-photoBtn.addEventListener('click', ()=> photoInput.click());
-photoInput.addEventListener('change', ()=>{
-  const file = photoInput.files[0];
-  if(!file) return;
-  const reader = new FileReader();
-  reader.onload = (e)=>{
-    const msgRef = ref(db,'messages');
-    push(msgRef, {uid:currentUser.uid, username:currentProfile.username, pfp:currentProfile.pfp, photo:e.target.result, ts:Date.now()});
-  }
-  reader.readAsDataURL(file);
+/* ---------------- User List ---------------- */
+showUsersBtn.onclick = ()=>{
+  userListPanel.classList.toggle('show');
+};
+const usersRef = ref(db,'users');
+onValue(usersRef,snap=>{
+  userListEl.innerHTML='';
+  let total=0;
+  snap.forEach(child=>{
+    const u = child.val();
+    if(u.username && u.pfp){
+      total++;
+      const div = document.createElement('div');
+      div.className='user-item';
+      div.innerHTML=`<img src="${u.pfp}"><span>${u.username}</span>`;
+      userListEl.appendChild(div);
+    }
+  });
 });
 
-// Load messages
-function loadMessages(){
-  const msgsRef = ref(db,'messages');
-  onChildAdded(msgsRef, (snap)=>{
-    const data = snap.val();
-    const div = document.createElement('div');
-    div.className='message';
-    const pfp = document.createElement('img');
-    pfp.className='pfp';
-    pfp.src = data.pfp || 'https://i.ibb.co/7W0Q6wz/default-pfp.png';
-    const content = document.createElement('div');
-    content.className='content';
-    if(data.text) content.textContent = data.text;
-    if(data.photo){
-      const img = document.createElement('img');
-      img.src = data.photo; img.style.maxWidth='150px'; img.style.borderRadius='8px';
-      content.appendChild(img);
-    }
-    const uname = document.createElement('div');
-    uname.className='username';
-    uname.textContent = data.username;
-    content.prepend(uname);
-    div.appendChild(pfp);
-    div.appendChild(content);
-    messagesEl.appendChild(div);
-    messagesEl.scrollTop=messagesEl.scrollHeight;
-  });
-}
-
-// Users
-userListBtn.addEventListener('click', ()=>{ userListEl.style.display = userListEl.style.display==='none'?'block':'none'; });
-async function loadUsers(){
-  const profilesRef = ref(db,'profiles');
-  onChildAdded(profilesRef, (snap)=>{
-    renderUserList();
-  });
-}
-
-async function renderUserList(){
-  const snap = await get(ref(db,'profiles'));
-  if(!snap.exists()) return;
-  userListEl.innerHTML='';
-  const data = snap.val();
-  const total = Object.keys(data).length;
-  const header = document.createElement('div'); header.textContent=`Total Users: ${total}`; header.style.fontWeight='700'; header.style.marginBottom='6px';
-  userListEl.appendChild(header);
-  Object.values(data).forEach(u=>{
-    const div = document.createElement('div'); div.className='user-item';
-    const img = document.createElement('img'); img.src=u.pfp || 'https://i.ibb.co/7W0Q6wz/default-pfp.png';
-    const span = document.createElement('span'); span.textContent=u.username;
-    div.appendChild(img); div.appendChild(span);
-    userListEl.appendChild(div);
-  });
-}
 </script>
 </body>
 </html>
