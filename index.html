@@ -14,8 +14,6 @@
   h1{font-size:18px;margin:0}
   .small{font-size:13px;color:var(--muted)}
   .card{background:var(--card);border-radius:12px;padding:14px;margin-bottom:12px;box-shadow:0 6px 18px rgba(2,6,23,0.6)}
-  .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-  .col{flex:1;min-width:260px}
   textarea{width:100%;min-height:84px;padding:12px;border-radius:8px;background:var(--glass);border:none;color:white;font-size:16px;resize:vertical}
   .styles{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:10px;max-height:60vh;overflow:auto;padding:6px}
   .style{background:var(--glass);padding:10px;border-radius:10px;cursor:pointer;text-align:center;min-height:48px;display:flex;align-items:center;justify-content:center;word-break:break-word;transition:transform .12s,background .12s}
@@ -52,6 +50,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
+// ----- Your Firebase Config -----
 const firebaseConfig = {
   apiKey: "AIzaSyDFPMf8HLMpS6DbZkdCR6T7GAm5sfz-TOw",
   authDomain: "urbrokhan-f631c.firebaseapp.com",
@@ -85,6 +84,28 @@ onAuthStateChanged(auth, user => {
 const emojiList = ['🔥','✨','💫','💖','🌸','⭐','💥','🌟','❤️','💎','💀','🎯','🎉','🥶','⚡','🌈','🌻','🐉','💚','😎','🌺','🍀','🌼','🎀','🦋','🍁','🎵','🎶','🍄','🌹','🍂','🌷','🍉','🍇','🍓','🍊','🍌','🥭','🍍','🍑','🍒','🥥','🥝','🍋','🥕','🌽','🥦','🍆','🥔'];
 const symbolList = ['♡','❀','★','✦','✧','❁','☯','☾','✪','❖','☘','☠','☢','⚡','☃','✈','⚜','❂','❉','✿','✺','❇','✤','✱','✵','✹','✺','✸','✷','❈','❊','❋','❌','⚔','⚙','☂','☁','☄','✌','✎','✏','☑','✒','♛','♚','♞','♟'];
 
+const fontStyles = [
+  t=>`<span style="font-family:cursive;font-size:18px">${t}</span>`,
+  t=>`<span style="font-family:monospace;font-size:17px">${t}</span>`,
+  t=>`<span style="font-family:serif;font-size:20px">${t}</span>`,
+  t=>`<span style="font-family:sans-serif;font-size:16px">${t}</span>`,
+  t=>`<span style="font-family:Impact;font-size:22px">${t}</span>`,
+  t=>`<span style="font-family:Arial Black;font-size:21px">${t}</span>`,
+  t=>`<span style="font-family:Tahoma;font-size:19px">${t}</span>`,
+  t=>`<span style="font-family:Verdana;font-size:18px">${t}</span>`,
+  t=>`<span style="font-family:Georgia;font-size:20px">${t}</span>`,
+  t=>`<span style="font-family:Courier New;font-size:18px">${t}</span>`,
+  t=>`<span style="font-family:Lucida Console;font-size:19px">${t}</span>`,
+  t=>`<span style="font-family:Trebuchet MS;font-size:18px">${t}</span>`,
+  t=>`<span style="font-family:Palatino Linotype;font-size:20px">${t}</span>`,
+  t=>`<span style="font-family:Book Antiqua;font-size:18px">${t}</span>`,
+  t=>`<span style="font-family:Comic Sans MS;font-size:22px">${t}</span>`,
+  t=>`<span style="font-family:Gill Sans;font-size:17px">${t}</span>`,
+  t=>`<span style="font-family:Optima;font-size:20px">${t}</span>`,
+  t=>`<span style="font-family:Segoe Print;font-size:19px">${t}</span>`,
+  t=>`<span style="font-family:Lucida Sans;font-size:18px">${t}</span>`
+];
+
 function renderStyles(){
   stylesList.innerHTML='';
   const val = inputEl.value || '';
@@ -93,13 +114,14 @@ function renderStyles(){
     t=>`♡ ${t} ♡`, t=>`❀ ${t} ❀`, t=>`★ ${t} ★`, t=>`✦ ${t} ✦`, t=>`✧ ${t} ✧`,
     t=>`❁ ${t} ❁`, t=>`☯ ${t} ☯`, t=>`☾ ${t} ☽`, t=>`✪ ${t} ✪`, t=>`❖ ${t} ❖`, t=>`☘ ${t} ☘`,
     ...emojiList.map(e=>t=>`${e} ${t} ${e}`),
-    ...symbolList.map(s=>t=>`${s} ${t} ${s}`)
+    ...symbolList.map(s=>t=>`${s} ${t} ${s}`),
+    ...fontStyles
   ];
   styleFns.forEach(fn=>{
     const div=document.createElement('div');
     div.className='style';
-    div.textContent=fn(val);
-    div.addEventListener('click',()=>navigator.clipboard.writeText(div.textContent));
+    div.innerHTML=fn(val);
+    div.addEventListener('click',()=>navigator.clipboard.writeText(val));
     stylesList.appendChild(div);
   });
 }
