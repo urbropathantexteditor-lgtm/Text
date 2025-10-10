@@ -1,236 +1,169 @@
-<!DOCTYPE html>
+<!doctype html>
+
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ur Bro — Group Chat</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Group Chat — Clocktower Theme</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
-  body{margin:0;font-family:'Inter',sans-serif;background:url('https://images.unsplash.com/photo-1603063747545-4f0d1c8f7b70?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8Y2xvY2t0b3dlcnx8fHx8fDE2OTY2OTk3OTU&ixlib=rb-4.0.3&q=80&w=1080') no-repeat center center fixed;background-size:cover;color:#fff;display:flex;justify-content:center;align-items:flex-start;padding:0;}
-  .chat-app{width:100%;max-width:600px;margin-top:40px;background:rgba(0,0,0,0.6);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;min-height:80vh;}
-  .header{background:rgba(0,0,0,0.7);padding:12px;display:flex;justify-content:space-between;align-items:center;}
-  .header h2{margin:0;font-weight:600;}
-  .user-list-btn{cursor:pointer;background:#10b981;padding:6px 10px;border:none;border-radius:6px;font-weight:600;}
-  #userListPanel{position:fixed;top:0;right:-300px;width:280px;height:100%;background:rgba(0,0,0,0.9);transition:0.3s;padding:12px;overflow-y:auto;z-index:1000;}
-  #userListPanel.show{right:0;}
-  .user-item{display:flex;align-items:center;margin-bottom:8px;}
-  .user-item img{width:30px;height:30px;border-radius:50%;margin-right:8px;}
-  .chat-messages{flex:1;padding:12px;overflow-y:auto;display:flex;flex-direction:column;}
-  .message{margin-bottom:12px;animation:fadeIn 0.5s ease;}
-  .message .meta{font-size:12px;color:#aaa;}
-  .message .text{font-size:16px;margin-top:2px;}
-  .message img{max-width:200px;border-radius:8px;margin-top:4px;}
-  @keyframes fadeIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
-  .typing-indicator{font-size:12px;color:#aaa;font-style:italic;margin-bottom:8px;}
-  .input-panel{display:flex;gap:6px;padding:10px;background:rgba(0,0,0,0.7);}
-  .input-panel input[type="text"]{flex:1;padding:8px;border-radius:6px;border:none;background:#1a1a1a;color:#fff;}
-  .input-panel input[type="file"]{display:none;}
-  .input-panel button{background:#10b981;padding:6px 10px;border:none;border-radius:6px;color:#000;font-weight:600;cursor:pointer;}
-  .overlay{position:fixed;inset:0;background:rgba(0,0,0,0.8);display:flex;justify-content:center;align-items:center;z-index:2000;}
-  .overlay-content{background:#071025;padding:20px;border-radius:12px;width:90%;max-width:360px;text-align:center;}
-  .overlay-content input{width:100%;padding:8px;margin:8px 0;border-radius:6px;border:none;}
-  .overlay-content img{width:80px;height:80px;border-radius:50%;object-fit:cover;margin-bottom:8px;}
+  body{margin:0;font-family:Arial,sans-serif;background:url('https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&fit=crop&w=1470&q=80') no-repeat center/cover;color:white;display:flex;justify-content:center;align-items:center;height:100vh}
+  .app{width:100%;max-width:500px;background:rgba(0,0,0,0.6);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;height:80vh}
+  .header{background:rgba(0,0,0,0.8);padding:12px;text-align:center;font-size:18px;font-weight:bold;position:relative}
+  .closeChat{position:absolute;right:12px;top:12px;cursor:pointer;font-size:18px}  
+  .chatArea{flex:1;padding:12px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;}
+  .msg{padding:10px;border-radius:10px;max-width:80%;display:flex;gap:8px;align-items:flex-start}
+  .msg.user{align-self:flex-end;background:rgba(16,185,129,0.8);}
+  .msg.other{align-self:flex-start;background:rgba(30,41,59,0.8);}
+  .msg img.pfp{width:32px;height:32px;border-radius:50%;object-fit:cover}
+  .msgContent{display:flex;flex-direction:column;}
+  .username{font-size:12px;color:#94a3b8}
+  .text{font-size:16px}
+  .inputArea{display:flex;gap:8px;padding:8px;background:rgba(0,0,0,0.7)}
+  .inputArea input{flex:1;padding:8px;border-radius:8px;border:none}
+  .inputArea button{padding:8px 12px;border:none;border-radius:8px;background:#10b981;color:#06201b;cursor:pointer}
+  .hidden{display:none}
+  .typing{font-size:12px;color:#94a3b8;animation:blink 1s infinite}
+  @keyframes blink{0%,50%,100%{opacity:0}25%,75%{opacity:1}}
+  .loginArea{display:flex;flex-direction:column;gap:8px;padding:12px}
+  .loginArea input{padding:8px;border-radius:8px;border:none}
+  .profileSetup{display:flex;flex-direction:column;gap:8px;padding:12px}
 </style>
 </head>
 <body>
-
-<div class="chat-app" id="chatApp">
-  <div class="header">
-    <h2>Ur Bro — Group Chat</h2>
-    <button class="user-list-btn" id="showUsersBtn">Users</button>
-  </div>
-  <div class="chat-messages" id="messages"></div>
-  <div class="typing-indicator" id="typingIndicator"></div>
-  <div class="input-panel">
-    <input type="text" id="msgInput" placeholder="Type a message...">
-    <input type="file" id="photoInput" accept="image/*">
-    <button id="sendPhotoBtn">📷</button>
-    <button id="sendBtn">Send</button>
-  </div>
-</div>
-
-<div id="userListPanel">
-  <h3>Active Users</h3>
-  <div id="userList"></div>
-</div>
-
-<div class="overlay" id="loginOverlay">
-  <div class="overlay-content">
-    <h3>Login & Set Profile</h3>
-    <button id="googleLoginBtn">Login with Google</button>
-    <div id="profileSetup" style="display:none;">
-      <img id="pfpPreview" src="" alt="Profile Picture">
-      <input type="text" id="usernameInput" placeholder="Choose a username">
-      <input type="file" id="pfpInput" accept="image/*">
-      <button id="saveProfileBtn">Save Profile</button>
+<div class="app" id="app">  <!-- Login -->  <div id="loginDiv" class="loginArea">
+    <h2>Login</h2>
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Password">
+    <button id="loginBtn">Login / Register</button>
+    <div id="loginMsg"></div>
+  </div>  <!-- Profile Setup -->  <div id="profileDiv" class="profileSetup hidden">
+    <h2>Set Profile</h2>
+    <input type="text" id="username" placeholder="Username">
+    <input type="file" id="pfp" accept="image/*">
+    <button id="saveProfile">Save Profile</button>
+  </div>  <!-- Chat -->  <div id="chatDiv" class="hidden" style="flex:1;display:flex;flex-direction:column">
+    <div class="header">General Chat <span class="closeChat" id="closeChat">⮐</span></div>
+    <div class="chatArea" id="chatArea"></div>
+    <div class="inputArea">
+      <input type="text" id="msgInput" placeholder="Type a message">
+      <input type="file" id="photoInput" accept="image/*">
+      <button id="sendBtn">Send</button>
     </div>
-  </div>
-</div>
-
-<script type="module">
+    <div class="typing" id="typingIndicator" style="display:none">Someone is typing...</div>
+  </div></div><script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { getDatabase, ref, set, get, onValue, update, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { getDatabase, ref, push, onChildAdded, set, get, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDFPMf8HLMpS6DbZkdCR6T7GAm5sfz-TOw",
-  authDomain: "urbrokhan-f631c.firebaseapp.com",
-  databaseURL: "https://urbrokhan-f631c-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "urbrokhan-f631c",
-  storageBucket: "urbrokhan-f631c.appspot.com",
-  messagingSenderId: "533086015351",
-  appId: "1:533086015351:web:a12328fbc4906e4f5c9b72"
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_AUTH_DOMAIN",
+  databaseURL: "YOUR_DB_URL",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_STORAGE_BUCKET",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
 };
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getDatabase(app);
-const provider = new GoogleAuthProvider();
 
-/* ---------------- Elements ---------------- */
-const loginOverlay = document.getElementById('loginOverlay');
-const googleLoginBtn = document.getElementById('googleLoginBtn');
-const profileSetup = document.getElementById('profileSetup');
-const pfpInput = document.getElementById('pfpInput');
-const pfpPreview = document.getElementById('pfpPreview');
-const usernameInput = document.getElementById('usernameInput');
-const saveProfileBtn = document.getElementById('saveProfileBtn');
-const messagesEl = document.getElementById('messages');
+const loginDiv = document.getElementById('loginDiv');
+const profileDiv = document.getElementById('profileDiv');
+const chatDiv = document.getElementById('chatDiv');
+const loginBtn = document.getElementById('loginBtn');
+const loginMsg = document.getElementById('loginMsg');
+const saveProfile = document.getElementById('saveProfile');
+const chatArea = document.getElementById('chatArea');
 const msgInput = document.getElementById('msgInput');
 const sendBtn = document.getElementById('sendBtn');
-const photoInput = document.getElementById('photoInput');
-const sendPhotoBtn = document.getElementById('sendPhotoBtn');
+const usernameInput = document.getElementById('username');
+const pfpInput = document.getElementById('pfp');
 const typingIndicator = document.getElementById('typingIndicator');
-const showUsersBtn = document.getElementById('showUsersBtn');
-const userListPanel = document.getElementById('userListPanel');
-const userListEl = document.getElementById('userList');
+const closeChat = document.getElementById('closeChat');
+const photoInput = document.getElementById('photoInput');
 
 let currentUser = null;
-let currentUid = null;
-let currentData = null;
-let typingTimeout = null;
 
-/* ---------------- Auth & Profile ---------------- */
-googleLoginBtn.onclick = async () => {
-  try {
-    const result = await signInWithPopup(auth, provider);
-  } catch(err){ console.error(err); alert('Login failed'); }
-};
+loginBtn.addEventListener('click', async ()=>{
+  const email = document.getElementById('email').value;
+  const pass = document.getElementById('password').value;
+  if(!email||!pass){ loginMsg.textContent='Enter email & password'; return; }
+  try{
+    let user;
+    try{ user = await signInWithEmailAndPassword(auth,email,pass); } catch(e){ user = await createUserWithEmailAndPassword(auth,email,pass); }
+  }catch(err){ loginMsg.textContent = 'Login failed: '+err.message; }
+});
 
-onAuthStateChanged(auth, async user => {
-  if(user){
-    currentUser = user;
-    currentUid = user.uid;
-    // check if profile exists
-    const snap = await get(ref(db,'users/'+currentUid));
-    if(!snap.exists() || !snap.val().username || !snap.val().pfp){
-      loginOverlay.style.display='flex';
-      profileSetup.style.display='block';
-    } else {
-      currentData = snap.val();
-      loginOverlay.style.display='none';
-      initChat();
+saveProfile.addEventListener('click', async ()=>{
+  const uname = usernameInput.value.trim();
+  const file = pfpInput.files[0];
+  if(!uname||!file){ alert('Enter username & choose profile pic'); return; }
+  const reader = new FileReader();
+  reader.onload = async ()=>{
+    const pfpBase64 = reader.result;
+    await update(ref(db,'users/'+currentUser.uid),{username:uname,pfp:pfpBase64});
+    profileDiv.classList.add('hidden');
+    chatDiv.classList.remove('hidden');
+    startChat();
+  };
+  reader.readAsDataURL(file);
+});
+
+function startChat(){
+  const messagesRef = ref(db,'messages');
+  onChildAdded(messagesRef,(snap)=>{
+    const msg = snap.val();
+    const div = document.createElement('div');
+    div.className='msg '+(msg.uid===currentUser.uid?'user':'other');
+    let content='';
+    if(msg.photo){ content=`<img src='${msg.photo}' style='max-width:150px;border-radius:8px'>`; }
+    if(msg.text){ content+=`<div class='text'>${msg.text}</div>`; }
+    div.innerHTML=`<img class='pfp' src='${msg.pfp}'><div class='msgContent'><div class='username'>${msg.username}</div>${content}</div>`;
+    chatArea.appendChild(div);
+    chatArea.scrollTop = chatArea.scrollHeight;
+  });
+
+  msgInput.addEventListener('input',()=>{typingIndicator.style.display='block';setTimeout(()=>typingIndicator.style.display='none',1000);});
+
+  sendBtn.addEventListener('click', async ()=>{
+    const text = msgInput.value.trim();
+    const file = photoInput.files[0];
+    if(!text&&!file) return;
+    let photo=null;
+    if(file){
+      const reader = new FileReader();
+      reader.onload= async ()=>{
+        photo = reader.result;
+        await push(ref(db,'messages'),{uid:currentUser.uid,username:currentUser.displayName,pfp:currentUser.photoURL,text,photo});
+        msgInput.value=''; photoInput.value='';
+      };
+      reader.readAsDataURL(file);
+    }else{
+      await push(ref(db,'messages'),{uid:currentUser.uid,username:currentUser.displayName,pfp:currentUser.photoURL,text});
+      msgInput.value='';
     }
-  } else {
-    currentUser = null;
-    currentUid = null;
-    currentData = null;
-    loginOverlay.style.display='flex';
-    profileSetup.style.display='none';
+  });
+}
+
+closeChat.addEventListener('click',()=>{ chatDiv.classList.add('hidden'); });
+
+onAuthStateChanged(auth,user=>{
+  if(user){
+    currentUser=user;
+    loginDiv.classList.add('hidden');
+    get(ref(db,'users/'+user.uid)).then(snap=>{
+      if(snap.exists()&&snap.val().username&&snap.val().pfp){
+        chatDiv.classList.remove('hidden');
+        startChat();
+      }else{
+        profileDiv.classList.remove('hidden');
+      }
+    });
+  }else{
+    loginDiv.classList.remove('hidden');
   }
 });
-
-pfpInput.onchange = e => {
-  const file = e.target.files[0];
-  if(!file) return;
-  const reader = new FileReader();
-  reader.onload = () => { pfpPreview.src = reader.result; }
-  reader.readAsDataURL(file);
-};
-
-saveProfileBtn.onclick = async () => {
-  const uname = usernameInput.value.trim();
-  const pfp = pfpPreview.src;
-  if(!uname || !pfp){ alert('Set username and profile picture'); return; }
-  await set(ref(db,'users/'+currentUid),{username:uname,pfp:pfp});
-  currentData = {username:uname,pfp:pfp};
-  loginOverlay.style.display='none';
-  initChat();
-};
-
-/* ---------------- Chat ---------------- */
-function initChat(){
-  // display messages in real-time
-  const msgRef = ref(db,'messages');
-  onValue(msgRef,snap=>{
-    messagesEl.innerHTML='';
-    snap.forEach(child=>{
-      const m = child.val();
-      const div = document.createElement('div');
-      div.className='message';
-      div.innerHTML=`<div class="meta"><img src="${m.pfp}" style="width:24px;height:24px;border-radius:50%;vertical-align:middle;margin-right:4px">${m.username}</div><div class="text">${m.text || ''}${m.photo ? '<br><img src="'+m.photo+'">' : ''}</div>`;
-      messagesEl.appendChild(div);
-    });
-    messagesEl.scrollTop = messagesEl.scrollHeight;
-  });
-
-  // typing indicator
-  msgInput.addEventListener('input',()=>{
-    const typingRef = ref(db,'typing/'+currentUid);
-    set(typingRef,{username:currentData.username});
-    if(typingTimeout) clearTimeout(typingTimeout);
-    typingTimeout = setTimeout(()=>{ set(typingRef,null); },1000);
-  });
-
-  // show who is typing
-  const typingRefAll = ref(db,'typing');
-  onValue(typingRefAll,snap=>{
-    let names = [];
-    snap.forEach(child=>{ if(child.key !== currentUid) names.push(child.val().username); });
-    typingIndicator.textContent = names.length ? names.join(', ')+' is typing...' : '';
-  });
-
-  sendBtn.onclick = sendMessage;
-  sendPhotoBtn.onclick = ()=> photoInput.click();
-  photoInput.onchange = async e=>{
-    const file = e.target.files[0];
-    if(!file) return;
-    const reader = new FileReader();
-    reader.onload = async () => {
-      await push(ref(db,'messages'),{username:currentData.username,pfp:currentData.pfp,photo:reader.result,timestamp:Date.now()});
-      photoInput.value='';
-    };
-    reader.readAsDataURL(file);
-  };
-}
-
-function sendMessage(){
-  const txt = msgInput.value.trim();
-  if(!txt) return;
-  push(ref(db,'messages'),{username:currentData.username,pfp:currentData.pfp,text:txt,timestamp:Date.now()});
-  msgInput.value='';
-}
-
-/* ---------------- User List ---------------- */
-showUsersBtn.onclick = ()=>{
-  userListPanel.classList.toggle('show');
-};
-const usersRef = ref(db,'users');
-onValue(usersRef,snap=>{
-  userListEl.innerHTML='';
-  let total=0;
-  snap.forEach(child=>{
-    const u = child.val();
-    if(u.username && u.pfp){
-      total++;
-      const div = document.createElement('div');
-      div.className='user-item';
-      div.innerHTML=`<img src="${u.pfp}"><span>${u.username}</span>`;
-      userListEl.appendChild(div);
-    }
-  });
-});
-
-</script>
-</body>
+</script></body>
 </html>
