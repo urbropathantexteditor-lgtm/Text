@@ -1,62 +1,33 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>ur bro — Stylish Text Generator (Auth + Coins + Coupon)</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ur bro — Stylish Text Generator</title>
 <style>
   :root{--bg:#0f172a;--card:#0b1220;--muted:#94a3b8;--accent:#10b981;--glass:#172033}
   body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;background:var(--bg);color:#f1f5f9;display:flex;justify-content:center;padding:18px}
-  .app{width:100%;max-width:700px}
-  header{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-bottom:12px}
-  .brand{display:flex;gap:12px;align-items:center}
-  .logo{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,#06b6d4,#7c3aed);display:flex;align-items:center;justify-content:center;font-weight:700;color:white}
-  h1{font-size:18px;margin:0}
+  .app{width:100%;max-width:600px}
+  header{display:flex;align-items:center;justify-content:center;margin-bottom:12px}
+  h1{margin:0;font-size:24px;text-align:center}
   .card{background:var(--card);border-radius:12px;padding:14px;margin-bottom:12px;box-shadow:0 6px 18px rgba(2,6,23,0.6)}
-  .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-  .col{flex:1;min-width:200px}
   textarea{width:100%;min-height:84px;padding:12px;border-radius:8px;background:var(--glass);border:none;color:white;font-size:16px;resize:vertical}
   .styles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;max-height:60vh;overflow:auto;padding:6px}
   .style{background:var(--glass);padding:10px;border-radius:10px;cursor:pointer;text-align:center;min-height:48px;display:flex;align-items:center;justify-content:center;word-break:break-word;transition:transform .12s,background .12s}
   .style:hover{transform:translateY(-4px);background:#243343}
-  .chip{background:rgba(255,255,255,0.03);padding:8px 10px;border-radius:999px;color:var(--muted);font-weight:600}
-  .btn{background:var(--accent);color:#06201b;padding:8px 12px;border-radius:8px;border:none;cursor:pointer;font-weight:600}
-  .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted);padding:8px 10px}
-  .wa-btn{position:fixed;right:18px;bottom:18px;background:#25D366;width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(0,0,0,0.4);z-index:1000}
+  .btn{background:var(--accent);color:#06201b;padding:10px 14px;border-radius:8px;border:none;cursor:pointer;font-weight:600;width:100%;margin-bottom:12px}
   .overlay{position:fixed;inset:0;background:linear-gradient(0deg,rgba(0,0,0,0.6),rgba(0,0,0,0.6));display:flex;align-items:center;justify-content:center;z-index:2000}
   .loginModal{background:#071025;padding:22px;border-radius:12px;max-width:420px;width:90%;text-align:center}
-  @media (max-width:600px){header{flex-direction:column;align-items:flex-start} .styles{grid-template-columns:repeat(auto-fit,minmax(120px,1fr))}}
 </style>
 </head>
 <body>
 <div class="app" id="app">
-  <header>
-    <div class="brand">
-      <div class="logo">PB</div>
-      <div><h1>ur bro</h1></div>
-    </div>
-    <div style="display:flex;gap:8px;align-items:center">
-      <div class="chip">Coins: <span id="coinCount">0</span></div>
-      <div class="small" id="userName"></div>
-      <button id="loginBtn" class="btn">Login with Google</button>
-      <button id="logoutBtn" class="btn ghost" style="display:none">Logout</button>
-    </div>
-  </header>
+  <header><h1>ur bro</h1></header>
 
-  <div class="card row">
-    <div class="col">
-      <div class="small">Apply coupon:</div>
-      <div style="display:flex;gap:8px;margin-top:8px">
-        <input id="couponInput" style="flex:1;padding:8px;border-radius:8px;border:none;background:rgba(255,255,255,0.03);color:white" placeholder="Enter coupon code" />
-        <button id="couponBtn" class="btn">Apply</button>
-      </div>
-      <div class="small" id="couponMsg" style="margin-top:8px;color:var(--muted)"></div>
-    </div>
-  </div>
+  <button id="loginBtn" class="btn">Login with Google</button>
 
   <div class="card">
-    <div class="small" style="margin-bottom:8px">Type text below — click a style to copy (costs 2 coins per copy)</div>
-    <textarea id="input">Hello from ur bro</textarea>
+    <textarea id="input" placeholder="Type your text here..."></textarea>
   </div>
 
   <div class="card">
@@ -64,168 +35,78 @@
   </div>
 </div>
 
-<a class="wa-btn" href="https://wa.me/447877486623" target="_blank" title="WhatsApp">
-  <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WA" style="width:30px;height:30px">
-</a>
-
-<div id="overlay" class="overlay" style="display:none">
+<div id="overlay" class="overlay">
   <div class="loginModal">
-    <h3 style="margin:0 0 8px 0">Welcome — Login required</h3>
-    <div class="small" style="margin-bottom:12px;color:var(--muted)">Sign in with Google to use the generator.</div>
-    <button id="overlayLogin" class="btn" style="width:100%">Login with Google</button>
+    <h3>Login Required</h3>
+    <button id="overlayLogin" class="btn">Login with Google</button>
   </div>
 </div>
 
 <script type="module">
+// Firebase imports
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { getDatabase, ref, get, set, update, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDFPMf8HLMpS6DbZkdCR6T7GAm5sfz-TOw",
   authDomain: "urbrokhan-f631c.firebaseapp.com",
-  databaseURL: "https://urbrokhan-f631c-default-rtdb.asia-southeast1.firebasedatabase.app",
   projectId: "urbrokhan-f631c",
-  storageBucket: "urbrokhan-f631c.firebasestorage.app",
+  storageBucket: "urbrokhan-f631c.appspot.com",
   messagingSenderId: "533086015351",
-  appId: "1:533086015351:web:a12328fbc4906e4f5c9b72",
-  measurementId: "G-TGT66KJV02"
+  appId: "1:533086015351:web:a12328fbc4906e4f5c9b72"
 };
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const db = getDatabase(app);
 const provider = new GoogleAuthProvider();
 
 const loginBtn = document.getElementById('loginBtn');
-const logoutBtn = document.getElementById('logoutBtn');
-const coinCountEl = document.getElementById('coinCount');
-const userNameEl = document.getElementById('userName');
 const overlay = document.getElementById('overlay');
 const overlayLogin = document.getElementById('overlayLogin');
-const stylesList = document.getElementById('stylesList');
 const inputEl = document.getElementById('input');
-const couponInput = document.getElementById('couponInput');
-const couponBtn = document.getElementById('couponBtn');
-const couponMsg = document.getElementById('couponMsg');
+const stylesList = document.getElementById('stylesList');
 
-let currentUser = null;
-let currentUid = null;
-let currentData = null;
-
-function genRefCode(){ return Math.random().toString(36).substring(2,8).toUpperCase(); }
-
-async function ensureUser(uid,email,name){
-  const uref = ref(db,'users/'+uid);
-  const snap = await get(uref);
-  if (!snap.exists()){
-    const code = genRefCode();
-    await set(uref,{ email: email||'', displayName: name||'', coins:6, referralCode: code });
-    return { email, displayName:name, coins:6, referralCode:code };
-  }
-  return snap.val();
+async function login(){
+  try{ await signInWithPopup(auth, provider); }
+  catch(err){ console.warn("Login failed", err); }
 }
 
-async function refreshUser(){
-  if (!currentUid) return;
-  const snap = await get(ref(db,'users/'+currentUid));
-  currentData = snap.exists()? snap.val(): null;
-  coinCountEl.textContent = (currentData && currentData.coins!=null) ? currentData.coins : 0;
-  userNameEl.textContent = (currentData && currentData.displayName) ? currentData.displayName : '';
-}
+loginBtn.addEventListener('click', login);
+overlayLogin.addEventListener('click', login);
 
-async function tryLoginPopup(){
-  try{ await signInWithPopup(auth, provider); return true; } 
-  catch(err){ console.warn('Popup blocked or failed:', err); return false; }
-}
-
-loginBtn.addEventListener('click', ()=> tryLoginPopup());
-overlayLogin.addEventListener('click', ()=> tryLoginPopup());
-logoutBtn.addEventListener('click', ()=> signOut(auth));
-
-onAuthStateChanged(auth, async (user)=>{
-  if (user){
-    currentUser = user;
-    currentUid = user.uid;
-    loginBtn.style.display = 'none';
-    logoutBtn.style.display = 'inline-block';
-    overlay.style.display = 'none';
-    await ensureUser(user.uid, user.email, user.displayName);
-    await refreshUser();
-    renderStyles();
-  } else {
-    currentUser = null; currentUid = null; currentData = null;
-    loginBtn.style.display = 'inline-block';
-    logoutBtn.style.display = 'none';
-    coinCountEl.textContent = '50';
-    userNameEl.textContent = '';
-    overlay.style.display = 'flex';
-    setTimeout(async ()=>{ await tryLoginPopup(); }, 250);
-  }
+onAuthStateChanged(auth,user=>{
+  if(user){ overlay.style.display='none'; loginBtn.style.display='none'; renderStyles(); }
+  else{ overlay.style.display='flex'; loginBtn.style.display='block'; }
 });
 
-/* ---------------- Coupon ---------------- */
-couponBtn.addEventListener('click', async ()=>{
-  couponMsg.textContent = '';
-  const code = (couponInput.value||'').trim().toUpperCase();
-  if (!code) { couponMsg.textContent = 'Enter a coupon code.'; return; }
-  if (!currentUid){ couponMsg.textContent = 'Please login first.'; return; }
-
-  if(code === 'URBRO10000'){ // your daily coupon
-    const coinsRef = ref(db, 'users/' + currentUid + '/coins');
-    await runTransaction(coinsRef, cur => (cur||0)+10000);
-    couponMsg.textContent = 'Coupon applied! +10,000 coins added.';
-    await refreshUser();
-  } else {
-    couponMsg.textContent = 'Invalid coupon.';
-  }
-});
-
-/* ---------------- Stylish generator ---------------- */
+// Stylish fonts
 const maps = {
   bold:{'a':'𝗮','b':'𝗯','c':'𝗰','d':'𝗱','e':'𝗲','f':'𝗳','g':'𝗴','h':'𝗵','i':'𝗶','j':'𝗷','k':'𝗸','l':'𝗹','m':'𝗺','n':'𝗻','o':'𝗼','p':'𝗽','q':'𝗾','r':'𝗿','s':'𝘀','t':'𝘁','u':'𝘂','v':'𝘃','w':'𝘄','x':'𝘅','y':'𝘆','z':'𝘇','A':'𝗔','B':'𝗕','C':'𝗖','D':'𝗗','E':'𝗘','F':'𝗙','G':'𝗚','H':'𝗛','I':'𝗜','J':'𝗝','K':'𝗞','L':'𝗟','M':'𝗠','N':'𝗡','O':'𝗢','P':'𝗣','Q':'𝗤','R':'𝗥','S':'𝗦','T':'𝗧','U':'𝗨','V':'𝗩','W':'𝗪','X':'𝗫','Y':'𝗬','Z':'𝗭'},
-  italic:{'a':'𝘢','b':'𝘣','c':'𝘤','d':'𝘥','e':'𝘦','f':'𝘧','g':'𝘨','h':'𝘩','i':'𝘪','j':'𝘫','k':'𝘬','l':'𝘭','m':'𝘮','n':'𝘯','o':'𝘰','p':'𝘱','q':'𝘲','r':'𝘳','s':'𝘴','t':'𝘵','u':'𝘶','v':'𝘷','w':'𝘸','x':'𝘹','y':'𝘺','z':'𝘻','A':'𝐴','B':'𝐵','C':'𝐶','D':'𝐷','E':'𝐸','F':'𝐹','G':'𝐺','H':'𝐻','I':'𝐼','J':'𝐽','K':'𝐾','L':'𝐿','M':'𝑀','N':'𝑁','O':'𝑂','P':'𝑃','Q':'𝑄','R':'𝑅','S':'𝑆','T':'𝑇','U':'𝑈','V':'𝑉','W':'𝑊','X':'𝑋','Y':'𝑌','Z':'𝑍'},
-  smallCaps:{'a':'ᴀ','b':'ʙ','c':'ᴄ','d':'ᴅ','e':'ᴇ','f':'ꜰ','g':'ɢ','h':'ʜ','i':'ɪ','j':'ᴊ','k':'ᴋ','l':'ʟ','m':'ᴍ','n':'ɴ','o':'ᴏ','p':'ᴘ','q':'ǫ','r':'ʀ','s':'s','t':'ᴛ','u':'ᴜ','v':'ᴠ','w':'ᴡ','x':'x','y':'ʏ','z':'ᴢ'}
+  italic:{'a':'𝘢','b':'𝘣','c':'𝘤','d':'𝘥','e':'𝘦','f':'𝘧','g':'𝘨','h':'𝘩','i':'𝘪','j':'𝘫','k':'𝘬','l':'𝘭','m':'𝘮','n':'𝘯','o':'𝘰','p':'𝘱','q':'𝘲','r':'𝘳','s':'𝘴','t':'𝘵','u':'𝘶','v':'𝘷','w':'𝘸','x':'𝘹','y':'𝘺','z':'𝘻'}
 };
+const emojiList = ['🔥','✨','💫','💖','🌸','⭐','💥','🌟','❤️','💎','💀','🎯','🎉','🥶','⚡','🌈','🌻','🐉','💚','😎'];
 function mapChars(text,map){ return text.split('').map(c=>map[c]||c).join(''); }
+
 const styleFns = [
-  t=>t, t=>t.toUpperCase(), t=>t.toLowerCase(), t=>mapChars(t,maps.bold),
-  t=>mapChars(t,maps.italic), t=>mapChars(t,maps.smallCaps),
+  t=>t, t=>t.toUpperCase(), t=>t.toLowerCase(),
+  t=>mapChars(t,maps.bold), t=>mapChars(t,maps.italic),
   t=>t.split('').reverse().join(''), t=>t.split('').join(' '),
-  t=>`♡ ${t} ♡`, t=>`❀ ${t} ❀`
+  t=>`♡ ${t} ♡`, t=>`❀ ${t} ❀`,
+  ...emojiList.map(e=>t=>`${e} ${t} ${e}`)
 ];
 
 function renderStyles(){
   stylesList.innerHTML='';
   const val = inputEl.value || '';
-  styleFns.forEach((fn)=>{
-    const div = document.createElement('div');
-    div.className = 'style';
-    div.textContent = fn(val);
-    div.addEventListener('click', async ()=>{
-      if (!currentUid){ alert('Login required.'); return; }
-      try{
-        const coinsRef = ref(db, 'users/' + currentUid + '/coins');
-        const tx = await runTransaction(coinsRef, (cur)=>{
-          if (cur === null) return 0;
-          if (cur >= 2) return cur - 2;
-          return;
-        });
-        if (!tx.committed){ alert('Not enough coins. Use coupon.'); return; }
-        await navigator.clipboard.writeText(div.textContent);
-        const originalBg = div.style.background;
-        div.style.background = 'linear-gradient(90deg,#10b981,#06b6d4)';
-        setTimeout(()=>div.style.background = originalBg,700);
-        await refreshUser();
-      }catch(err){ console.error(err); alert('Invaild input.'); }
-    });
+  styleFns.forEach(fn=>{
+    const div=document.createElement('div');
+    div.className='style';
+    div.textContent=fn(val);
+    div.addEventListener('click',()=>{ navigator.clipboard.writeText(div.textContent); });
     stylesList.appendChild(div);
   });
 }
-
 inputEl.addEventListener('input', renderStyles);
-renderStyles();
-
 </script>
 </body>
 </html>
