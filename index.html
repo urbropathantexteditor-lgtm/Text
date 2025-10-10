@@ -1,52 +1,49 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ur bro pathan — Stylish Text Generator</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>ur bro — Stylish Text Generator</title>
 <style>
-:root{--bg:#0b0b0b;--card:#0f0f0f;--muted:#94a3b8;--accent:#10b981;--glass:#1a1a1a}
-body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;color:#f1f5f9;background:var(--bg);display:flex;justify-content:center;padding:8px}
-.app{width:100%;max-width:100%;}
-header{display:flex;align-items:center;justify-content:flex-start;margin-bottom:8px;padding:0 8px}
-.logo{width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,#06b6d4,#7c3aed);display:flex;align-items:center;justify-content:center;font-weight:700;color:white;margin-right:8px}
-h1{font-size:18px;margin:0}
-.small{font-size:12px;color:var(--muted)}
-.card{background:var(--card);border-radius:10px;padding:10px;margin-bottom:8px;box-shadow:0 4px 12px rgba(2,6,23,0.6)}
-textarea{width:100%;min-height:70px;padding:8px;border-radius:6px;background:var(--glass);border:none;color:white;font-size:14px;resize:vertical}
-.styles{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:6px;max-height:50vh;overflow:auto;padding:4px}
-.style{background:var(--glass);padding:8px;border-radius:8px;cursor:pointer;text-align:center;min-height:40px;display:flex;align-items:center;justify-content:center;word-break:break-word;transition:transform .12s,background .12s}
-.style:hover{transform:translateY(-2px);background:#243343}
-.btn{background:var(--accent);color:#06201b;padding:6px 10px;border-radius:6px;border:none;cursor:pointer;font-weight:600;font-size:13px}
-.btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted)}
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.8);display:flex;align-items:center;justify-content:center;z-index:2000}
-.loginModal{background:#111;padding:20px;border-radius:12px;width:90%;max-width:320px;text-align:center}
-input{padding:6px;border-radius:6px;border:none;background:rgba(255,255,255,0.03);color:white;flex:1}
+  :root{--bg:#0f172a;--card:#0b1220;--muted:#94a3b8;--accent:#10b981;--glass:#172033}
+  body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;background:var(--bg);color:#f1f5f9;display:flex;justify-content:center;padding:12px}
+  .app{width:100%;max-width:480px}
+  header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+  h1{font-size:20px;margin:0;font-weight:700}
+  .card{background:var(--card);border-radius:12px;padding:12px;margin-bottom:12px;box-shadow:0 6px 18px rgba(2,6,23,0.6)}
+  textarea{width:100%;min-height:84px;padding:12px;border-radius:8px;background:var(--glass);border:none;color:white;font-size:16px;resize:vertical}
+  .styles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;max-height:60vh;overflow:auto;padding:6px}
+  .style{background:var(--glass);padding:10px;border-radius:10px;cursor:pointer;text-align:center;min-height:48px;display:flex;align-items:center;justify-content:center;word-break:break-word;transition:transform .12s,background .12s}
+  .style:hover{transform:translateY(-3px);background:#243343}
+  .chip{background:rgba(255,255,255,0.03);padding:6px 10px;border-radius:999px;color:var(--muted);font-weight:600}
+  .btn{background:var(--accent);color:#06201b;padding:6px 10px;border-radius:8px;border:none;cursor:pointer;font-weight:600;font-size:14px}
+  .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted)}
+  .overlay{position:fixed;inset:0;background:linear-gradient(0deg,rgba(0,0,0,0.6),rgba(0,0,0,0.6));display:flex;align-items:center;justify-content:center;z-index:2000}
+  .loginModal{background:#071025;padding:20px;border-radius:12px;max-width:360px;width:90%;text-align:center}
 </style>
 </head>
 <body>
-<div class="app">
+<div class="app" id="app">
   <header>
-    <div class="logo">PB</div>
-    <h1>ur bro pathan</h1>
+    <h1>ur bro</h1>
+    <div style="display:flex;gap:8px;align-items:center">
+      <div class="chip">Coins: <span id="coinCount">6</span></div>
+      <button id="loginBtn" class="btn">Login</button>
+      <button id="logoutBtn" class="btn ghost" style="display:none">Logout</button>
+    </div>
   </header>
 
   <div class="card">
-    <div class="small">Coins: <span id="coinCount">6</span></div>
-  </div>
-
-  <div class="card">
-    <div class="small">Apply a coupon code:</div>
-    <div style="display:flex;gap:6px;margin-top:6px">
-      <input id="applyCoupon" placeholder="Enter coupon code"/>
-      <button id="applyCouponBtn" class="btn">Apply</button>
+    <div class="small">Apply coupon (if you have one):</div>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <input id="applyCoupon" style="flex:1;padding:8px;border-radius:8px;border:none;background:rgba(255,255,255,0.03);color:white" placeholder="Enter coupon code" />
+      <button id="applyBtn" class="btn">Apply</button>
     </div>
-    <div class="small" id="couponMsg" style="margin-top:4px;color:var(--muted)"></div>
+    <div class="small" id="applyMsg" style="margin-top:8px;color:var(--muted)"></div>
   </div>
 
   <div class="card">
-    <div class="small" style="margin-bottom:6px">Type text below — click a style to copy (costs 2 coins):</div>
-    <textarea id="input">Hello from ur bro pathan</textarea>
+    <textarea id="input">Hello from ur bro</textarea>
   </div>
 
   <div class="card">
@@ -54,20 +51,19 @@ input{padding:6px;border-radius:6px;border:none;background:rgba(255,255,255,0.03
   </div>
 </div>
 
-<div id="overlay" class="overlay">
+<!-- Login overlay -->
+<div id="overlay" class="overlay" style="display:none">
   <div class="loginModal">
-    <h3>Login Required</h3>
-    <div class="small" style="margin:8px 0">Sign in with Google to generate text and use coupons.</div>
-    <button id="overlayLogin" class="btn" style="width:100%">Login with Google</button>
+    <h3 style="margin:0 0 8px 0">Login Required</h3>
+    <button id="overlayLogin" class="btn" style="width:100%">Login</button>
   </div>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { getDatabase, ref, get, set, update, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-// ----------------- FIREBASE -----------------
 const firebaseConfig = {
   apiKey: "AIzaSyDFPMf8HLMpS6DbZkdCR6T7GAm5sfz-TOw",
   authDomain: "urbrokhan-f631c.firebaseapp.com",
@@ -77,109 +73,136 @@ const firebaseConfig = {
   messagingSenderId: "533086015351",
   appId: "1:533086015351:web:a12328fbc4906e4f5c9b72"
 };
+
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getDatabase(app);
 const provider = new GoogleAuthProvider();
 
-// ----------------- ELEMENTS -----------------
+const loginBtn = document.getElementById('loginBtn');
+const logoutBtn = document.getElementById('logoutBtn');
+const coinCountEl = document.getElementById('coinCount');
 const overlay = document.getElementById('overlay');
 const overlayLogin = document.getElementById('overlayLogin');
-const coinCountEl = document.getElementById('coinCount');
 const applyCouponInput = document.getElementById('applyCoupon');
-const applyCouponBtn = document.getElementById('applyCouponBtn');
-const couponMsg = document.getElementById('couponMsg');
-const inputEl = document.getElementById('input');
+const applyBtnEl = document.getElementById('applyBtn');
+const applyMsg = document.getElementById('applyMsg');
 const stylesList = document.getElementById('stylesList');
+const inputEl = document.getElementById('input');
 
 let currentUser = null;
 let currentUid = null;
+let currentData = null;
 
-// ----------------- COUPONS -----------------
-let validCoupons = { "WELCOME10":10, "URBRO20":20, "BONUS5":5 };
-
-// ----------------- USER HELPERS -----------------
+/* ---------------- Helpers ---------------- */
 async function ensureUser(uid,email,name){
   const uref = ref(db,'users/'+uid);
   const snap = await get(uref);
-  if(!snap.exists()){
+  if (!snap.exists()){
     await set(uref,{ email: email||'', displayName: name||'', coins:6 });
+    return { email, displayName:name, coins:6 };
   }
+  return snap.val();
 }
 async function refreshUser(){
-  if(!currentUid) return;
+  if (!currentUid) return;
   const snap = await get(ref(db,'users/'+currentUid));
-  const data = snap.exists()? snap.val(): {coins:6};
-  coinCountEl.textContent = data.coins||6;
+  currentData = snap.exists()? snap.val(): null;
+  coinCountEl.textContent = (currentData && currentData.coins!=null) ? currentData.coins : 6;
 }
 
-// ----------------- LOGIN -----------------
-overlayLogin.addEventListener('click', ()=> signInWithRedirect(auth,provider));
-
-getRedirectResult(auth)
-.then(result=>{
-  if(result.user){
-    currentUser = result.user;
-    currentUid = result.user.uid;
+/* ---------------- Auth flow ---------------- */
+async function tryLoginPopup(){
+  try{
+    await signInWithPopup(auth, provider);
+    return true;
+  }catch(err){
+    console.warn('Popup blocked or failed:', err);
+    return false;
   }
-}).catch(console.error);
+}
+loginBtn.addEventListener('click', ()=> tryLoginPopup());
+overlayLogin.addEventListener('click', ()=> tryLoginPopup());
+logoutBtn.addEventListener('click', ()=> signOut(auth));
 
-onAuthStateChanged(auth, async user=>{
-  if(user){
+onAuthStateChanged(auth, async (user)=>{
+  if (user){
     currentUser = user;
     currentUid = user.uid;
+    loginBtn.style.display = 'none';
+    logoutBtn.style.display = 'inline-block';
     overlay.style.display = 'none';
     await ensureUser(user.uid,user.email,user.displayName);
     await refreshUser();
     renderStyles();
   } else {
+    currentUser = null; currentUid = null; currentData = null;
+    loginBtn.style.display = 'inline-block';
+    logoutBtn.style.display = 'none';
+    coinCountEl.textContent = '6';
     overlay.style.display = 'flex';
-    coinCountEl.textContent='6';
+    setTimeout(async ()=>{
+      await tryLoginPopup();
+    }, 250);
   }
 });
 
-// ----------------- COUPON APPLY -----------------
-applyCouponBtn.addEventListener('click', async ()=>{
-  const code = (applyCouponInput.value||'').trim().toUpperCase();
-  if(!currentUid){ couponMsg.textContent='Login to apply coupon.'; return; }
-  if(!code){ couponMsg.textContent='Enter a coupon code.'; return; }
-  if(!validCoupons[code]){ couponMsg.textContent='Invalid coupon.'; return; }
-  try{
-    const coinsRef = ref(db,'users/'+currentUid+'/coins');
-    await runTransaction(coinsRef,cur=> (cur||0)+validCoupons[code]);
-    couponMsg.textContent = `Coupon applied! +${validCoupons[code]} coins.`;
-    applyCouponInput.value='';
-    await refreshUser();
-  }catch(err){ console.error(err); couponMsg.textContent='Failed to apply coupon.'; }
+/* ---------------- Coupon apply ---------------- */
+applyBtnEl.addEventListener('click', async ()=>{
+  const code = (applyCouponInput.value||'').trim();
+  if (!code) { applyMsg.textContent = 'Enter a coupon.'; return; }
+  if (!currentUid){ applyMsg.textContent = 'Please login first.'; return; }
+  // for simplicity, assume admin changes coupon codes manually in DB under /coupons/CODE:coins
+  const couponSnap = await get(ref(db,'coupons/'+code));
+  if (!couponSnap.exists()){ applyMsg.textContent = 'Invalid coupon.'; return; }
+  const coinsToAdd = couponSnap.val()||0;
+  await runTransaction(ref(db,'users/'+currentUid+'/coins'), cur=>(cur||6)+coinsToAdd);
+  applyMsg.textContent = `Coupon applied! +${coinsToAdd} coins.`;
+  applyCouponInput.value='';
+  await refreshUser();
 });
 
-// ----------------- STYLISH TEXT -----------------
+/* ---------------- Stylish generator ---------------- */
 const maps = {
-  bold:{'a':'𝗮','b':'𝗯','c':'𝗰','d':'𝗱','e':'𝗲','f':'𝗳','g':'𝗴','h':'𝗵','i':'𝗶','j':'𝗷','k':'𝗸','l':'𝗹','m':'
-    import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-
-/* ----------------- NEW STYLE FUNCTIONS ----------------- */
+  bold:{'a':'𝗮','b':'𝗯','c':'𝗰','d':'𝗱','e':'𝗲','f':'𝗳','g':'𝗴','h':'𝗵','i':'𝗶','j':'𝗷','k':'𝗸','l':'𝗹','m':'𝗺','n':'𝗻','o':'𝗼','p':'𝗽','q':'𝗾','r':'𝗿','s':'𝘀','t':'𝘁','u':'𝘂','v':'𝘃','w':'𝘄','x':'𝘅','y':'𝘆','z':'𝘇','A':'𝗔','B':'𝗕','C':'𝗖','D':'𝗗','E':'𝗘','F':'𝗙','G':'𝗚','H':'𝗛','I':'𝗜','J':'𝗝','K':'𝗞','L':'𝗟','M':'𝗠','N':'𝗡','O':'𝗢','P':'𝗣','Q':'𝗤','R':'𝗥','S':'𝗦','T':'𝗧','U':'𝗨','V':'𝗩','W':'𝗪','X':'𝗫','Y':'𝗬','Z':'𝗭'},
+  italic:{'a':'𝘢','b':'𝘣','c':'𝘤','d':'𝘥','e':'𝘦','f':'𝘧','g':'𝘨','h':'𝘩','i':'𝘪','j':'𝘫','k':'𝘬','l':'𝘭','m':'𝘮','n':'𝘯','o':'𝘰','p':'𝘱','q':'𝘲','r':'𝘳','s':'𝘴','t':'𝘵','u':'𝘶','v':'𝘷','w':'𝘸','x':'𝘹','y':'𝘺','z':'𝘻'}
+};
+function mapChars(text,map){ return text.split('').map(c=>map[c]||c).join(''); }
 const styleFns = [
-  t=>t,                       // normal
+  t=>t,
   t=>t.toUpperCase(),
   t=>t.toLowerCase(),
-  t=>t.split('').reverse().join(''),             // reversed
-  t=>t.split('').join(' '),                      // spaced
-  t=>`★ ${t} ★`,                                 // star
-  t=>`✧ ${t} ✧`,                                 // sparkle
-  t=>`☾ ${t} ☽`,                                 // moon
-  t=>`✿ ${t} ✿`,                                 // flower
-  t=>`ღ ${t} ღ`,                                 // heart
-  t=>`➳ ${t} ➳`,                                 // arrow
-  t=>`♪ ${t} ♪`,                                 // music
-  t=>`♛ ${t} ♛`,                                 // crown
-  t=>t.replace(/[aeiou]/gi, c=>c.toUpperCase()), // vowels uppercase
-  t=>t.replace(/[bcdfghjklmnpqrstvwxyz]/gi, c=>c.toUpperCase()), // consonants uppercase
-  t=>t.split('').map(c=>c+'̴').join(''),        // glitch effect 1
-  t=>t.split('').map(c=>'̵'+c).join(''),        // glitch effect 2
-  t=>t.split('').map(c=>c+'͜').join(''),        // swirl effect
-  t=>t.split('').map(c=>'~'+c+'~').join(''),    // tilde effect
-  t=>t.split('').map(c=>'•'+c+'•').join(''),    // dot effect
-  t=>t.split('').map(c=>c+'★').join(''),        // end star
-  t=>t.split('').map(c=>'★'+c).join(''),        // start star
+  t=>mapChars(t,maps.bold),
+  t=>mapChars(t,maps.italic),
+  t=>t.split('').reverse().join(''),
+  t=>t.split('').join(' '),
+  t=>`♡ ${t} ♡`
 ];
+
+function renderStyles(){
+  stylesList.innerHTML='';
+  const val = inputEl.value || '';
+  styleFns.forEach(fn=>{
+    const div=document.createElement('div');
+    div.className='style';
+    div.textContent=fn(val);
+    div.addEventListener('click', async ()=>{
+      if (!currentUid){ alert('Login required.'); return; }
+      const coinsRef = ref(db, 'users/' + currentUid + '/coins');
+      const tx = await runTransaction(coinsRef, cur=>{ if(cur>=2) return cur-2; return; });
+      if(!tx.committed){ alert('Not enough coins'); return; }
+      await navigator.clipboard.writeText(div.textContent);
+      const originalBg=div.style.background;
+      div.style.background='linear-gradient(90deg,#10b981,#06b6d4)';
+      setTimeout(()=>div.style.background=originalBg,700);
+      await refreshUser();
+    });
+    stylesList.appendChild(div);
+  });
+}
+
+inputEl.addEventListener('input', renderStyles);
+renderStyles();
+</script>
+</body>
+</html>
