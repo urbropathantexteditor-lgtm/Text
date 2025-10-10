@@ -1,99 +1,346 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ur bro pathan — Stylish Text Generator</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>ur bro pathan — Stylish Text Generator (Auth + Coins + Referral)</title>
 <style>
-body { margin:0; font-family:'Inter',sans-serif; background:#0f172a; color:#f1f5f9; min-height:100vh; display:flex; justify-content:center; align-items:flex-start; padding:20px; }
-.container { width:100%; max-width:960px; }
-h1 { text-align:center; font-size:26px; margin-bottom:8px; }
-p { text-align:center; color:#94a3b8; margin-top:0; margin-bottom:20px; font-size:15px; }
-textarea { width:100%; min-height:100px; padding:12px; border-radius:8px; background:#1e293b; color:white; border:none; font-size:16px; margin-bottom:20px; resize:none; }
-.styles { display:grid; grid-template-columns:repeat(auto-fit, minmax(220px,1fr)); gap:10px; max-height:70vh; overflow-y:auto; padding-bottom:20px; }
-.style { background:#1e293b; padding:10px 12px; border-radius:10px; cursor:pointer; transition:0.2s; font-size:16px; word-break:break-word; text-align:center; min-height:40px; display:flex; justify-content:center; align-items:center; }
-.style:hover { background:#334155; transform:scale(1.02); }
-.footer { text-align:center; color:#94a3b8; margin-top:20px; font-size:13px; }
-.wa-btn { position: fixed; bottom: 20px; right: 20px; background-color: #25D366; border-radius: 50%; width: 60px; height: 60px; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer; z-index: 1000; transition: transform 0.2s ease; }
-.wa-btn:hover { transform: scale(1.1); }
-.wa-btn img { width: 35px; height: 35px; }
-@media (max-width:600px) { .style { font-size:14px; min-height:35px; } textarea { font-size:14px; } h1 { font-size:22px; } p { font-size:13px; } }
+  :root{--bg:#0f172a;--card:#0b1220;--muted:#94a3b8;--accent:#10b981;--glass:#172033}
+  body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;background:var(--bg);color:#f1f5f9;display:flex;justify-content:center;padding:18px}
+  .app{width:100%;max-width:1100px}
+  header{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-bottom:12px}
+  .brand{display:flex;gap:12px;align-items:center}
+  .logo{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,#06b6d4,#7c3aed);display:flex;align-items:center;justify-content:center;font-weight:700;color:white}
+  h1{font-size:18px;margin:0}
+  .small{font-size:13px;color:var(--muted)}
+  .card{background:var(--card);border-radius:12px;padding:14px;margin-bottom:12px;box-shadow:0 6px 18px rgba(2,6,23,0.6)}
+  .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+  .col{flex:1;min-width:260px}
+  textarea{width:100%;min-height:84px;padding:12px;border-radius:8px;background:var(--glass);border:none;color:white;font-size:16px;resize:vertical}
+  .styles{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;max-height:60vh;overflow:auto;padding:6px}
+  .style{background:var(--glass);padding:10px;border-radius:10px;cursor:pointer;text-align:center;min-height:48px;display:flex;align-items:center;justify-content:center;word-break:break-word;transition:transform .12s,background .12s}
+  .style:hover{transform:translateY(-4px);background:#243343}
+  .chip{background:rgba(255,255,255,0.03);padding:8px 10px;border-radius:999px;color:var(--muted);font-weight:600}
+  .btn{background:var(--accent);color:#06201b;padding:8px 12px;border-radius:8px;border:none;cursor:pointer;font-weight:600}
+  .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted);padding:8px 10px}
+  .wa-btn{position:fixed;right:18px;bottom:18px;background:#25D366;width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(0,0,0,0.4);z-index:1000}
+  .overlay{position:fixed;inset:0;background:linear-gradient(0deg,rgba(0,0,0,0.6),rgba(0,0,0,0.6));display:flex;align-items:center;justify-content:center;z-index:2000}
+  .loginModal{background:#071025;padding:22px;border-radius:12px;max-width:420px;width:90%;text-align:center}
+  @media (max-width:600px){header{flex-direction:column;align-items:flex-start} .styles{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}}
 </style>
 </head>
 <body>
-<div class="container">
-<h1>ur bro pathan — Stylish Text Generator</h1>
-<p>Type your text below and tap any style to copy instantly!</p>
-<textarea id="input">Hello from ur bro pathan</textarea>
-<div class="styles" id="stylesList"></div>
-<div class="footer">Made by <strong>ur bro pathan</strong></div>
-</div>
-<a href="https://wa.me/447877486623" target="_blank" class="wa-btn" title="Chat on WhatsApp">
-<img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp">
-</a>
+  <div class="app" id="app">
+    <header>
+      <div class="brand">
+        <div class="logo">PB</div>
+        <div>
+          <h1>ur bro pathan — Stylish Text Generator</h1>
+          <div class="small">Google login required — 2 coins per copy • Referral rewards</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <div class="chip">Coins: <span id="coinCount">0</span></div>
+        <div class="small" id="userName"></div>
+        <button id="loginBtn" class="btn">Login with Google</button>
+        <button id="logoutBtn" class="btn ghost" style="display:none">Logout</button>
+      </div>
+    </header>
 
-<script>
-// Fonts maps
-const maps = {
-bold:{'a':'𝗮','b':'𝗯','c':'𝗰','d':'𝗱','e':'𝗲','f':'𝗳','g':'𝗴','h':'𝗵','i':'𝗶','j':'𝗷','k':'𝗸','l':'𝗹','m':'𝗺','n':'𝗻','o':'𝗼','p':'𝗽','q':'𝗾','r':'𝗿','s':'𝘀','t':'𝘁','u':'𝘂','v':'𝘃','w':'𝘄','x':'𝘅','y':'𝘆','z':'𝘇','A':'𝗔','B':'𝗕','C':'𝗖','D':'𝗗','E':'𝗘','F':'𝗙','G':'𝗚','H':'𝗛','I':'𝗜','J':'𝗝','K':'𝗞','L':'𝗟','M':'𝗠','N':'𝗡','O':'𝗢','P':'𝗣','Q':'𝗤','R':'𝗥','S':'𝗦','T':'𝗧','U':'𝗨','V':'𝗩','W':'𝗪','X':'𝗫','Y':'𝗬','Z':'𝗭'},
-italic:{'a':'𝘢','b':'𝘣','c':'𝘤','d':'𝘥','e':'𝘦','f':'𝘧','g':'𝘨','h':'𝘩','i':'𝘪','j':'𝘫','k':'𝘬','l':'𝘭','m':'𝘮','n':'𝘯','o':'𝘰','p':'𝘱','q':'𝘲','r':'𝘳','s':'𝘴','t':'𝘵','u':'𝘶','v':'𝘷','w':'𝘸','x':'𝘹','y':'𝘺','z':'𝘻','A':'𝐴','B':'𝐵','C':'𝐶','D':'𝐷','E':'𝐸','F':'𝐹','G':'𝐺','H':'𝐻','I':'𝐼','J':'𝐽','K':'𝐾','L':'𝐿','M':'𝑀','N':'𝑁','O':'𝑂','P':'𝑃','Q':'𝑄','R':'𝑅','S':'𝑆','T':'𝑇','U':'𝑈','V':'𝑉','W':'𝑊','X':'𝑋','Y':'𝑌','Z':'𝑍'},
-smallCaps:{'a':'ᴀ','b':'ʙ','c':'ᴄ','d':'ᴅ','e':'ᴇ','f':'ꜰ','g':'ɢ','h':'ʜ','i':'ɪ','j':'ᴊ','k':'ᴋ','l':'ʟ','m':'ᴍ','n':'ɴ','o':'ᴏ','p':'ᴘ','q':'ǫ','r':'ʀ','s':'s','t':'ᴛ','u':'ᴜ','v':'ᴠ','w':'ᴡ','x':'x','y':'ʏ','z':'ᴢ'}
+    <div class="card row">
+      <div class="col">
+        <div class="small">Your referral code (share):</div>
+        <div style="display:flex;gap:8px;align-items:center;margin-top:8px">
+          <div id="myRef" class="chip">—</div>
+          <button id="copyRef" class="btn ghost" style="display:none">Copy</button>
+          <div class="small" id="refCount"></div>
+        </div>
+      </div>
+      <div style="min-width:260px">
+        <div class="small">Apply referral code (if you have one):</div>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <input id="applyRef" style="flex:1;padding:8px;border-radius:8px;border:none;background:rgba(255,255,255,0.03);color:white" placeholder="Enter referral code" />
+          <button id="applyBtn" class="btn">Apply</button>
+        </div>
+        <div class="small" id="applyMsg" style="margin-top:8px;color:var(--muted)"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="small" style="margin-bottom:8px">Type text below — styles update live. Click a style to copy (costs 2 coins).</div>
+      <textarea id="input">Hello from ur bro pathan</textarea>
+    </div>
+
+    <div class="card">
+      <div class="styles" id="stylesList"></div>
+    </div>
+  </div>
+
+  <a class="wa-btn" href="https://wa.me/447877486623" target="_blank" title="WhatsApp">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WA" style="width:30px;height:30px">
+  </a>
+
+  <!-- Login overlay (shown until user is signed in or popup blocked) -->
+  <div id="overlay" class="overlay" style="display:none">
+    <div class="loginModal">
+      <h3 style="margin:0 0 8px 0">Welcome — Login required</h3>
+      <div class="small" style="margin-bottom:12px;color:var(--muted)">You must sign in with Google to use the generator. A popup should appear — if it's blocked, click Login.</div>
+      <button id="overlayLogin" class="btn" style="width:100%">Login with Google</button>
+    </div>
+  </div>
+
+<script type="module">
+/* ---------------- Firebase (Realtime DB + Auth) ---------------- */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { getDatabase, ref, get, set, update, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDFPMf8HLMpS6DbZkdCR6T7GAm5sfz-TOw",
+  authDomain: "urbrokhan-f631c.firebaseapp.com",
+  databaseURL: "https://urbrokhan-f631c-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "urbrokhan-f631c",
+  storageBucket: "urbrokhan-f631c.firebasestorage.app",
+  messagingSenderId: "533086015351",
+  appId: "1:533086015351:web:a12328fbc4906e4f5c9b72",
+  measurementId: "G-TGT66KJV02"
 };
 
-const emojiList=['🔥','✨','💫','💖','🌸','⭐','💥','🌟','❤️','💎','💀','🎯','🎉','🥶','⚡','🌈','🌻','🐉','💚','😎'];
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getDatabase(app);
+const provider = new GoogleAuthProvider();
 
+/* ---------------- Elements ---------------- */
+const loginBtn = document.getElementById('loginBtn');
+const logoutBtn = document.getElementById('logoutBtn');
+const coinCountEl = document.getElementById('coinCount');
+const userNameEl = document.getElementById('userName');
+const myRefEl = document.getElementById('myRef');
+const copyRefBtn = document.getElementById('copyRef');
+const refCountEl = document.getElementById('refCount');
+const applyRefInput = document.getElementById('applyRef');
+const applyRefBtn = document.getElementById('applyBtn');
+const applyMsg = document.getElementById('applyMsg');
+const overlay = document.getElementById('overlay');
+const overlayLogin = document.getElementById('overlayLogin');
+const stylesList = document.getElementById('stylesList');
+const inputEl = document.getElementById('input');
+
+/* ---------------- State ---------------- */
+let currentUser = null;
+let currentUid = null;
+let currentData = null;
+
+/* ---------------- Helpers ---------------- */
+function genRefCode(){
+  return Math.random().toString(36).substring(2,8).toUpperCase();
+}
+async function ensureUser(uid,email,name){
+  const uref = ref(db,'users/'+uid);
+  const snap = await get(uref);
+  if (!snap.exists()){
+    const code = genRefCode();
+    await set(uref,{ email: email||'', displayName: name||'', coins:0, referralCode: code, referredUsers: {}, bonusAwarded:false, referredBy: null });
+    await set(ref(db,'refCodes/'+code), uid);
+    return { email, displayName:name, coins:0, referralCode:code, referredUsers:{}, bonusAwarded:false, referredBy:null };
+  }
+  return snap.val();
+}
+async function refreshUser(){
+  if (!currentUid) return;
+  const snap = await get(ref(db,'users/'+currentUid));
+  currentData = snap.exists()? snap.val(): null;
+  coinCountEl.textContent = (currentData && currentData.coins!=null) ? currentData.coins : 0;
+  userNameEl.textContent = (currentData && currentData.displayName) ? currentData.displayName : '';
+  myRefEl.textContent = (currentData && currentData.referralCode) ? currentData.referralCode : '—';
+  copyRefBtn.style.display = currentData ? 'inline-block' : 'none';
+  const count = currentData && currentData.referredUsers ? Object.keys(currentData.referredUsers).length : 0;
+  refCountEl.textContent = count ? `Referred: ${count}` : '';
+}
+
+/* ---------------- Auth flow ---------------- */
+async function tryLoginPopup(){
+  try{
+    await signInWithPopup(auth, provider);
+    // if success, onAuthStateChanged will handle rest
+    return true;
+  }catch(err){
+    console.warn('Popup login blocked or failed:', err);
+    return false;
+  }
+}
+loginBtn.addEventListener('click', ()=> tryLoginPopup());
+overlayLogin.addEventListener('click', ()=> tryLoginPopup());
+logoutBtn.addEventListener('click', ()=> signOut(auth));
+
+onAuthStateChanged(auth, async (user)=>{
+  if (user){
+    currentUser = user;
+    currentUid = user.uid;
+    loginBtn.style.display = 'none';
+    logoutBtn.style.display = 'inline-block';
+    overlay.style.display = 'none';
+    // ensure user record exists
+    await ensureUser(user.uid, user.email, user.displayName);
+    await refreshUser();
+    renderStyles(); // now enable styles
+  } else {
+    currentUser = null; currentUid = null; currentData = null;
+    loginBtn.style.display = 'inline-block';
+    logoutBtn.style.display = 'none';
+    coinCountEl.textContent = '0';
+    userNameEl.textContent = '';
+    myRefEl.textContent = '—';
+    copyRefBtn.style.display = 'none';
+    refCountEl.textContent = '';
+    // show overlay and try to open popup automatically
+    overlay.style.display = 'flex';
+    // small delay to give page load time
+    setTimeout(async ()=>{
+      const ok = await tryLoginPopup();
+      if (!ok) {
+        // popup blocked — overlay remains and user must click
+      } else {
+        // popup succeeded — overlay will be hidden by onAuthStateChanged
+      }
+    }, 250);
+  }
+});
+
+/* ---------------- Referral apply ---------------- */
+applyRefBtn.addEventListener('click', async ()=>{
+  applyMsg.textContent = '';
+  const code = (applyRefInput.value||'').trim().toUpperCase();
+  if (!code) { applyMsg.textContent = 'Enter a referral code.'; return; }
+  if (!currentUid){ applyMsg.textContent = 'Please login first.'; return; }
+  try{
+    const codeSnap = await get(ref(db,'refCodes/'+code));
+    if (!codeSnap.exists()){ applyMsg.textContent = 'Invalid code.'; return; }
+    const refUid = codeSnap.val();
+    if (refUid === currentUid){ applyMsg.textContent = 'Cannot use your own code.'; return; }
+    // check if already has referredBy
+    const mySnap = await get(ref(db,'users/'+currentUid+'/referredBy'));
+    if (mySnap.exists() && mySnap.val()){ applyMsg.textContent = 'You already applied a referral.'; return; }
+
+    // Use transaction to add referred user and +10 coins
+    const refUserRef = ref(db,'users/'+refUid);
+    await runTransaction(refUserRef, (curr)=>{
+      if (curr===null) return curr;
+      if (!curr.referredUsers) curr.referredUsers = {};
+      if (curr.referredUsers[currentUid]) return; // already counted
+      curr.referredUsers[currentUid] = true;
+      curr.coins = (curr.coins||0) + 10;
+      return curr;
+    });
+
+    // set current user's referredBy
+    await update(ref(db,'users/'+currentUid), { referredBy: refUid });
+
+    // check bonus
+    const afterSnap = await get(ref(db,'users/'+refUid));
+    if (afterSnap.exists()){
+      const refData = afterSnap.val();
+      const count = refData.referredUsers ? Object.keys(refData.referredUsers).length : 0;
+      if (count >= 15 && !refData.bonusAwarded){
+        // award 1000 coins
+        await update(ref(db,'users/'+refUid), { coins: (refData.coins||0) + 1000, bonusAwarded: true });
+      }
+    }
+
+    applyMsg.textContent = 'Referral applied! Referrer got +10 coins.';
+    await refreshUser();
+  }catch(err){ console.error(err); applyMsg.textContent = 'Failed to apply referral.'; }
+});
+
+/* copy referral */
+copyRefBtn.addEventListener('click', ()=>{
+  const code = myRefEl.textContent || '';
+  if (!code) return;
+  navigator.clipboard.writeText(code).then(()=>{ copyRefBtn.textContent = 'Copied'; setTimeout(()=>copyRefBtn.textContent='Copy',1000); });
+});
+
+/* ---------------- Stylish generator ---------------- */
+/* character maps */
+const maps = {
+  bold:{'a':'𝗮','b':'𝗯','c':'𝗰','d':'𝗱','e':'𝗲','f':'𝗳','g':'𝗴','h':'𝗵','i':'𝗶','j':'𝗷','k':'𝗸','l':'𝗹','m':'𝗺','n':'𝗻','o':'𝗼','p':'𝗽','q':'𝗾','r':'𝗿','s':'𝘀','t':'𝘁','u':'𝘂','v':'𝘃','w':'𝘄','x':'𝘅','y':'𝘆','z':'𝘇','A':'𝗔','B':'𝗕','C':'𝗖','D':'𝗗','E':'𝗘','F':'𝗙','G':'𝗚','H':'𝗛','I':'𝗜','J':'𝗝','K':'𝗞','L':'𝗟','M':'𝗠','N':'𝗡','O':'𝗢','P':'𝗣','Q':'𝗤','R':'𝗥','S':'𝗦','T':'𝗧','U':'𝗨','V':'𝗩','W':'𝗪','X':'𝗫','Y':'𝗬','Z':'𝗭'},
+  italic:{'a':'𝘢','b':'𝘣','c':'𝘤','d':'𝘥','e':'𝘦','f':'𝘧','g':'𝘨','h':'𝘩','i':'𝘪','j':'𝘫','k':'𝘬','l':'𝘭','m':'𝘮','n':'𝘯','o':'𝘰','p':'𝘱','q':'𝘲','r':'𝘳','s':'𝘴','t':'𝘵','u':'𝘶','v':'𝘷','w':'𝘸','x':'𝘹','y':'𝘺','z':'𝘻','A':'𝐴','B':'𝐵','C':'𝐶','D':'𝐷','E':'𝐸','F':'𝐹','G':'𝐺','H':'𝐻','I':'𝐼','J':'𝐽','K':'𝐾','L':'𝐿','M':'𝑀','N':'𝑁','O':'𝑂','P':'𝑃','Q':'𝑄','R':'𝑅','S':'𝑆','T':'𝑇','U':'𝑈','V':'𝑉','W':'𝑊','X':'𝑋','Y':'𝑌','Z':'𝑍'},
+  smallCaps:{'a':'ᴀ','b':'ʙ','c':'ᴄ','d':'ᴅ','e':'ᴇ','f':'ꜰ','g':'ɢ','h':'ʜ','i':'ɪ','j':'ᴊ','k':'ᴋ','l':'ʟ','m':'ᴍ','n':'ɴ','o':'ᴏ','p':'ᴘ','q':'ǫ','r':'ʀ','s':'s','t':'ᴛ','u':'ᴜ','v':'ᴠ','w':'ᴡ','x':'x','y':'ʏ','z':'ᴢ'}
+};
+const emojiList = ['🔥','✨','💫','💖','🌸','⭐','💥','🌟','❤️','💎','💀','🎯','🎉','🥶','⚡','🌈','🌻','🐉','💚','😎'];
 function mapChars(text,map){ return text.split('').map(c=>map[c]||c).join(''); }
 
-// Array of style functions
-const styles = [
-t=>t,
-t=>t.toUpperCase(),
-t=>t.toLowerCase(),
-t=>mapChars(t,maps.bold),
-t=>mapChars(t,maps.italic),
-t=>mapChars(t,maps.smallCaps),
-t=>t.split('').reverse().join(''),
-t=>t.split('').join(' '),
-t=>`(•_•) ${t} (•_•)`,
-t=>`¯\\_(ツ)_/¯ ${t} ¯\\_(ツ)_/¯`,
-t=>`𐌄𐋄𐌀𐌌𐌐𐌋𐌄 ${t} 𐌕𐌄𐋄𐌕`,
-t=>`▄︻デ ${t} ═══━一`,
-t=>`❀·ᰄ· ${t} ·ᰄ·❀`,
-t=>`❀ꗥ～ꗥ❀ ${t} ❀ꗥ～ꗥ❀`,
-t=>`✨${t}✨`,
-t=>`💖${t}💖`,
-t=>`🌸${t}🌸`,
-t=>`⭐${t}⭐`,
-t=>`💥${t}💥`,
-t=>`▁▂▃▄▅▆▇█ ${t} █▇▆▅▄▃▂▁`,
-t=>`•°•.°• ${t} •°•.°•`,
-t=>`❁❀❁ ${t} ❁❀❁`,
-t=>`★彡 ${t} 彡★`,
-t=>`✿✾✿ ${t} ✿✾✿`,
-t=>`♡✧ ${t} ✧♡`,
-t=>`♪♫ ${t} ♫♪`,
-...emojiList.map(e=>t=>`${e}${t}${e}`)
+/* style functions - all dynamic */
+const styleFns = [
+  t=>t,
+  t=>t.toUpperCase(),
+  t=>t.toLowerCase(),
+  t=>mapChars(t,maps.bold),
+  t=>mapChars(t,maps.italic),
+  t=>mapChars(t,maps.smallCaps),
+  t=>t.split('').reverse().join(''),
+  t=>t.split('').join(' '),
+  t=>`♡ ${t} ♡`,
+  t=>`❀ ${t} ❀`,
+  t=>`▂▃▅▇█ ${t} █▇▅▃▂`,
+  t=>`(•_•) ${t} (•_•)`,
+  t=>`¯\\_(ツ)_/¯ ${t} ¯\\_(ツ)_/¯`,
+  t=>`𐌄𐋄𐌀𐌌𐌐𐌋𐌄 ${t} 𐌕𐌄𐋄𐌕`,
+  t=>`▄︻デ ${t} ═══━一`,
+  t=>`❀·ᰄ· ${t} ·ᰄ·❀`,
+  t=>`❀ꗥ～ꗥ❀ ${t} ❀ꗥ～ꗥ❀`,
+  ...emojiList.map(e=>t=>`${e} ${t} ${e}`),
+  t=>`🄴🅇🄰🄼🄿🄻🄴 ${t}`,
+  t=>`ᴱˣᵃᵐᵖˡᵉ ᵗᵉˣᵗ ${t}`,
+  t=>`Ⓔⓧⓐⓜⓟⓛⓔ ⓣⓔⓧⓣ ${t}`,
+  t=>`ₑₓₐ𝑚𝑝Լₑ 𝑡ₑₓ𝑡 ${t}`,
+  t=>`E̷̤͑̾͠ ${t}`
 ];
 
-function update(){
+/* render style boxes live */
+function renderStyles(){
   stylesList.innerHTML='';
-  const val = input.value || 'Hello from ur bro pathan';
-  styles.forEach(fn=>{
-    const div=document.createElement('div');
-    div.className='style';
-    div.textContent=fn(val);
-    div.addEventListener('click',()=>{
-      navigator.clipboard.writeText(div.textContent).then(()=>{
-        div.style.background='#10b981';
-        setTimeout(()=>div.style.background='#1e293b',600);
-      });
+  const val = inputEl.value || '';
+  styleFns.forEach((fn)=>{
+    const div = document.createElement('div');
+    div.className = 'style';
+    div.textContent = fn(val);
+    // clicking a style attempts to deduct 2 coins then copy
+    div.addEventListener('click', async ()=>{
+      if (!currentUid){ alert('Login required.'); return; }
+      try{
+        // deduct 2 coins atomically
+        const coinsRef = ref(db, 'users/' + currentUid + '/coins');
+        const tx = await runTransaction(coinsRef, (cur)=>{
+          if (cur === null) return 0; // safety fallback
+          if (cur >= 2) return cur - 2;
+          return; // abort if not enough
+        });
+        if (!tx.committed){
+          alert('Not enough coins. Use a referral code or ask admin to credit you.');
+          return;
+        }
+        await navigator.clipboard.writeText(div.textContent);
+        // feedback
+        const originalBg = div.style.background;
+        div.style.background = 'linear-gradient(90deg,#10b981,#06b6d4)';
+        setTimeout(()=>div.style.background = originalBg,700);
+        await refreshUser(); // update displayed coins
+      }catch(err){
+        console.error('Error deducting/copying:', err);
+        alert('Action failed. Try again.');
+      }
     });
     stylesList.appendChild(div);
   });
 }
 
-input.addEventListener('input', update);
-update();
+/* live update as user types */
+inputEl.addEventListener('input', renderStyles);
+
+/* initial render and user refresh */
+renderStyles();
+
 </script>
 </body>
 </html>
