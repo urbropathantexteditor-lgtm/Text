@@ -3,169 +3,261 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ur bro — Stylish Text Generator</title>
+<title>General Chat — Clocktower Theme</title>
 <style>
-  :root{--bg:#0f172a;--card:#0b1220;--muted:#94a3b8;--accent:#10b981;--glass:#172033}
-  body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;background:var(--bg);color:#f1f5f9;display:flex;justify-content:center;padding:18px}
-  .app{width:100%;max-width:600px}
-  header{display:flex;align-items:center;justify-content:center;margin-bottom:12px}
-  h1{margin:0;font-size:24px;text-align:center}
-  .card{background:var(--card);border-radius:12px;padding:14px;margin-bottom:12px;box-shadow:0 6px 18px rgba(2,6,23,0.6)}
-  textarea{width:100%;min-height:84px;padding:12px;border-radius:8px;background:var(--glass);border:none;color:white;font-size:16px;resize:vertical}
-  .styles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;max-height:60vh;overflow:auto;padding:6px}
-  .style{background:var(--glass);padding:10px;border-radius:10px;cursor:pointer;text-align:center;min-height:48px;display:flex;align-items:center;justify-content:center;word-break:break-word;transition:transform .12s,background .12s}
-  .style:hover{transform:translateY(-4px);background:#243343}
-  .btn{background:var(--accent);color:#06201b;padding:10px 14px;border-radius:8px;border:none;cursor:pointer;font-weight:600;width:100%;margin-bottom:12px}
-  .overlay{position:fixed;inset:0;background:linear-gradient(0deg,rgba(0,0,0,0.6),rgba(0,0,0,0.6));display:flex;align-items:center;justify-content:center;z-index:2000}
-  .loginModal{background:#071025;padding:22px;border-radius:12px;max-width:420px;width:90%;text-align:center}
+  @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+  body, html { margin:0; padding:0; font-family: 'Roboto', sans-serif; height:100%; background:#0b1220; color:#f1f5f9; display:flex; justify-content:center; align-items:center; }
+  body { background: url('https://i.ibb.co/CKcC8D7/clocktower-bg.jpg') no-repeat center center fixed; background-size: cover; }
+
+  .chat-app { width:100%; max-width:450px; height:90%; background:rgba(11,18,32,0.85); border-radius:12px; display:flex; flex-direction:column; overflow:hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.6);}
+  
+  .header { padding:12px; background:rgba(16,185,129,0.9); display:flex; justify-content:space-between; align-items:center; color:#fff; font-weight:700; }
+  .header h2 { margin:0; font-size:18px; }
+  .header button { background:transparent; border:none; color:#fff; font-weight:700; cursor:pointer; }
+
+  .chat-messages { flex:1; padding:12px; overflow-y:auto; display:flex; flex-direction:column; gap:8px; }
+  .message { display:flex; gap:8px; align-items:flex-start; animation:fadeIn 0.3s ease; }
+  .message .pfp { width:36px; height:36px; border-radius:50%; object-fit:cover; }
+  .message .content { max-width:75%; background:rgba(255,255,255,0.05); padding:8px 10px; border-radius:10px; word-break:break-word; }
+  .message .username { font-size:12px; color:#a1aab8; font-weight:600; margin-bottom:2px; }
+
+  .typing { font-size:12px; color:#10b981; font-style:italic; margin-left:44px; }
+  
+  .chat-input { display:flex; padding:8px; gap:6px; background:rgba(0,0,0,0.4);}
+  .chat-input input[type="text"] { flex:1; padding:10px; border-radius:8px; border:none; outline:none; }
+  .chat-input input[type="file"] { display:none; }
+  .chat-input button { padding:8px 12px; background:#10b981; border:none; border-radius:8px; color:#fff; cursor:pointer; }
+
+  .overlay { position:fixed; inset:0; background:rgba(0,0,0,0.7); display:flex; align-items:center; justify-content:center; z-index:2000; }
+  .loginModal, .profileModal { background:#071025; padding:22px; border-radius:12px; width:90%; max-width:400px; text-align:center; }
+  .loginModal button, .profileModal button { margin-top:12px; width:100%; padding:10px; border:none; border-radius:8px; background:#10b981; color:#fff; cursor:pointer; font-weight:600; }
+
+  .user-list { position:absolute; top:50px; right:12px; background:rgba(0,0,0,0.7); padding:8px; border-radius:8px; max-height:200px; overflow-y:auto; display:none; }
+  .user-item { display:flex; align-items:center; gap:6px; margin-bottom:6px; }
+  .user-item img { width:24px; height:24px; border-radius:50%; }
+
+  @keyframes fadeIn { 0% {opacity:0;} 100% {opacity:1;} }
 </style>
 </head>
 <body>
-<div class="app" id="app">
-  <header><h1>ur bro</h1></header>
 
-  <button id="loginBtn" class="btn">Login with Google</button>
-
-  <div class="card">
-    <textarea id="input" placeholder="Type your text here..."></textarea>
+<div class="chat-app">
+  <div class="header">
+    <h2>General Chat</h2>
+    <button id="userListBtn">Users</button>
   </div>
 
-  <div class="card">
-    <div class="styles" id="stylesList"></div>
+  <div class="chat-messages" id="messages"></div>
+  <div class="typing" id="typingIndicator" style="display:none;">Someone is typing...</div>
+
+  <div class="chat-input">
+    <input type="text" id="msgInput" placeholder="Type a message" disabled>
+    <button id="sendBtn">Send</button>
+    <button id="photoBtn">📷</button>
+    <input type="file" id="photoInput" accept="image/*">
   </div>
+
+  <div class="user-list" id="userList"></div>
 </div>
 
 <div id="overlay" class="overlay">
   <div class="loginModal">
     <h3>Login Required</h3>
-    <button id="overlayLogin" class="btn">Login with Google</button>
+    <p>You must sign in with Google to continue</p>
+    <button id="loginBtn">Login with Google</button>
+  </div>
+</div>
+
+<div id="profileOverlay" class="overlay" style="display:none">
+  <div class="profileModal">
+    <h3>Set Your Profile</h3>
+    <input type="text" id="usernameInput" placeholder="Enter username" style="width:100%;padding:10px;border-radius:8px;border:none;margin-top:10px;">
+    <input type="file" id="pfpInput" accept="image/*" style="margin-top:10px;">
+    <button id="saveProfileBtn">Save Profile</button>
   </div>
 </div>
 
 <script type="module">
-// Firebase imports
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { getDatabase, ref, push, onChildAdded, set, get, update, child } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDFPMf8HLMpS6DbZkdCR6T7GAm5sfz-TOw",
-  authDomain: "urbrokhan-f631c.firebaseapp.com",
-  projectId: "urbrokhan-f631c",
-  storageBucket: "urbrokhan-f631c.appspot.com",
-  messagingSenderId: "533086015351",
-  appId: "1:533086015351:web:a12328fbc4906e4f5c9b72"
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_AUTH_DOMAIN",
+  databaseURL: "YOUR_DB_URL",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_STORAGE_BUCKET",
+  messagingSenderId: "YOUR_MSG_ID",
+  appId: "YOUR_APP_ID"
 };
 
 const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 
-const loginBtn = document.getElementById('loginBtn');
 const overlay = document.getElementById('overlay');
-const overlayLogin = document.getElementById('overlayLogin');
-const inputEl = document.getElementById('input');
-const stylesList = document.getElementById('stylesList');
+const loginBtn = document.getElementById('loginBtn');
+const profileOverlay = document.getElementById('profileOverlay');
+const usernameInput = document.getElementById('usernameInput');
+const pfpInput = document.getElementById('pfpInput');
+const saveProfileBtn = document.getElementById('saveProfileBtn');
 
-async function login(){
-  try{ await signInWithPopup(auth, provider); }
-  catch(err){ console.warn("Login failed", err); }
-}
+const msgInput = document.getElementById('msgInput');
+const sendBtn = document.getElementById('sendBtn');
+const messagesEl = document.getElementById('messages');
+const typingIndicator = document.getElementById('typingIndicator');
 
-loginBtn.addEventListener('click', login);
-overlayLogin.addEventListener('click', login);
+const photoBtn = document.getElementById('photoBtn');
+const photoInput = document.getElementById('photoInput');
 
-onAuthStateChanged(auth,user=>{
-  if(user){ overlay.style.display='none'; loginBtn.style.display='none'; renderStyles(); }
-  else{ overlay.style.display='flex'; loginBtn.style.display='block'; }
+const userListBtn = document.getElementById('userListBtn');
+const userListEl = document.getElementById('userList');
+
+let currentUser = null;
+let currentProfile = null;
+
+// Login
+loginBtn.addEventListener('click', async()=>{
+  try{
+    await signInWithPopup(auth, provider);
+  }catch(e){ console.error(e); alert("Login failed."); }
 });
 
-// Stylish fonts
-const maps = {
-  bold:{'a':'𝗮','b':'𝗯','c':'𝗰','d':'𝗱','e':'𝗲','f':'𝗳','g':'𝗴','h':'𝗵','i':'𝗶','j':'𝗷','k':'𝗸','l':'𝗹','m':'𝗺','n':'𝗻','o':'𝗼','p':'𝗽','q':'𝗾','r':'𝗿','s':'𝘀','t':'𝘁','u':'𝘂','v':'𝘃','w':'𝘄','x':'𝘅','y':'𝘆','z':'𝘇','A':'𝗔','B':'𝗕','C':'𝗖','D':'𝗗','E':'𝗘','F':'𝗙','G':'𝗚','H':'𝗛','I':'𝗜','J':'𝗝','K':'𝗞','L':'𝗟','M':'𝗠','N':'𝗡','O':'𝗢','P':'𝗣','Q':'𝗤','R':'𝗥','S':'𝗦','T':'𝗧','U':'𝗨','V':'𝗩','W':'𝗪','X':'𝗫','Y':'𝗬','Z':'𝗭'},
-  italic:{'a':'𝘢','b':'𝘣','c':'𝘤','d':'𝘥','e':'𝘦','f':'𝘧','g':'𝘨','h':'𝘩','i':'𝘪','j':'𝘫','k':'𝘬','l':'𝘭','m':'𝘮','n':'𝘯','o':'𝘰','p':'𝘱','q':'𝘲','r':'𝘳','s':'𝘴','t':'𝘵','u':'𝘶','v':'𝘷','w':'𝘸','x':'𝘹','y':'𝘺','z':'𝘻'}
-};
-const styleFns = [
-  t => t,                         // Normal
-  t => t.toUpperCase(),
-  t => t.toLowerCase(),
-  t => mapChars(t, maps.bold),
-  t => mapChars(t, maps.italic),
-  t => mapChars(t, maps.smallCaps),
-  t => t.split('').reverse().join(''),
-  t => t.split('').join(' '),
-  t => `♡ ${t} ♡`,
-  t => `❀ ${t} ❀`,
-  t => `▂▃▅▇█ ${t} █▇▅▃▂`,
-  t => `(•_•) ${t} (•_•)`,
-  t => `¯\\_(ツ)_/¯ ${t} ¯\\_(ツ)_/¯`,
-  t => `🔥 ${t} 🔥`,
-  t => `✨ ${t} ✨`,
-  t => `💫 ${t} 💫`,
-  t => `🌸 ${t} 🌸`,
-  t => `⭐ ${t} ⭐`,
-  t => `💥 ${t} 💥`,
-  t => `💖 ${t} 💖`,
-  t => `💎 ${t} 💎`,
-  t => `💚 ${t} 💚`,
-  t => `😎 ${t} 😎`,
-  t => `🥶 ${t} 🥶`,
-  t => `⚡ ${t} ⚡`,
-  t => `🌈 ${t} 🌈`,
-  t => `🌻 ${t} 🌻`,
-  t => `🐉 ${t} 🐉`,
-  t => `❀·ᰄ· ${t} ·ᰄ·❀`,
-  t => `乂❤‿❤乂 ${t} 乂❤‿❤乂`,
-  t => `✿◕ ‿ ◕✿ ${t} ✿◕ ‿ ◕✿`,
-  t => `☯ ${t} ☯`,
-  t => `☀ ${t} ☀`,
-  t => `☾ ${t} ☽`,
-  t => `✦ ${t} ✦`,
-  t => `⚜ ${t} ⚜`,
-  t => `✧ ${t} ✧`,
-  t => `⛧ ${t} ⛧`,
-  t => `✪ ${t} ✪`,
-  t => `༺ ${t} ༻`,
-  t => `❂ ${t} ❂`,
-  t => `◈ ${t} ◈`,
-  t => `♛ ${t} ♛`,
-  t => `♕ ${t} ♕`,
-  t => `⫷ ${t} ⫸`,
-  t => `◌ ${t} ◌`,
-  t => t.split('').map(c => c + '\u0305').join(''),  // Overline
-  t => t.split('').map(c => c + '\u0336').join(''),  // Strikethrough
-  t => t.split('').map(c => c + '\u0311').join(''),  // Accented
-  t => t.split('').map(c => c + '\u032F').join('')   // Diacritic
-];>t=>`${e} ${t} ${e}`)
-];
+onAuthStateChanged(auth, async(user)=>{
+  if(user){
+    currentUser = user;
+    overlay.style.display='none';
+    checkProfile();
+  } else {
+    overlay.style.display='flex';
+    msgInput.disabled=true;
+  }
+});
 
-function renderStyles(){
-  stylesList.innerHTML='';
-  const val = inputEl.value || '';
-  styleFns.forEach(fn=>{
-    const div=document.createElement('div');
-    div.className='style';
-    div.textContent=fn(val);
-    div.addEventListener('click',()=>{ navigator.clipboard.writeText(div.textContent); });
-    stylesList.appendChild(div);
+// Check if profile exists
+async function checkProfile(){
+  const snap = await get(ref(db,'profiles/'+currentUser.uid));
+  if(!snap.exists()){
+    profileOverlay.style.display='flex';
+  } else {
+    currentProfile = snap.val();
+    msgInput.disabled=false;
+    loadMessages();
+    loadUsers();
+  }
+}
+
+// Save profile
+saveProfileBtn.addEventListener('click', async()=>{
+  const username = usernameInput.value.trim();
+  if(!username){ alert('Enter username'); return; }
+  let pfpUrl = '';
+  if(pfpInput.files[0]){
+    const reader = new FileReader();
+    reader.onload = async(e)=>{
+      pfpUrl = e.target.result;
+      await set(ref(db,'profiles/'+currentUser.uid), {username, pfp:pfpUrl});
+      currentProfile={username,pfp:pfpUrl};
+      profileOverlay.style.display='none';
+      msgInput.disabled=false;
+      loadMessages();
+      loadUsers();
+    }
+    reader.readAsDataURL(pfpInput.files[0]);
+  } else {
+    await set(ref(db,'profiles/'+currentUser.uid), {username, pfp:''});
+    currentProfile={username,pfp:''};
+    profileOverlay.style.display='none';
+    msgInput.disabled=false;
+    loadMessages();
+    loadUsers();
+  }
+});
+
+// Send message
+sendBtn.addEventListener('click', sendMsg);
+msgInput.addEventListener('keypress', (e)=>{
+  if(e.key==='Enter') sendMsg();
+});
+
+function sendMsg(){
+  const text = msgInput.value.trim();
+  if(!text) return;
+  const msgRef = ref(db,'messages');
+  push(msgRef, {uid:currentUser.uid, username:currentProfile.username, pfp:currentProfile.pfp, text, ts:Date.now()});
+  msgInput.value='';
+}
+
+// Photo
+photoBtn.addEventListener('click', ()=> photoInput.click());
+photoInput.addEventListener('change', ()=>{
+  const file = photoInput.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = (e)=>{
+    const msgRef = ref(db,'messages');
+    push(msgRef, {uid:currentUser.uid, username:currentProfile.username, pfp:currentProfile.pfp, photo:e.target.result, ts:Date.now()});
+  }
+  reader.readAsDataURL(file);
+});
+
+// Load messages
+function loadMessages(){
+  const msgsRef = ref(db,'messages');
+  onChildAdded(msgsRef, (snap)=>{
+    const data = snap.val();
+    const div = document.createElement('div');
+    div.className='message';
+    const pfp = document.createElement('img');
+    pfp.className='pfp';
+    pfp.src = data.pfp || 'https://i.ibb.co/7W0Q6wz/default-pfp.png';
+    const content = document.createElement('div');
+    content.className='content';
+    if(data.text) content.textContent = data.text;
+    if(data.photo){
+      const img = document.createElement('img');
+      img.src = data.photo; img.style.maxWidth='150px'; img.style.borderRadius='8px';
+      content.appendChild(img);
+    }
+    const uname = document.createElement('div');
+    uname.className='username';
+    uname.textContent = data.username;
+    content.prepend(uname);
+    div.appendChild(pfp);
+    div.appendChild(content);
+    messagesEl.appendChild(div);
+    messagesEl.scrollTop=messagesEl.scrollHeight;
   });
 }
-inputEl.addEventListener('input', renderStyles);
+
+// Users
+userListBtn.addEventListener('click', ()=>{ userListEl.style.display = userListEl.style.display==='none'?'block':'none'; });
+async function loadUsers(){
+  const profilesRef = ref(db,'profiles');
+  onChildAdded(profilesRef, (snap)=>{
+    renderUserList();
+  });
+}
+
+async function renderUserList(){
+  const snap = await get(ref(db,'profiles'));
+  if(!snap.exists()) return;
+  userListEl.innerHTML='';
+  const data = snap.val();
+  const total = Object.keys(data).length;
+  const header = document.createElement('div'); header.textContent=`Total Users: ${total}`; header.style.fontWeight='700'; header.style.marginBottom='6px';
+  userListEl.appendChild(header);
+  Object.values(data).forEach(u=>{
+    const div = document.createElement('div'); div.className='user-item';
+    const img = document.createElement('img'); img.src=u.pfp || 'https://i.ibb.co/7W0Q6wz/default-pfp.png';
+    const span = document.createElement('span'); span.textContent=u.username;
+    div.appendChild(img); div.appendChild(span);
+    userListEl.appendChild(div);
+  });
+}
 </script>
-  <a class="wa-btn" href="https://wa.me/447877486623" target="_blank" title="WhatsApp" style="
-  position:fixed;
-  right:18px;
-  bottom:18px;
-  background:#25D366;
-  width:60px;
-  height:60px;
-  border-radius:50%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  box-shadow:0 8px 24px rgba(0,0,0,0.4);
-  z-index:1000;
-">
-  <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WA" style="width:30px;height:30px">
-  </a>
 </body>
 </html>
