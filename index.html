@@ -1,79 +1,113 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>ur bro — Stylish Text Generator</title>
 <style>
-:root{
-  --bg:#0f172a;
-  --card:#0b1220;
-  --accent:#10b981;
-  --glass:#172033;
-  --muted:#94a3b8;
-}
-body{
-  margin:0;
-  font-family:Inter,system-ui,Segoe UI,Roboto,Arial;
-  background:var(--bg);
-  color:#f1f5f9;
-  display:flex;
-  justify-content:center;
-  padding:18px;
-}
-.app{width:100%;max-width:1100px;display:none;}
-header{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-bottom:12px}
-.brand{display:flex;gap:12px;align-items:center}
-.logo{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,#06b6d4,#7c3aed);display:flex;align-items:center;justify-content:center;font-weight:700;color:white}
-h1{font-size:20px;margin:0}
-.card{background:var(--card);border-radius:12px;padding:14px;margin-bottom:12px;box-shadow:0 6px 18px rgba(2,6,23,0.6)}
-textarea{width:100%;min-height:84px;padding:12px;border-radius:8px;background:var(--glass);border:none;color:white;font-size:16px;resize:vertical}
-.styles{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;max-height:60vh;overflow:auto;padding:6px}
-.style{background:var(--glass);padding:10px;border-radius:10px;cursor:pointer;text-align:center;min-height:48px;display:flex;align-items:center;justify-content:center;word-break:break-word;transition:transform .12s,background .12s}
-.style:hover{transform:translateY(-4px);background:#243343}
-.btn{background:var(--accent);color:#06201b;padding:8px 12px;border-radius:8px;border:none;cursor:pointer;font-weight:600}
-.overlay{position:fixed;inset:0;background:linear-gradient(0deg,rgba(0,0,0,0.6),rgba(0,0,0,0.6));display:flex;align-items:center;justify-content:center;z-index:2000}
-.loginModal{background:#071025;padding:22px;border-radius:12px;max-width:420px;width:90%;text-align:center}
-@media (max-width:600px){.styles{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}}
+  :root{--bg:#0f172a;--card:#0b1220;--muted:#94a3b8;--accent:#10b981;--glass:#172033}
+  body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;background:var(--bg);color:#f1f5f9;display:flex;justify-content:center;padding:18px}
+  .app{width:100%;max-width:500px}
+  header{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-bottom:12px}
+  .brand{display:flex;gap:12px;align-items:center}
+  .logo{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,#06b6d4,#7c3aed);display:flex;align-items:center;justify-content:center;font-weight:700;color:white}
+  h1{font-size:18px;margin:0}
+  .small{font-size:13px;color:var(--muted)}
+  .card{background:var(--card);border-radius:12px;padding:14px;margin-bottom:12px;box-shadow:0 6px 18px rgba(2,6,23,0.6)}
+  .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+  .col{flex:1;min-width:260px}
+  textarea{width:100%;min-height:84px;padding:12px;border-radius:8px;background:var(--glass);border:none;color:white;font-size:16px;resize:vertical}
+  .styles{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:10px;max-height:60vh;overflow:auto;padding:6px}
+  .style{background:var(--glass);padding:10px;border-radius:10px;cursor:pointer;text-align:center;min-height:48px;display:flex;align-items:center;justify-content:center;word-break:break-word;transition:transform .12s,background .12s}
+  .style:hover{transform:translateY(-4px);background:#243343}
+  .btn{background:var(--accent);color:#06201b;padding:8px 12px;border-radius:8px;border:none;cursor:pointer;font-weight:600;width:100%}
+  .wa-btn{position:fixed;right:18px;bottom:18px;background:#25D366;width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(0,0,0,0.4);z-index:1000}
+  @media (max-width:600px){header{flex-direction:column;align-items:flex-start} .styles{grid-template-columns:repeat(auto-fit,minmax(80px,1fr))}}
 </style>
 </head>
 <body>
+  <div class="app" id="app">
+    <header>
+      <div class="brand">
+        <div class="logo">PB</div>
+        <div><h1>ur bro — Stylish Text Generator</h1></div>
+      </div>
+      <button id="loginBtn" class="btn">Login with Google</button>
+    </header>
 
-<div class="app" id="app">
-  <header>
-    <div class="brand">
-      <div class="logo">PB</div>
-      <h1>ur bro — Stylish Text Generator</h1>
+    <div class="card">
+      <textarea id="input" placeholder="Type your text here..."></textarea>
     </div>
-    <div>
-      <span id="userName" class="btn" style="cursor:default;"></span>
-      <button id="logoutBtn" class="btn" style="display:none">Logout</button>
+
+    <div class="card">
+      <div class="styles" id="stylesList"></div>
     </div>
-  </header>
-
-  <div class="card">
-    <textarea id="input" placeholder="Type your text here..."></textarea>
   </div>
 
-  <div class="card">
-    <div class="styles" id="stylesList"></div>
-  </div>
-</div>
-
-<!-- Login overlay -->
-<div id="overlay" class="overlay">
-  <div class="loginModal">
-    <h3>Welcome — Login required</h3>
-    <p style="color:var(--muted);">Sign in with Google to generate stylish text.</p>
-    <button id="loginBtn" class="btn" style="width:100%">Login with Google</button>
-  </div>
-</div>
+  <a class="wa-btn" href="https://wa.me/447877486623?text=Hello" target="_blank" title="WhatsApp">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WA" style="width:30px;height:30px">
+  </a>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-// ✅ Your Firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyDFPMf8HLMpS6DbZkdCR6T7GAm5sfz-TOw",
+  authDomain: "urbrokhan-f631c.firebaseapp.com",
+  databaseURL: "https://urbrokhan-f631c-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "urbrokhan-f631c",
+  storageBucket: "urbrokhan-f631c.appspot.com",
+  messagingSenderId: "533086015351",
+  appId: "1:533086015351:web:a12328fbc4906e4f5c9b72",
+  measurementId: "G-TGT66KJV02"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
+
+const loginBtn = document.getElementById('loginBtn');
+const inputEl = document.getElementById('input');
+const stylesList = document.getElementById('stylesList');
+
+loginBtn.addEventListener('click', async () => {
+  try {
+    await signInWithPopup(auth, provider);
+  } catch(err){ console.error(err); alert('Login failed'); }
+});
+
+onAuthStateChanged(auth, user => {
+  if (user) loginBtn.style.display='none';
+});
+
+/* ---------------- Stylish generator ---------------- */
+const emojiList = ['🔥','✨','💫','💖','🌸','⭐','💥','🌟','❤️','💎','💀','🎯','🎉','🥶','⚡','🌈','🌻','🐉','💚','😎','🌺','🍀','🌼','🎀','🦋','🍁','🎵','🎶','🍄','🌹','🍂','🌷','🍉','🍇','🍓','🍊','🍌','🥭','🍍','🍑','🍒','🥥','🥝','🍋','🥕','🌽','🥦','🍆','🥔'];
+const symbolList = ['♡','❀','★','✦','✧','❁','☯','☾','✪','❖','☘','☠','☢','⚡','☃','✈','⚜','❂','❉','✿','✺','❇','✤','✱','✵','✹','✺','✸','✷','❈','❊','❋','❌','⚔','⚙','☂','☁','☄','✌','✎','✏','☑','✒','♛','♚','♞','♟'];
+
+function renderStyles(){
+  stylesList.innerHTML='';
+  const val = inputEl.value || '';
+  const styleFns = [
+    t=>t.toUpperCase(), t=>t.toLowerCase(), t=>t.split('').join(' '),
+    t=>`♡ ${t} ♡`, t=>`❀ ${t} ❀`, t=>`★ ${t} ★`, t=>`✦ ${t} ✦`, t=>`✧ ${t} ✧`,
+    t=>`❁ ${t} ❁`, t=>`☯ ${t} ☯`, t=>`☾ ${t} ☽`, t=>`✪ ${t} ✪`, t=>`❖ ${t} ❖`, t=>`☘ ${t} ☘`,
+    ...emojiList.map(e=>t=>`${e} ${t} ${e}`),
+    ...symbolList.map(s=>t=>`${s} ${t} ${s}`)
+  ];
+  styleFns.forEach(fn=>{
+    const div=document.createElement('div');
+    div.className='style';
+    div.textContent=fn(val);
+    div.addEventListener('click',()=>navigator.clipboard.writeText(div.textContent));
+    stylesList.appendChild(div);
+  });
+}
+inputEl.addEventListener('input', renderStyles);
+renderStyles();
+</script>
+</body>
+</html>// ✅ Your Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyDFPMf8HLMpS6DbZkdCR6T7GAm5sfz-TOw",
   authDomain: "urbrokhan-f631c.firebaseapp.com",
