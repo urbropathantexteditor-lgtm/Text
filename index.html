@@ -148,18 +148,42 @@ onAuthStateChanged(auth, async (user)=>{
 });
 
 /* ---------------- Coupon apply ---------------- */
-applyBtnEl.addEventListener('click', async ()=>{
-  const code = (applyCouponInput.value||'').trim();
-  if (!code) { applyMsg.textContent = 'Enter a coupon.'; return; }
-  if (!currentUid){ applyMsg.textContent = 'Please login first.'; return; }
-  // for simplicity, assume admin changes coupon codes manually in DB under /coupons/CODE:coins
-  const couponSnap = await get(ref(db,'coupons/'+code));
-  if (!couponSnap.exists()){ applyMsg.textContent = 'Invalid coupon.'; return; }
-  const coinsToAdd = couponSnap.val()||0;
-  await runTransaction(ref(db,'users/'+currentUid+'/coins'), cur=>(cur||6)+coinsToAdd);
-  applyMsg.textContent = `Coupon applied! +${coinsToAdd} coins.`;
-  applyCouponInput.value='';
-  await refreshUser();
+const couponCode = "SUPER10000"; // <-- change manually
+const couponReward = 10000;      // coins reward
+
+applyCouponBtn = document.createElement('button');
+applyCouponBtn.textContent = "Apply Coupon";
+applyCouponBtn.className = "btn";
+applyRefInput.parentNode.appendChild(applyCouponBtn); // add button after referral input
+
+const couponMsg = document.createElement('div');
+couponMsg.className = "small";
+couponMsg.style.marginTop = "8px";
+applyRefInput.parentNode.appendChild(couponMsg);
+
+applyCouponBtn.addEventListener('click', async ()=>{
+    couponMsg.textContent = '';
+    if (!currentUid){ couponMsg.textContent = 'Login first.'; return; }
+    const entered = (applyRefInput.value||'').trim().toUpperCase();
+    if (entered !== couponCode){ couponMsg.textContent = 'Invalid coupon.'; return; }
+
+    try{
+        const userRef = ref(db,'users/'+currentUid+'/usedCoupons/'+couponCode);
+        const usedSnap = await get(userRef);
+        if (usedSnap.exists() && usedSnap.val() === true){
+            couponMsg.textContent = 'Coupon already used.';
+            return;
+        }
+
+        // add coins
+        await runTransaction(ref(db,'users/'+currentUid+'/coins'), (cur)=> (cur||0) + couponReward);
+
+        // mark coupon as used
+        await set(userRef,true);
+
+        couponMsg.textContent = `Coupon applied! +${couponReward} coins added.`;
+        await refreshUser();
+    } catch(err){ console.error(err); couponMsg.textContent='Failed to apply coupon.'; }
 });
 
 /* ---------------- Stylish generator ---------------- */
