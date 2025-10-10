@@ -157,7 +157,7 @@ onAuthStateChanged(auth, async (user)=>{
     currentUser = null; currentUid = null; currentData = null;
     loginBtn.style.display = 'inline-block';
     logoutBtn.style.display = 'none';
-    coinCountEl.textContent = '0';
+    coinCountEl.textContent = '50';
     userNameEl.textContent = '';
     overlay.style.display = 'flex';
     setTimeout(async ()=>{ await tryLoginPopup(); }, 250);
