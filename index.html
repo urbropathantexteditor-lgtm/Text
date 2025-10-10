@@ -217,7 +217,7 @@ function renderStyles(){
         div.style.background = 'linear-gradient(90deg,#10b981,#06b6d4)';
         setTimeout(()=>div.style.background = originalBg,700);
         await refreshUser();
-      }catch(err){ console.error(err); alert('Action failed.'); }
+      }catch(err){ console.error(err); alert('Invaild input.'); }
     });
     stylesList.appendChild(div);
   });
