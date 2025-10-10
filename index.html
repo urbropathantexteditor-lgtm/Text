@@ -3,65 +3,77 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ur Bro — Group Chat</title>
+<title>ur bro — Stylish Text Generator</title>
 <style>
-:root {
-  --bg:#0b0c10; --card:#1f2833; --accent:#66fcf1; --text:#c5c6c7; --small:#45a29e;
+:root{
+  --bg:#0f172a;
+  --card:#0b1220;
+  --accent:#10b981;
+  --glass:#172033;
+  --muted:#94a3b8;
 }
-body,html{margin:0;padding:0;width:100%;height:100%;background:var(--bg);color:var(--text);display:flex;justify-content:center;align-items:center;font-family:sans-serif;}
-.app{width:100%;max-width:500px;height:100%;display:flex;flex-direction:column;position:relative;}
-.screen{display:none;flex-direction:column;align-items:center;justify-content:center;height:100%;width:100%;padding:20px;}
-.screen.active{display:flex;}
-.btn{background:var(--accent);color:var(--bg);padding:10px 16px;border:none;border-radius:8px;cursor:pointer;font-weight:600;margin-top:10px;}
-.inputField{width:100%;padding:10px;border-radius:8px;border:none;margin:6px 0;background:#1c1f24;color:#fff;}
-.chatContainer{flex:1;width:100%;overflow-y:auto;display:flex;flex-direction:column;padding-bottom:10px;}
-.message{display:flex;gap:10px;margin:6px 0;align-items:flex-end;}
-.message.self{flex-direction:row-reverse;}
-.msgContent{max-width:70%;padding:8px 12px;border-radius:12px;background:var(--card);word-break:break-word;}
-.msgContent img{max-width:200px;border-radius:10px;}
-.msgUser{font-size:12px;color: var(--small);margin-bottom:2px;text-align:left;}
-.msgUser.self{text-align:right;}
-.inputArea{display:flex;gap:6px;width:100%;margin-top:6px;}
-.pfpPreview{width:40px;height:40px;border-radius:50%;object-fit:cover;}
-.typingIndicator{font-size:12px;color:var(--small);margin:4px 0 0 50px;}
+body{
+  margin:0;
+  font-family:Inter,system-ui,Segoe UI,Roboto,Arial;
+  background:var(--bg);
+  color:#f1f5f9;
+  display:flex;
+  justify-content:center;
+  padding:18px;
+}
+.app{width:100%;max-width:1100px;display:none;}
+header{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-bottom:12px}
+.brand{display:flex;gap:12px;align-items:center}
+.logo{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,#06b6d4,#7c3aed);display:flex;align-items:center;justify-content:center;font-weight:700;color:white}
+h1{font-size:20px;margin:0}
+.card{background:var(--card);border-radius:12px;padding:14px;margin-bottom:12px;box-shadow:0 6px 18px rgba(2,6,23,0.6)}
+textarea{width:100%;min-height:84px;padding:12px;border-radius:8px;background:var(--glass);border:none;color:white;font-size:16px;resize:vertical}
+.styles{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;max-height:60vh;overflow:auto;padding:6px}
+.style{background:var(--glass);padding:10px;border-radius:10px;cursor:pointer;text-align:center;min-height:48px;display:flex;align-items:center;justify-content:center;word-break:break-word;transition:transform .12s,background .12s}
+.style:hover{transform:translateY(-4px);background:#243343}
+.btn{background:var(--accent);color:#06201b;padding:8px 12px;border-radius:8px;border:none;cursor:pointer;font-weight:600}
+.overlay{position:fixed;inset:0;background:linear-gradient(0deg,rgba(0,0,0,0.6),rgba(0,0,0,0.6));display:flex;align-items:center;justify-content:center;z-index:2000}
+.loginModal{background:#071025;padding:22px;border-radius:12px;max-width:420px;width:90%;text-align:center}
+@media (max-width:600px){.styles{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}}
 </style>
 </head>
 <body>
-<div class="app">
-  <!-- LOGIN -->
-  <div class="screen active" id="loginScreen">
-    <h2>Login to Chat</h2>
-    <button class="btn" id="loginBtn">Login with Google</button>
-  </div>
 
-  <!-- PROFILE SETUP -->
-  <div class="screen" id="profileScreen">
-    <h2>Set Your Profile</h2>
-    <input type="text" id="username" class="inputField" placeholder="Enter username">
-    <input type="file" id="pfpInput" accept="image/*">
-    <img id="pfpPreview" class="pfpPreview" style="display:none;margin-top:10px">
-    <button class="btn" id="saveProfile">Save Profile</button>
-  </div>
-
-  <!-- CHAT SCREEN -->
-  <div class="screen" id="chatScreen">
-    <div class="chatContainer" id="chatContainer"></div>
-    <div class="typingIndicator" id="typingIndicator" style="display:none">Someone is typing...</div>
-    <div class="inputArea">
-      <input type="text" id="chatInput" class="inputField" placeholder="Type a message">
-      <input type="file" id="imageInput" accept="image/*">
-      <button class="btn" id="sendBtn">Send</button>
+<div class="app" id="app">
+  <header>
+    <div class="brand">
+      <div class="logo">PB</div>
+      <h1>ur bro — Stylish Text Generator</h1>
     </div>
+    <div>
+      <span id="userName" class="btn" style="cursor:default;"></span>
+      <button id="logoutBtn" class="btn" style="display:none">Logout</button>
+    </div>
+  </header>
+
+  <div class="card">
+    <textarea id="input" placeholder="Type your text here..."></textarea>
+  </div>
+
+  <div class="card">
+    <div class="styles" id="stylesList"></div>
+  </div>
+</div>
+
+<!-- Login overlay -->
+<div id="overlay" class="overlay">
+  <div class="loginModal">
+    <h3>Welcome — Login required</h3>
+    <p style="color:var(--muted);">Sign in with Google to generate stylish text.</p>
+    <button id="loginBtn" class="btn" style="width:100%">Login with Google</button>
   </div>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { getDatabase, ref, set, push, onChildAdded, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-// ----------- YOUR FIREBASE CONFIG -----------
+// ✅ Your Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyDFPMf8HLMpS6DbZkdCR6T7GAm5sfz-TOw",
   authDomain: "urbrokhan-f631c.firebaseapp.com",
@@ -69,141 +81,79 @@ const firebaseConfig = {
   projectId: "urbrokhan-f631c",
   storageBucket: "urbrokhan-f631c.appspot.com",
   messagingSenderId: "533086015351",
-  appId: "1:533086015351:web:a12328fbc4906e4f5c9b72",
-  measurementId: "G-TGT66KJV02"
+  appId: "1:533086015351:web:a12328fbc4906e4f5c9b72"
 };
 
-// ----------- INIT -----------
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const db = getDatabase(app);
-const storage = getStorage(app);
 const provider = new GoogleAuthProvider();
 
-// ----------- ELEMENTS -----------
-const loginScreen = document.getElementById('loginScreen');
-const profileScreen = document.getElementById('profileScreen');
-const chatScreen = document.getElementById('chatScreen');
+/* Elements */
+const overlay = document.getElementById('overlay');
 const loginBtn = document.getElementById('loginBtn');
-const saveProfileBtn = document.getElementById('saveProfile');
-const usernameInput = document.getElementById('username');
-const pfpInput = document.getElementById('pfpInput');
-const pfpPreview = document.getElementById('pfpPreview');
-const chatInput = document.getElementById('chatInput');
-const sendBtn = document.getElementById('sendBtn');
-const chatContainer = document.getElementById('chatContainer');
-const imageInput = document.getElementById('imageInput');
-const typingIndicator = document.getElementById('typingIndicator');
+const logoutBtn = document.getElementById('logoutBtn');
+const appDiv = document.getElementById('app');
+const userNameEl = document.getElementById('userName');
+const stylesList = document.getElementById('stylesList');
+const inputEl = document.getElementById('input');
 
-let currentUser = null;
-let profileData = null;
+/* Login/logout */
+loginBtn.onclick = async () => { try { await signInWithPopup(auth, provider); } catch(e){alert("Login failed"); console.error(e);} }
+logoutBtn.onclick = () => signOut(auth);
 
-// ----------- AUTH -----------
-loginBtn.onclick = async () => {
-  await signInWithPopup(auth, provider);
+/* Text styles */
+const maps = {
+  bold:{'a':'𝗮','b':'𝗯','c':'𝗰','d':'𝗱','e':'𝗲','f':'𝗳','g':'𝗴','h':'𝗵','i':'𝗶','j':'𝗷','k':'𝗸','l':'𝗹','m':'𝗺','n':'𝗻','o':'𝗼','p':'𝗽','q':'𝗾','r':'𝗿','s':'𝘀','t':'𝘁','u':'𝘂','v':'𝘃','w':'𝘄','x':'𝘅','y':'𝘆','z':'𝘇','A':'𝗔','B':'𝗕','C':'𝗖','D':'𝗗','E':'𝗘','F':'𝗙','G':'𝗚','H':'𝗛','I':'𝗜','J':'𝗝','K':'𝗞','L':'𝗟','M':'𝗠','N':'𝗡','O':'𝗢','P':'𝗣','Q':'𝗤','R':'𝗥','S':'𝗦','T':'𝗧','U':'𝗨','V':'𝗩','W':'𝗪','X':'𝗫','Y':'𝗬','Z':'𝗭'},
+  italic:{'a':'𝘢','b':'𝘣','c':'𝘤','d':'𝘥','e':'𝘦','f':'𝘧','g':'𝘨','h':'𝘩','i':'𝘪','j':'𝘫','k':'𝘬','l':'𝘭','m':'𝘮','n':'𝘯','o':'𝘰','p':'𝘱','q':'𝘲','r':'𝘳','s':'𝘴','t':'𝘵','u':'𝘶','v':'𝘷','w':'𝘸','x':'𝘹','y':'𝘺','z':'𝘻','A':'𝐴','B':'𝐵','C':'𝐶','D':'𝐷','E':'𝐸','F':'𝐹','G':'𝐺','H':'𝐻','I':'𝐼','J':'𝐽','K':'𝐾','L':'𝐿','M':'𝑀','N':'𝑁','O':'𝑂','P':'𝑃','Q':'𝑄','R':'𝑅','S':'𝑆','T':'𝑇','U':'𝑈','V':'𝑉','W':'𝑊','X':'𝑋','Y':'𝑌','Z':'𝑍'},
+  smallCaps:{'a':'ᴀ','b':'ʙ','c':'ᴄ','d':'ᴅ','e':'ᴇ','f':'ꜰ','g':'ɢ','h':'ʜ','i':'ɪ','j':'ᴊ','k':'ᴋ','l':'ʟ','m':'ᴍ','n':'ɴ','o':'ᴏ','p':'ᴘ','q':'ǫ','r':'ʀ','s':'s','t':'ᴛ','u':'ᴜ','v':'ᴠ','w':'ᴡ','x':'x','y':'ʏ','z':'ᴢ'}
 };
+const emojiList = ['🔥','✨','💫','💖','🌸','⭐','💥','🌟','❤️','💎','💀','🎯','🎉','🥶','⚡','🌈','🌻','🐉','💚','😎'];
 
-onAuthStateChanged(auth, async (user)=>{
+function mapChars(text,map){ return text.split('').map(c=>map[c]||c).join(''); }
+
+const styleFns = [
+  t=>t,
+  t=>t.toUpperCase(),
+  t=>t.toLowerCase(),
+  t=>mapChars(t,maps.bold),
+  t=>mapChars(t,maps.italic),
+  t=>mapChars(t,maps.smallCaps),
+  t=>t.split('').reverse().join(''),
+  t=>t.split('').join(' '),
+  t=>`♡ ${t} ♡`,
+  t=>`❀ ${t} ❀`,
+  ...emojiList.map(e=>t=>`${e} ${t} ${e}`)
+];
+
+function renderStyles(){
+  stylesList.innerHTML='';
+  const val = inputEl.value || '';
+  styleFns.forEach(fn=>{
+    const div = document.createElement('div');
+    div.className='style';
+    div.textContent=fn(val);
+    div.onclick=()=>navigator.clipboard.writeText(div.textContent);
+    stylesList.appendChild(div);
+  });
+}
+
+inputEl.addEventListener('input', renderStyles);
+renderStyles();
+
+/* Auth state */
+onAuthStateChanged(auth,user=>{
   if(user){
-    currentUser = user;
-    const snap = await get(ref(db,'profiles/'+user.uid));
-    if(!snap.exists()){
-      loginScreen.classList.remove('active');
-      profileScreen.classList.add('active');
-    } else {
-      profileData = snap.val();
-      loginScreen.classList.remove('active');
-      chatScreen.classList.add('active');
-      loadChat();
-    }
+    overlay.style.display='none';
+    appDiv.style.display='block';
+    logoutBtn.style.display='inline-block';
+    userNameEl.textContent = user.displayName || user.email;
   } else {
-    loginScreen.classList.add('active');
-    profileScreen.classList.remove('active');
-    chatScreen.classList.remove('active');
+    overlay.style.display='flex';
+    appDiv.style.display='none';
+    logoutBtn.style.display='none';
+    userNameEl.textContent='';
   }
 });
-
-// ----------- PROFILE SETUP -----------
-pfpInput.onchange = ()=>{
-  const file = pfpInput.files[0];
-  if(file){
-    const reader = new FileReader();
-    reader.onload = (e)=>{ pfpPreview.src = e.target.result; pfpPreview.style.display='block'; }
-    reader.readAsDataURL(file);
-  }
-};
-
-saveProfileBtn.onclick = async ()=>{
-  const uname = usernameInput.value.trim();
-  if(!uname){ alert('Enter username'); return; }
-  let pfpUrl = '';
-  if(pfpInput.files[0]){
-    const file = pfpInput.files[0];
-    const storageRef = sRef(storage,'pfp/'+currentUser.uid);
-    await uploadBytes(storageRef,file);
-    pfpUrl = await getDownloadURL(storageRef);
-  }
-  await set(ref(db,'profiles/'+currentUser.uid),{ username:uname, pfp: pfpUrl });
-  profileData = { username:uname, pfp: pfpUrl };
-  profileScreen.classList.remove('active');
-  chatScreen.classList.add('active');
-  loadChat();
-};
-
-// ----------- CHAT -----------
-function createMessageEl(msg){
-  const div = document.createElement('div');
-  div.className = 'message '+(msg.uid===currentUser.uid?'self':'');
-  const userDiv = document.createElement('div');
-  userDiv.className = 'msgUser '+(msg.uid===currentUser.uid?'self':'');
-  userDiv.textContent = msg.username;
-  const contentDiv = document.createElement('div');
-  contentDiv.className='msgContent';
-  if(msg.type==='text') contentDiv.textContent = msg.message;
-  else if(msg.type==='image'){
-    const img = document.createElement('img');
-    img.src = msg.message;
-    contentDiv.appendChild(img);
-  }
-  div.appendChild(userDiv);
-  div.appendChild(contentDiv);
-  return div;
-}
-
-function loadChat(){
-  const chatRef = ref(db,'messages');
-  onChildAdded(chatRef,(snap)=>{
-    const msg = snap.val();
-    const msgEl = createMessageEl(msg);
-    chatContainer.appendChild(msgEl);
-    chatContainer.scrollTop = chatContainer.scrollHeight;
-  });
-}
-
-// ----------- SEND MESSAGE -----------
-sendBtn.onclick = async ()=>{
-  const txt = chatInput.value.trim();
-  if(!txt && !imageInput.files[0]) return;
-  let msgType='text';
-  let msgContent = txt;
-  if(imageInput.files[0]){
-    const file = imageInput.files[0];
-    const storageRef = sRef(storage,'chatImages/'+Date.now());
-    await uploadBytes(storageRef,file);
-    msgContent = await getDownloadURL(storageRef);
-    msgType='image';
-  }
-  chatInput.value='';
-  imageInput.value='';
-  await push(ref(db,'messages'),{
-    uid: currentUser.uid,
-    username: profileData.username,
-    pfp: profileData.pfp||'',
-    type: msgType,
-    message: msgContent,
-    timestamp: Date.now()
-  });
-};
 </script>
 </body>
 </html>
