@@ -5,63 +5,63 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ur Bro — Group Chat</title>
 <style>
-  :root {
-    --bg: #0f172a;
-    --card: #1e293b;
-    --accent: #10b981;
-    --text: #f1f5f9;
-    --muted: #94a3b8;
-    --input-bg: #172033;
-  }
-  body { margin:0; font-family:sans-serif; background:var(--bg); color:var(--text); }
-  .center { display:flex; justify-content:center; align-items:center; height:100vh; flex-direction:column; }
-  .btn { padding:10px 16px; border:none; border-radius:8px; cursor:pointer; background:var(--accent); color:#000; font-weight:600; margin:6px; }
-  .card { background:var(--card); border-radius:12px; padding:16px; margin:12px; width:90%; max-width:500px; box-shadow:0 4px 12px rgba(0,0,0,0.5); }
-  input, textarea { width:100%; padding:10px; margin:6px 0; border:none; border-radius:8px; background:var(--input-bg); color:var(--text); }
-  .chat-container { display:flex; flex-direction:column; height:80vh; overflow-y:auto; gap:8px; padding:8px; background:var(--card); border-radius:12px; }
-  .message { display:flex; gap:8px; align-items:flex-start; }
-  .msg-content { background:var(--accent); padding:8px 12px; border-radius:12px; max-width:70%; word-break:break-word; color:#000; position:relative; animation:fadeIn 0.3s; }
-  .msg-user { font-size:12px; color:var(--muted); }
-  .pfp { width:32px; height:32px; border-radius:50%; object-fit:cover; }
-  .top-bar { display:flex; justify-content:space-between; align-items:center; background:var(--card); padding:10px 16px; border-bottom:1px solid rgba(255,255,255,0.1); }
-  .typing { font-size:12px; color:var(--muted); font-style:italic; }
-  .hidden { display:none; }
-  @keyframes fadeIn { from {opacity:0; transform:translateY(4px);} to {opacity:1; transform:translateY(0);} }
+:root {
+  --bg:#0b0c10; --card:#1f2833; --accent:#66fcf1; --text:#c5c6c7; --small:#45a29e;
+}
+body,html{margin:0;padding:0;width:100%;height:100%;background:var(--bg);color:var(--text);display:flex;justify-content:center;align-items:center;font-family:sans-serif;}
+.app{width:100%;max-width:500px;height:100%;display:flex;flex-direction:column;position:relative;}
+.screen{display:none;flex-direction:column;align-items:center;justify-content:center;height:100%;width:100%;padding:20px;}
+.screen.active{display:flex;}
+.btn{background:var(--accent);color:var(--bg);padding:10px 16px;border:none;border-radius:8px;cursor:pointer;font-weight:600;margin-top:10px;}
+.inputField{width:100%;padding:10px;border-radius:8px;border:none;margin:6px 0;background:#1c1f24;color:#fff;}
+.chatContainer{flex:1;width:100%;overflow-y:auto;display:flex;flex-direction:column;padding-bottom:10px;}
+.message{display:flex;gap:10px;margin:6px 0;align-items:flex-end;}
+.message.self{flex-direction:row-reverse;}
+.msgContent{max-width:70%;padding:8px 12px;border-radius:12px;background:var(--card);word-break:break-word;}
+.msgContent img{max-width:200px;border-radius:10px;}
+.msgUser{font-size:12px;color: var(--small);margin-bottom:2px;text-align:left;}
+.msgUser.self{text-align:right;}
+.inputArea{display:flex;gap:6px;width:100%;margin-top:6px;}
+.pfpPreview{width:40px;height:40px;border-radius:50%;object-fit:cover;}
+.typingIndicator{font-size:12px;color:var(--small);margin:4px 0 0 50px;}
 </style>
 </head>
 <body>
-<div id="loginDiv" class="center card">
-  <h2>Login Required</h2>
-  <button id="googleLogin" class="btn">Login with Google</button>
-</div>
-
-<div id="profileDiv" class="center card hidden">
-  <h2>Set Profile</h2>
-  <input type="text" id="username" placeholder="Enter Username">
-  <input type="file" id="pfpInput" accept="image/*">
-  <button id="saveProfile" class="btn">Save Profile</button>
-</div>
-
-<div id="chatDiv" class="hidden">
-  <div class="top-bar">
-    <div>Ur Bro Group Chat</div>
-    <div><button id="logoutBtn" class="btn">Logout</button></div>
+<div class="app">
+  <!-- LOGIN -->
+  <div class="screen active" id="loginScreen">
+    <h2>Login to Chat</h2>
+    <button class="btn" id="loginBtn">Login with Google</button>
   </div>
-  <div class="chat-container" id="chatContainer"></div>
-  <div style="padding:10px; display:flex; gap:6px;">
-    <input type="text" id="chatMsg" placeholder="Type message...">
-    <input type="file" id="chatPhoto" accept="image/*">
-    <button id="sendBtn" class="btn">Send</button>
+
+  <!-- PROFILE SETUP -->
+  <div class="screen" id="profileScreen">
+    <h2>Set Your Profile</h2>
+    <input type="text" id="username" class="inputField" placeholder="Enter username">
+    <input type="file" id="pfpInput" accept="image/*">
+    <img id="pfpPreview" class="pfpPreview" style="display:none;margin-top:10px">
+    <button class="btn" id="saveProfile">Save Profile</button>
   </div>
-  <div id="typingIndicator" class="typing hidden">Someone is typing...</div>
+
+  <!-- CHAT SCREEN -->
+  <div class="screen" id="chatScreen">
+    <div class="chatContainer" id="chatContainer"></div>
+    <div class="typingIndicator" id="typingIndicator" style="display:none">Someone is typing...</div>
+    <div class="inputArea">
+      <input type="text" id="chatInput" class="inputField" placeholder="Type a message">
+      <input type="file" id="imageInput" accept="image/*">
+      <button class="btn" id="sendBtn">Send</button>
+    </div>
+  </div>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { getDatabase, ref, set, push, onChildAdded, get, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { getDatabase, ref, set, push, onChildAdded, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 
-// ------------------- Replace with your Firebase config -------------------
+// ----------- YOUR FIREBASE CONFIG -----------
 const firebaseConfig = {
   apiKey: "AIzaSyDFPMf8HLMpS6DbZkdCR6T7GAm5sfz-TOw",
   authDomain: "urbrokhan-f631c.firebaseapp.com",
@@ -73,146 +73,137 @@ const firebaseConfig = {
   measurementId: "G-TGT66KJV02"
 };
 
-// ------------------- Firebase init -------------------
+// ----------- INIT -----------
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getDatabase(app);
+const storage = getStorage(app);
 const provider = new GoogleAuthProvider();
 
-// ------------------- Elements -------------------
-const loginDiv = document.getElementById('loginDiv');
-const profileDiv = document.getElementById('profileDiv');
-const chatDiv = document.getElementById('chatDiv');
-const googleLogin = document.getElementById('googleLogin');
-const logoutBtn = document.getElementById('logoutBtn');
+// ----------- ELEMENTS -----------
+const loginScreen = document.getElementById('loginScreen');
+const profileScreen = document.getElementById('profileScreen');
+const chatScreen = document.getElementById('chatScreen');
+const loginBtn = document.getElementById('loginBtn');
+const saveProfileBtn = document.getElementById('saveProfile');
 const usernameInput = document.getElementById('username');
 const pfpInput = document.getElementById('pfpInput');
-const saveProfile = document.getElementById('saveProfile');
-const chatContainer = document.getElementById('chatContainer');
-const chatMsg = document.getElementById('chatMsg');
-const chatPhoto = document.getElementById('chatPhoto');
+const pfpPreview = document.getElementById('pfpPreview');
+const chatInput = document.getElementById('chatInput');
 const sendBtn = document.getElementById('sendBtn');
+const chatContainer = document.getElementById('chatContainer');
+const imageInput = document.getElementById('imageInput');
 const typingIndicator = document.getElementById('typingIndicator');
 
 let currentUser = null;
-let currentUserData = null;
+let profileData = null;
 
-// ------------------- Auth Flow -------------------
-googleLogin.addEventListener('click', async () => {
-  try { await signInWithPopup(auth, provider); } 
-  catch(e){ alert("Login failed"); console.error(e); }
-});
+// ----------- AUTH -----------
+loginBtn.onclick = async () => {
+  await signInWithPopup(auth, provider);
+};
 
-logoutBtn.addEventListener('click', async ()=>{
-  await signOut(auth);
-});
-
-// ------------------- Profile Check -------------------
-async function checkProfile(uid){
-  const snap = await get(ref(db,'users/'+uid));
-  if(snap.exists() && snap.val().username){
-    currentUserData = snap.val();
-    showChat();
-  } else {
-    showProfile();
-  }
-}
-
-// ------------------- Display Divs -------------------
-function showLogin(){ loginDiv.classList.remove('hidden'); profileDiv.classList.add('hidden'); chatDiv.classList.add('hidden'); }
-function showProfile(){ loginDiv.classList.add('hidden'); profileDiv.classList.remove('hidden'); chatDiv.classList.add('hidden'); }
-function showChat(){ loginDiv.classList.add('hidden'); profileDiv.classList.add('hidden'); chatDiv.classList.remove('hidden'); loadMessages(); }
-
-// ------------------- Save Profile -------------------
-saveProfile.addEventListener('click', async ()=>{
-  const uname = usernameInput.value.trim();
-  if(!uname){ alert("Enter username"); return; }
-  let pfpURL = "";
-  if(pfpInput.files.length>0){
-    const file = pfpInput.files[0];
-    pfpURL = await new Promise((res)=>{
-      const reader = new FileReader();
-      reader.onload = e=>res(e.target.result);
-      reader.readAsDataURL(file);
-    });
-  }
-  await set(ref(db,'users/'+currentUser.uid), {username:uname, pfp:pfpURL});
-  currentUserData = {username:uname, pfp:pfpURL};
-  showChat();
-});
-
-// ------------------- On Auth Change -------------------
-onAuthStateChanged(auth, async user=>{
+onAuthStateChanged(auth, async (user)=>{
   if(user){
     currentUser = user;
-    loginDiv.classList.add('hidden');
-    await checkProfile(user.uid);
+    const snap = await get(ref(db,'profiles/'+user.uid));
+    if(!snap.exists()){
+      loginScreen.classList.remove('active');
+      profileScreen.classList.add('active');
+    } else {
+      profileData = snap.val();
+      loginScreen.classList.remove('active');
+      chatScreen.classList.add('active');
+      loadChat();
+    }
   } else {
-    showLogin();
+    loginScreen.classList.add('active');
+    profileScreen.classList.remove('active');
+    chatScreen.classList.remove('active');
   }
 });
 
-// ------------------- Chat -------------------
-sendBtn.addEventListener('click', async ()=>{
-  const text = chatMsg.value.trim();
-  let photo = null;
-  if(chatPhoto.files.length>0){
-    const file = chatPhoto.files[0];
-    photo = await new Promise((res)=>{
-      const reader = new FileReader();
-      reader.onload = e=>res(e.target.result);
-      reader.readAsDataURL(file);
-    });
-    chatPhoto.value="";
+// ----------- PROFILE SETUP -----------
+pfpInput.onchange = ()=>{
+  const file = pfpInput.files[0];
+  if(file){
+    const reader = new FileReader();
+    reader.onload = (e)=>{ pfpPreview.src = e.target.result; pfpPreview.style.display='block'; }
+    reader.readAsDataURL(file);
   }
-  if(!text && !photo){ return; }
-  await push(ref(db,'messages'), {
-    uid:currentUser.uid,
-    username: currentUserData.username,
-    pfp: currentUserData.pfp||"",
-    text: text||"",
-    photo: photo||"",
-    timestamp: Date.now()
-  });
-  chatMsg.value="";
-});
+};
 
-// ------------------- Load Messages -------------------
-function loadMessages(){
-  chatContainer.innerHTML="";
-  const msgRef = ref(db,'messages');
-  onChildAdded(msgRef, snapshot=>{
-    const msg = snapshot.val();
-    const div = document.createElement('div');
-    div.className='message';
-    div.innerHTML = `
-      <img class="pfp" src="${msg.pfp||'https://via.placeholder.com/32'}">
-      <div>
-        <div class="msg-user">${msg.username}</div>
-        <div class="msg-content">${msg.text}${msg.photo?'<br><img src="'+msg.photo+'" style="max-width:200px; border-radius:12px;">':''}</div>
-      </div>
-    `;
-    chatContainer.appendChild(div);
+saveProfileBtn.onclick = async ()=>{
+  const uname = usernameInput.value.trim();
+  if(!uname){ alert('Enter username'); return; }
+  let pfpUrl = '';
+  if(pfpInput.files[0]){
+    const file = pfpInput.files[0];
+    const storageRef = sRef(storage,'pfp/'+currentUser.uid);
+    await uploadBytes(storageRef,file);
+    pfpUrl = await getDownloadURL(storageRef);
+  }
+  await set(ref(db,'profiles/'+currentUser.uid),{ username:uname, pfp: pfpUrl });
+  profileData = { username:uname, pfp: pfpUrl };
+  profileScreen.classList.remove('active');
+  chatScreen.classList.add('active');
+  loadChat();
+};
+
+// ----------- CHAT -----------
+function createMessageEl(msg){
+  const div = document.createElement('div');
+  div.className = 'message '+(msg.uid===currentUser.uid?'self':'');
+  const userDiv = document.createElement('div');
+  userDiv.className = 'msgUser '+(msg.uid===currentUser.uid?'self':'');
+  userDiv.textContent = msg.username;
+  const contentDiv = document.createElement('div');
+  contentDiv.className='msgContent';
+  if(msg.type==='text') contentDiv.textContent = msg.message;
+  else if(msg.type==='image'){
+    const img = document.createElement('img');
+    img.src = msg.message;
+    contentDiv.appendChild(img);
+  }
+  div.appendChild(userDiv);
+  div.appendChild(contentDiv);
+  return div;
+}
+
+function loadChat(){
+  const chatRef = ref(db,'messages');
+  onChildAdded(chatRef,(snap)=>{
+    const msg = snap.val();
+    const msgEl = createMessageEl(msg);
+    chatContainer.appendChild(msgEl);
     chatContainer.scrollTop = chatContainer.scrollHeight;
   });
 }
 
-// ------------------- Typing Indicator (Simple) -------------------
-let typingTimeout;
-chatMsg.addEventListener('input', ()=>{
-  const typingRef = ref(db,'typing/'+currentUser.uid);
-  set(typingRef,true);
-  clearTimeout(typingTimeout);
-  typingTimeout = setTimeout(()=> set(typingRef,false),1500);
-});
-const typingRef = ref(db,'typing');
-onChildAdded(typingRef, snap=>{
-  if(snap.key!==currentUser?.uid && snap.val()){
-    typingIndicator.classList.remove('hidden');
-    setTimeout(()=>typingIndicator.classList.add('hidden'),2000);
+// ----------- SEND MESSAGE -----------
+sendBtn.onclick = async ()=>{
+  const txt = chatInput.value.trim();
+  if(!txt && !imageInput.files[0]) return;
+  let msgType='text';
+  let msgContent = txt;
+  if(imageInput.files[0]){
+    const file = imageInput.files[0];
+    const storageRef = sRef(storage,'chatImages/'+Date.now());
+    await uploadBytes(storageRef,file);
+    msgContent = await getDownloadURL(storageRef);
+    msgType='image';
   }
-});
-
+  chatInput.value='';
+  imageInput.value='';
+  await push(ref(db,'messages'),{
+    uid: currentUser.uid,
+    username: profileData.username,
+    pfp: profileData.pfp||'',
+    type: msgType,
+    message: msgContent,
+    timestamp: Date.now()
+  });
+};
 </script>
 </body>
 </html>
