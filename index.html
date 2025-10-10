@@ -1,59 +1,78 @@
-<!doctype html>
-
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Group Chat — Clocktower Theme</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>General Chat — Clocktower Theme</title>
 <style>
-  body{margin:0;font-family:Arial,sans-serif;background:url('https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&fit=crop&w=1470&q=80') no-repeat center/cover;color:white;display:flex;justify-content:center;align-items:center;height:100vh}
-  .app{width:100%;max-width:500px;background:rgba(0,0,0,0.6);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;height:80vh}
-  .header{background:rgba(0,0,0,0.8);padding:12px;text-align:center;font-size:18px;font-weight:bold;position:relative}
-  .closeChat{position:absolute;right:12px;top:12px;cursor:pointer;font-size:18px}  
-  .chatArea{flex:1;padding:12px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;}
-  .msg{padding:10px;border-radius:10px;max-width:80%;display:flex;gap:8px;align-items:flex-start}
-  .msg.user{align-self:flex-end;background:rgba(16,185,129,0.8);}
-  .msg.other{align-self:flex-start;background:rgba(30,41,59,0.8);}
-  .msg img.pfp{width:32px;height:32px;border-radius:50%;object-fit:cover}
-  .msgContent{display:flex;flex-direction:column;}
-  .username{font-size:12px;color:#94a3b8}
-  .text{font-size:16px}
-  .inputArea{display:flex;gap:8px;padding:8px;background:rgba(0,0,0,0.7)}
-  .inputArea input{flex:1;padding:8px;border-radius:8px;border:none}
-  .inputArea button{padding:8px 12px;border:none;border-radius:8px;background:#10b981;color:#06201b;cursor:pointer}
-  .hidden{display:none}
-  .typing{font-size:12px;color:#94a3b8;animation:blink 1s infinite}
-  @keyframes blink{0%,50%,100%{opacity:0}25%,75%{opacity:1}}
-  .loginArea{display:flex;flex-direction:column;gap:8px;padding:12px}
-  .loginArea input{padding:8px;border-radius:8px;border:none}
-  .profileSetup{display:flex;flex-direction:column;gap:8px;padding:12px}
+  @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+  body{margin:0;padding:0;font-family:'Roboto',sans-serif;background:url('https://images.unsplash.com/photo-1505232070786-5d27e7d20f31?auto=format&fit=crop&w=1950&q=80') no-repeat center/cover;display:flex;justify-content:center;align-items:center;height:100vh;color:#fff;}
+  #app{width:100%;max-width:480px;background:rgba(0,0,0,0.65);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;height:90vh;}
+  .header{padding:12px;background:rgba(0,0,0,0.75);text-align:center;font-weight:700;font-size:18px;}
+  .content{flex:1;padding:10px;overflow-y:auto;display:flex;flex-direction:column-reverse;gap:10px;}
+  .message{display:flex;gap:8px;align-items:flex-end;}
+  .msg-pfp{width:36px;height:36px;border-radius:50%;object-fit:cover;}
+  .msg-text{background:rgba(255,255,255,0.1);padding:8px 12px;border-radius:10px;max-width:70%;word-break:break-word;animation:fadeIn 0.3s;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+  .inputBox{display:flex;padding:10px;background:rgba(0,0,0,0.75);}
+  .inputBox input[type=text]{flex:1;padding:8px;border-radius:8px;border:none;margin-right:6px;background:rgba(255,255,255,0.1);color:#fff;}
+  .inputBox input[type=file]{display:none;}
+  .inputBox button{padding:8px 12px;border:none;border-radius:8px;background:#10b981;color:#000;font-weight:600;cursor:pointer;}
+  .loginModal{position:absolute;inset:0;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;z-index:10;}
+  .loginCard{background:#111827;padding:22px;border-radius:12px;width:90%;max-width:380px;text-align:center;}
+  .loginCard input{width:100%;padding:8px;margin:6px 0;border-radius:6px;border:none;background:rgba(255,255,255,0.1);color:#fff;}
+  .loginCard button{padding:8px 12px;border:none;border-radius:8px;background:#10b981;color:#000;font-weight:600;cursor:pointer;margin-top:6px;width:100%;}
+  .typing{font-size:12px;color:#ccc;margin-left:44px;font-style:italic;}
+  .setProfile{position:absolute;inset:0;background:rgba(0,0,0,0.9);display:flex;align-items:center;justify-content:center;z-index:11;}
+  .profileCard{background:#111827;padding:22px;border-radius:12px;width:90%;max-width:380px;text-align:center;}
+  .profileCard input{width:100%;padding:8px;margin:6px 0;border-radius:6px;border:none;background:rgba(255,255,255,0.1);color:#fff;}
+  .profileCard img{width:60px;height:60px;border-radius:50%;object-fit:cover;margin-bottom:10px;}
 </style>
 </head>
 <body>
-<div class="app" id="app">  <!-- Login -->  <div id="loginDiv" class="loginArea">
-    <h2>Login</h2>
+<div id="app">
+  <div class="header">General Chat</div>
+  <div class="content" id="chatContent"></div>
+  <div class="typing" id="typingIndicator"></div>
+  <div class="inputBox">
+    <input type="text" id="msgInput" placeholder="Type message..." disabled>
+    <input type="file" id="photoInput" accept="image/*">
+    <button id="sendBtn" disabled>Send</button>
+    <button id="photoBtn">📷</button>
+  </div>
+</div>
+
+<!-- Login Modal -->
+<div id="loginModal" class="loginModal">
+  <div class="loginCard">
+    <h3>Login</h3>
     <input type="email" id="email" placeholder="Email">
     <input type="password" id="password" placeholder="Password">
-    <button id="loginBtn">Login / Register</button>
-    <div id="loginMsg"></div>
-  </div>  <!-- Profile Setup -->  <div id="profileDiv" class="profileSetup hidden">
-    <h2>Set Profile</h2>
-    <input type="text" id="username" placeholder="Username">
-    <input type="file" id="pfp" accept="image/*">
-    <button id="saveProfile">Save Profile</button>
-  </div>  <!-- Chat -->  <div id="chatDiv" class="hidden" style="flex:1;display:flex;flex-direction:column">
-    <div class="header">General Chat <span class="closeChat" id="closeChat">⮐</span></div>
-    <div class="chatArea" id="chatArea"></div>
-    <div class="inputArea">
-      <input type="text" id="msgInput" placeholder="Type a message">
-      <input type="file" id="photoInput" accept="image/*">
-      <button id="sendBtn">Send</button>
-    </div>
-    <div class="typing" id="typingIndicator" style="display:none">Someone is typing...</div>
-  </div></div><script type="module">
+    <button id="emailLoginBtn">Login with Email</button>
+    <hr style="margin:10px 0;border-color:#333">
+    <input type="tel" id="phone" placeholder="Phone (+1234567890)">
+    <button id="phoneLoginBtn">Send OTP</button>
+    <input type="text" id="otpInput" placeholder="Enter OTP" style="display:none;">
+    <button id="verifyOtpBtn" style="display:none;">Verify OTP</button>
+  </div>
+</div>
+
+<!-- Profile Setup Modal -->
+<div id="profileModal" class="setProfile" style="display:none">
+  <div class="profileCard">
+    <h3>Set Profile</h3>
+    <img id="pfpPreview" src="https://via.placeholder.com/60">
+    <input type="text" id="usernameInput" placeholder="Username">
+    <input type="file" id="pfpInput" accept="image/*">
+    <button id="saveProfileBtn">Save Profile</button>
+  </div>
+</div>
+
+<script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { getDatabase, ref, push, onChildAdded, set, get, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+import { getDatabase, ref, set, push, onValue, update, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { getStorage, ref as sref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 
 const firebaseConfig = {
   apiKey: "YOUR_API_KEY",
@@ -61,109 +80,173 @@ const firebaseConfig = {
   databaseURL: "YOUR_DB_URL",
   projectId: "YOUR_PROJECT_ID",
   storageBucket: "YOUR_STORAGE_BUCKET",
-  messagingSenderId: "YOUR_SENDER_ID",
+  messagingSenderId: "YOUR_MSG_SENDER_ID",
   appId: "YOUR_APP_ID"
 };
 
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
 const db = getDatabase(app);
+const auth = getAuth(app);
+const storage = getStorage(app);
 
-const loginDiv = document.getElementById('loginDiv');
-const profileDiv = document.getElementById('profileDiv');
-const chatDiv = document.getElementById('chatDiv');
-const loginBtn = document.getElementById('loginBtn');
-const loginMsg = document.getElementById('loginMsg');
-const saveProfile = document.getElementById('saveProfile');
-const chatArea = document.getElementById('chatArea');
+const chatContent = document.getElementById('chatContent');
 const msgInput = document.getElementById('msgInput');
 const sendBtn = document.getElementById('sendBtn');
-const usernameInput = document.getElementById('username');
-const pfpInput = document.getElementById('pfp');
-const typingIndicator = document.getElementById('typingIndicator');
-const closeChat = document.getElementById('closeChat');
+const photoBtn = document.getElementById('photoBtn');
 const photoInput = document.getElementById('photoInput');
+const loginModal = document.getElementById('loginModal');
+const profileModal = document.getElementById('profileModal');
+const usernameInput = document.getElementById('usernameInput');
+const saveProfileBtn = document.getElementById('saveProfileBtn');
+const pfpInput = document.getElementById('pfpInput');
+const pfpPreview = document.getElementById('pfpPreview');
+const typingIndicator = document.getElementById('typingIndicator');
+
+// ----------------- AUTH -----------------
+const emailLoginBtn = document.getElementById('emailLoginBtn');
+const phoneLoginBtn = document.getElementById('phoneLoginBtn');
+const otpInput = document.getElementById('otpInput');
+const verifyOtpBtn = document.getElementById('verifyOtpBtn');
+const emailInput = document.getElementById('email');
+const passwordInput = document.getElementById('password');
+const phoneInput = document.getElementById('phone');
 
 let currentUser = null;
 
-loginBtn.addEventListener('click', async ()=>{
-  const email = document.getElementById('email').value;
-  const pass = document.getElementById('password').value;
-  if(!email||!pass){ loginMsg.textContent='Enter email & password'; return; }
+// Email login
+emailLoginBtn.addEventListener('click', async()=>{
   try{
-    let user;
-    try{ user = await signInWithEmailAndPassword(auth,email,pass); } catch(e){ user = await createUserWithEmailAndPassword(auth,email,pass); }
-  }catch(err){ loginMsg.textContent = 'Login failed: '+err.message; }
+    const userCredential = await signInWithEmailAndPassword(auth,emailInput.value,passwordInput.value);
+  }catch(err){
+    try{
+      await createUserWithEmailAndPassword(auth,emailInput.value,passwordInput.value);
+    }catch(e){ alert(e.message); }
+  }
 });
 
-saveProfile.addEventListener('click', async ()=>{
-  const uname = usernameInput.value.trim();
-  const file = pfpInput.files[0];
-  if(!uname||!file){ alert('Enter username & choose profile pic'); return; }
-  const reader = new FileReader();
-  reader.onload = async ()=>{
-    const pfpBase64 = reader.result;
-    await update(ref(db,'users/'+currentUser.uid),{username:uname,pfp:pfpBase64});
-    profileDiv.classList.add('hidden');
-    chatDiv.classList.remove('hidden');
-    startChat();
-  };
-  reader.readAsDataURL(file);
+// Phone login
+window.recaptchaVerifier = new RecaptchaVerifier('phoneLoginBtn', { 'size':'invisible' }, auth);
+
+phoneLoginBtn.addEventListener('click', async()=>{
+  const phoneNumber = phoneInput.value;
+  const appVerifier = window.recaptchaVerifier;
+  try{
+    const confirmationResult = await signInWithPhoneNumber(auth,phoneNumber,appVerifier);
+    window.confirmationResult = confirmationResult;
+    otpInput.style.display='block';
+    verifyOtpBtn.style.display='block';
+  }catch(e){ alert(e.message); }
 });
 
-function startChat(){
-  const messagesRef = ref(db,'messages');
-  onChildAdded(messagesRef,(snap)=>{
-    const msg = snap.val();
-    const div = document.createElement('div');
-    div.className='msg '+(msg.uid===currentUser.uid?'user':'other');
-    let content='';
-    if(msg.photo){ content=`<img src='${msg.photo}' style='max-width:150px;border-radius:8px'>`; }
-    if(msg.text){ content+=`<div class='text'>${msg.text}</div>`; }
-    div.innerHTML=`<img class='pfp' src='${msg.pfp}'><div class='msgContent'><div class='username'>${msg.username}</div>${content}</div>`;
-    chatArea.appendChild(div);
-    chatArea.scrollTop = chatArea.scrollHeight;
-  });
+verifyOtpBtn.addEventListener('click', async()=>{
+  try{
+    const result = await window.confirmationResult.confirm(otpInput.value);
+  }catch(e){ alert(e.message); }
+});
 
-  msgInput.addEventListener('input',()=>{typingIndicator.style.display='block';setTimeout(()=>typingIndicator.style.display='none',1000);});
-
-  sendBtn.addEventListener('click', async ()=>{
-    const text = msgInput.value.trim();
-    const file = photoInput.files[0];
-    if(!text&&!file) return;
-    let photo=null;
-    if(file){
-      const reader = new FileReader();
-      reader.onload= async ()=>{
-        photo = reader.result;
-        await push(ref(db,'messages'),{uid:currentUser.uid,username:currentUser.displayName,pfp:currentUser.photoURL,text,photo});
-        msgInput.value=''; photoInput.value='';
-      };
-      reader.readAsDataURL(file);
-    }else{
-      await push(ref(db,'messages'),{uid:currentUser.uid,username:currentUser.displayName,pfp:currentUser.photoURL,text});
-      msgInput.value='';
-    }
-  });
-}
-
-closeChat.addEventListener('click',()=>{ chatDiv.classList.add('hidden'); });
-
+// On auth change
 onAuthStateChanged(auth,user=>{
   if(user){
     currentUser=user;
-    loginDiv.classList.add('hidden');
-    get(ref(db,'users/'+user.uid)).then(snap=>{
-      if(snap.exists()&&snap.val().username&&snap.val().pfp){
-        chatDiv.classList.remove('hidden');
-        startChat();
-      }else{
-        profileDiv.classList.remove('hidden');
-      }
-    });
+    loginModal.style.display='none';
+    checkProfile();
   }else{
-    loginDiv.classList.remove('hidden');
+    loginModal.style.display='flex';
   }
 });
-</script></body>
+
+// ---------------- PROFILE ----------------
+async function checkProfile(){
+  const uref = ref(db,'users/'+currentUser.uid);
+  const snap = await get(uref);
+  if(!snap.exists() || !snap.val().username){
+    profileModal.style.display='flex';
+  }else{
+    profileModal.style.display='none';
+    enableChat();
+  }
+}
+
+pfpInput.addEventListener('change',()=>{
+  const file = pfpInput.files[0];
+  if(file){
+    const url = URL.createObjectURL(file);
+    pfpPreview.src=url;
+  }
+});
+
+saveProfileBtn.addEventListener('click', async()=>{
+  const username = usernameInput.value.trim();
+  if(!username){ alert('Enter username'); return; }
+  let pfpURL = pfpPreview.src;
+  if(pfpInput.files[0]){
+    const file = pfpInput.files[0];
+    const storageRef = sref(storage,'pfp/'+currentUser.uid);
+    await uploadBytes(storageRef,file);
+    pfpURL = await getDownloadURL(storageRef);
+  }
+  await set(ref(db,'users/'+currentUser.uid),{ username, pfp:pfpURL });
+  profileModal.style.display='none';
+  enableChat();
+});
+
+// ---------------- CHAT ----------------
+function enableChat(){
+  msgInput.disabled=false;
+  sendBtn.disabled=false;
+  photoBtn.addEventListener('click',()=>photoInput.click());
+  sendBtn.addEventListener('click',sendMessage);
+  photoInput.addEventListener('change',sendMessage);
+  msgInput.addEventListener('input',()=>{
+    const typingRef = ref(db,'typing/'+currentUser.uid);
+    set(typingRef,true);
+    setTimeout(()=>set(typingRef,false),1000);
+  });
+  const chatRef = ref(db,'messages');
+  onValue(chatRef,snap=>{
+    chatContent.innerHTML='';
+    snap.forEach(s=>{
+      const data = s.val();
+      const div = document.createElement('div');
+      div.className='message';
+      const img = document.createElement('img');
+      img.className='msg-pfp';
+      img.src=data.pfp||'https://via.placeholder.com/36';
+      const msgDiv = document.createElement('div');
+      msgDiv.className='msg-text';
+      msgDiv.textContent=data.text;
+      if(data.photo) msgDiv.innerHTML=`<img src="${data.photo}" style="max-width:120px;border-radius:8px;"><br>`+msgDiv.textContent;
+      div.append(img,msgDiv);
+      chatContent.appendChild(div);
+    });
+    chatContent.scrollTop=chatContent.scrollHeight;
+  });
+  // Typing indicator
+  const typingRef = ref(db,'typing');
+  onValue(typingRef,snap=>{
+    const val = snap.val()||{};
+    const typingUsers = Object.keys(val).filter(k=>val[k] && k!==currentUser.uid);
+    typingIndicator.textContent = typingUsers.length ? 'Someone is typing...' : '';
+  });
+}
+
+async function sendMessage(){
+  let text = msgInput.value;
+  let photoFile = photoInput.files[0];
+  let photoURL = '';
+  if(photoFile){
+    const storageRef = sref(storage,'photos/'+Date.now());
+    await uploadBytes(storageRef,photoFile);
+    photoURL = await getDownloadURL(storageRef);
+  }
+  if(!text && !photoURL) return;
+  const userSnap = await get(ref(db,'users/'+currentUser.uid));
+  const userData = userSnap.val();
+  const msgRef = push(ref(db,'messages'));
+  await set(msgRef,{ uid:currentUser.uid, username:userData.username, pfp:userData.pfp||'', text, photo:photoURL, timestamp:Date.now() });
+  msgInput.value='';
+  photoInput.value='';
+}
+</script>
+</body>
 </html>
