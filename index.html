@@ -1,50 +1,176 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Stylish Text & Chat</title>
+<title>ur bro — Stylish Text & Chat</title>
 <style>
-:root{--bg:#0f172a;--card:#0b1220;--glass:#172033;--accent:#10b981;}
-body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;background:var(--bg);color:#f1f5f9;display:flex;justify-content:center;height:100vh;overflow:hidden;}
-.app{width:100%;max-width:500px;height:100%;display:flex;flex-direction:column;}
-header{display:flex;gap:12px;align-items:center;justify-content:space-between;padding:12px;}
-.brand{display:flex;gap:12px;align-items:center;}
-.logo{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,#06b6d4,#7c3aed);display:flex;align-items:center;justify-content:center;font-weight:700;color:white;}
-h1{font-size:18px;margin:0;}
-.card{background:var(--card);border-radius:12px;padding:14px;margin:8px;box-shadow:0 6px 18px rgba(2,6,23,0.6);}
-textarea{width:100%;min-height:84px;padding:12px;border-radius:8px;background:var(--glass);border:none;color:white;font-size:16px;resize:vertical;}
-.styles{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:10px;max-height:50vh;overflow:auto;padding:6px;}
-.style{background:var(--glass);padding:10px;border-radius:10px;cursor:pointer;text-align:center;min-height:48px;display:flex;align-items:center;justify-content:center;word-break:break-word;transition:transform .12s,background .12s;}
-.style:hover{transform:translateY(-4px);background:#243343;}
-#chatPage{display:none;flex-direction:column;height:100%;background:#0b1220;position:relative;}
-#chatHeader{display:flex;align-items:center;gap:10px;background:#0f172a;padding:12px;font-weight:bold;color:#00ffaa;}
-#chatMessages{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;margin-bottom:60px;}
-.msg{background:#172033;padding:10px;border-radius:10px;max-width:75%;word-wrap:break-word;}
+:root{
+  --bg:#0f172a;
+  --card:#0b1220;
+  --glass:#172033;
+  --accent:#10b981;
+}
+body{
+  margin:0;
+  font-family:Inter,system-ui,Segoe UI,Roboto,Arial;
+  background:var(--bg);
+  color:#f1f5f9;
+  display:flex;
+  justify-content:center;
+  padding:0;
+  height:100vh;
+  overflow:hidden;
+}
+.app{
+  width:100%;
+  max-width:500px;
+  height:100%;
+  display:flex;
+  flex-direction:column;
+}
+header{
+  display:flex;
+  gap:12px;
+  align-items:center;
+  justify-content:space-between;
+  padding:12px;
+  background:#0b1220;
+}
+.brand{
+  display:flex;
+  gap:12px;
+  align-items:center;
+}
+.logo{
+  width:44px;
+  height:44px;
+  border-radius:10px;
+  background:linear-gradient(135deg,#06b6d4,#7c3aed);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:700;
+  color:white;
+}
+h1{font-size:16px;margin:0;color:#fff}
+.card{
+  background:var(--card);
+  border-radius:12px;
+  padding:12px;
+  margin:8px;
+  box-shadow:0 6px 18px rgba(2,6,23,0.6);
+}
+textarea,input{
+  width:100%;
+  padding:10px;
+  border-radius:8px;
+  background:var(--glass);
+  border:none;
+  color:white;
+  font-size:16px;
+}
+.styles{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(100px,1fr));
+  gap:10px;
+  max-height:60vh;
+  overflow:auto;
+  padding:6px;
+}
+.style{
+  background:var(--glass);
+  padding:10px;
+  border-radius:10px;
+  cursor:pointer;
+  text-align:center;
+  min-height:48px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  word-break:break-word;
+  transition:transform .12s,background .12s;
+}
+.style:hover{transform:translateY(-3px);background:#243343}
+.gc-btn,.wa-btn{
+  position:fixed;
+  right:18px;
+  width:60px;
+  height:60px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow:0 8px 24px rgba(0,0,0,0.4);
+  cursor:pointer;
+  z-index:1000;
+}
+.wa-btn{background:#25D366;bottom:18px;}
+.gc-btn{background:#00bcd4;bottom:90px;}
+#chatPage{
+  display:none;
+  flex-direction:column;
+  height:100%;
+  background:#0b1220;
+  overflow:hidden;
+}
+#chatHeader{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  background:#0f172a;
+  padding:12px;
+  font-weight:bold;
+  color:#00ffaa;
+}
+#chatMessages{
+  flex:1;
+  overflow-y:auto;
+  padding:12px;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+.msg{
+  background:#172033;
+  padding:10px;
+  border-radius:10px;
+  max-width:75%;
+  word-wrap:break-word;
+}
 .me{align-self:flex-end;background:#2563eb;}
-footer{position:fixed;bottom:0;left:0;width:100%;max-width:500px;display:flex;padding:10px;background:#0f172a;gap:6px;box-sizing:border-box;}
-input,button{padding:10px;border:none;border-radius:8px;font-size:15px;}
-input{flex:1;background:#1f2937;color:white;}
-button{background:#00ffaa;color:#06201b;font-weight:bold;}
-.back{cursor:pointer;color:#00ffaa;font-size:20px;}
-.gc-btn,.wa-btn{position:fixed;right:18px;width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(0,0,0,0.4);cursor:pointer;z-index:1000;}
-.gc-btn{bottom:90px;background:#00bcd4;}
-.wa-btn{bottom:18px;background:#25D366;}
+footer{
+  display:flex;
+  padding:10px;
+  background:#0f172a;
+  gap:6px;
+}
+button{
+  padding:10px;
+  border:none;
+  border-radius:8px;
+  font-size:15px;
+  background:#00ffaa;
+  color:#06201b;
+  font-weight:bold;
+}
+.back{cursor:pointer;color:#00ffaa;font-size:20px}
 </style>
 </head>
 <body>
-
 <div class="app" id="mainApp">
   <header>
     <div class="brand">
       <div class="logo">PB</div>
-      <h1>Stylish Text Generator</h1>
+      <div><h1>Stylish Text Generator</h1></div>
     </div>
     <button id="loginBtn">Login with Google</button>
   </header>
+
   <div class="card">
     <textarea id="input" placeholder="Type your text here..."></textarea>
   </div>
+
   <div class="card">
     <div class="styles" id="stylesList"></div>
   </div>
@@ -54,113 +180,111 @@ button{background:#00ffaa;color:#06201b;font-weight:bold;}
   <div id="chatHeader"><span class="back" id="backBtn">⬅</span> INDEVERYDAY Chat</div>
   <div id="chatMessages"></div>
   <footer>
-    <input type="text" id="msgInput" placeholder="Type message..."/>
+    <input type="text" id="msgInput" placeholder="Type message...">
     <button id="sendBtn">Send</button>
   </footer>
 </div>
 
-<div class="gc-btn" id="gcBtn" title="Open Group Chat">
-  <img src="https://cdn-icons-png.flaticon.com/512/134/134914.png" style="width:30px;height:30px">
-</div>
-<a class="wa-btn" href="https://wa.me/447877486623?text=Hello" target="_blank">
-  <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" style="width:30px;height:30px">
-</a>
+<div class="gc-btn" id="gcBtn"><img src="https://cdn-icons-png.flaticon.com/512/134/134914.png" width="30"></div>
+<a class="wa-btn" href="https://wa.me/447877486623?text=Hello" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" width="30"></a>
 
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script>
-// Firebase Init
-const firebaseConfig = {
-  apiKey:"AIzaSyDFPMf8HLMpS6DbZkdCR6T7GAm5sfz-TOw",
-  authDomain:"urbrokhan-f631c.firebaseapp.com",
-  databaseURL:"https://urbrokhan-f631c-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId:"urbrokhan-f631c",
-  storageBucket:"urbrokhan-f631c.appspot.com",
-  messagingSenderId:"533086015351",
-  appId:"1:533086015351:web:a12328fbc4906e4f5c9b72"
-};
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.database();
-
-// Google Login
-const loginBtn = document.getElementById('loginBtn');
-loginBtn.onclick = ()=> {
+  const firebaseConfig = {
+    apiKey: "AIzaSyDFPMf8HLMpS6DbZkdCR6T7GAm5sfz-TOw",
+    authDomain: "urbrokhan-f631c.firebaseapp.com",
+    databaseURL: "https://urbrokhan-f631c-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "urbrokhan-f631c",
+    storageBucket: "urbrokhan-f631c.appspot.com",
+    messagingSenderId: "533086015351",
+    appId: "1:533086015351:web:a12328fbc4906e4f5c9b72"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+  const auth = firebase.auth();
   const provider = new firebase.auth.GoogleAuthProvider();
-  auth.signInWithPopup(provider).catch(err=>alert("Login failed"));
-};
-auth.onAuthStateChanged(user=>{
-  loginBtn.style.display = user ? 'none' : 'block';
-});
 
-/* Stylish Text */
-const inputEl = document.getElementById('input');
-const stylesList = document.getElementById('stylesList');
-const emojiList = ['🔥','✨','💫','💖','🌸','⭐','💥','🌟','❤️','💎','💀','🎯','🎉','🥶','⚡','🌈','🌻','🐉','💚','😎'];
-const symbolList = ['♡','❀','★','✦','✧','❁','☯','☾','✪','❖','☘','☠','⚡','☃','✈','⚜','❂','❉','✿','✺','❇'];
-const fontStyles = [
-  t=>`<span style="font-family:cursive;font-size:18px">${t}</span>`,
-  t=>`<span style="font-family:monospace;font-size:17px">${t}</span>`,
-  t=>`<span style="font-family:serif;font-size:20px">${t}</span>`,
-  t=>`<span style="font-family:sans-serif;font-size:16px">${t}</span>`,
-  t=>`<span style="font-family:Impact;font-size:22px">${t}</span>`,
-  t=>`<span style="font-family:Comic Sans MS;font-size:22px">${t}</span>`
-];
-function renderStyles(){
-  stylesList.innerHTML='';
-  const val = inputEl.value || '';
-  const styleFns = [
-    t=>t.toUpperCase(), t=>t.toLowerCase(), t=>t.split('').join(' '),
-    t=>`♡ ${t} ♡`, t=>`❀ ${t} ❀`, t=>`★ ${t} ★`, t=>`✦ ${t} ✦`,
-    ...emojiList.map(e=>t=>`${e} ${t} ${e}`),
-    ...symbolList.map(s=>t=>`${s} ${t} ${s}`),
-    ...fontStyles
-  ];
-  styleFns.forEach(fn=>{
-    const div=document.createElement('div');
-    div.className='style';
-    div.innerHTML=fn(val);
-    div.onclick=()=>navigator.clipboard.writeText(val);
-    stylesList.appendChild(div);
+  const loginBtn = document.getElementById('loginBtn');
+  const gcBtn = document.getElementById('gcBtn');
+  const backBtn = document.getElementById('backBtn');
+  const chatPage = document.getElementById('chatPage');
+  const mainApp = document.getElementById('mainApp');
+  const msgInput = document.getElementById('msgInput');
+  const chatMessages = document.getElementById('chatMessages');
+  const sendBtn = document.getElementById('sendBtn');
+
+  let chatUser = null;
+
+  loginBtn.onclick = () => {
+    auth.signInWithPopup(provider).then(res=>{
+      chatUser = res.user.displayName || "User";
+      loginBtn.style.display="none";
+      alert("Login successful! Now you can open chat.");
+    }).catch(err=>alert("Login failed"));
+  };
+
+  gcBtn.onclick = () => {
+    if(!chatUser){
+      alert("Please login to chat!");
+      return;
+    }
+    mainApp.style.display="none";
+    chatPage.style.display="flex";
+  };
+  backBtn.onclick = () => {
+    chatPage.style.display="none";
+    mainApp.style.display="flex";
+  };
+
+  sendBtn.onclick = ()=>{
+    const msg = msgInput.value.trim();
+    if(!msg) return;
+    db.ref("groupChat").push({name:chatUser,message:msg,time:new Date().toLocaleTimeString()});
+    msgInput.value="";
+  };
+
+  db.ref("groupChat").on("child_added", snapshot=>{
+    const data = snapshot.val();
+    const div = document.createElement("div");
+    div.className="msg"+(data.name===chatUser?" me":"");
+    div.innerHTML=`<b>${data.name}</b>: ${data.message}<br><small>${data.time}</small>`;
+    chatMessages.appendChild(div);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
   });
-}
-inputEl.addEventListener('input', renderStyles);
-renderStyles();
 
-/* Chat */
-const gcBtn = document.getElementById('gcBtn');
-const backBtn = document.getElementById('backBtn');
-const chatPage = document.getElementById('chatPage');
-const mainApp = document.getElementById('mainApp');
-const msgInput = document.getElementById('msgInput');
-const chatMessages = document.getElementById('chatMessages');
-const sendBtn = document.getElementById('sendBtn');
-
-let chatName = localStorage.getItem("chatName");
-if(!chatName){ chatName=prompt("Enter your name:"); localStorage.setItem("chatName",chatName); }
-
-gcBtn.onclick = ()=>{
-  if(!auth.currentUser){ alert("Login first!"); return; }
-  mainApp.style.display="none"; chatPage.style.display="flex";
-};
-backBtn.onclick = ()=>{ chatPage.style.display="none"; mainApp.style.display="flex"; };
-
-sendBtn.onclick = ()=>{
-  const msg = msgInput.value.trim();
-  if(!msg) return;
-  db.ref("groupChat").push({name:chatName,message:msg,time:new Date().toLocaleTimeString()});
-  msgInput.value="";
-};
-
-db.ref("groupChat").on("child_added", snapshot=>{
-  const data = snapshot.val();
-  const div = document.createElement("div");
-  div.className = "msg"+(data.name===chatName?" me":"");
-  div.innerHTML=`<b>${data.name}</b>: ${data.message}<br><small>${data.time}</small>`;
-  chatMessages.appendChild(div);
-  chatMessages.scrollTop = chatMessages.scrollHeight;
-});
+  // Stylish Text Generator
+  const inputEl = document.getElementById('input');
+  const stylesList = document.getElementById('stylesList');
+  const emojis = ['🔥','✨','💫','💖','🌸','⭐','💥','🌟','❤️','💎','💀','🎯','🎉','🥶','⚡','🌈','🌻','🐉','💚','😎'];
+  const fonts = [
+    t=>`<span style="font-family:cursive">${t}</span>`,
+    t=>`<span style="font-family:monospace">${t}</span>`,
+    t=>`<span style="font-family:serif">${t}</span>`,
+    t=>`<span style="font-family:sans-serif">${t}</span>`,
+    t=>`<span style="font-family:Impact">${t}</span>`,
+    t=>`<span style="font-family:Comic Sans MS">${t}</span>`
+  ];
+  function renderStyles(){
+    stylesList.innerHTML="";
+    const val = inputEl.value||"";
+    const allStyles = [
+      t=>t.toUpperCase(), t=>t.toLowerCase(),
+      t=>`♡ ${t} ♡`, t=>`❀ ${t} ❀`,
+      ...emojis.map(e=>t=>`${e} ${t} ${e}`),
+      ...fonts
+    ];
+    allStyles.forEach(fn=>{
+      const div=document.createElement("div");
+      div.className="style";
+      div.innerHTML=fn(val);
+      div.onclick=()=>navigator.clipboard.writeText(div.innerText);
+      stylesList.appendChild(div);
+    });
+  }
+  inputEl.oninput = renderStyles;
+  renderStyles();
 </script>
 </body>
 </html>
