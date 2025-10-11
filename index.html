@@ -1,290 +1,68 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>ur bro — Stylish Text & Chat</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Site Temporarily Disabled</title>
 <style>
-:root{
-  --bg:#0f172a;
-  --card:#0b1220;
-  --glass:#172033;
-  --accent:#10b981;
-}
-body{
-  margin:0;
-  font-family:Inter,system-ui,Segoe UI,Roboto,Arial;
-  background:var(--bg);
-  color:#f1f5f9;
-  display:flex;
-  justify-content:center;
-  padding:0;
-  height:100vh;
-  overflow:hidden;
-}
-.app{
-  width:100%;
-  max-width:500px;
-  height:100%;
-  display:flex;
-  flex-direction:column;
-}
-header{
-  display:flex;
-  gap:12px;
-  align-items:center;
-  justify-content:space-between;
-  padding:12px;
-  background:#0b1220;
-}
-.brand{
-  display:flex;
-  gap:12px;
-  align-items:center;
-}
-.logo{
-  width:44px;
-  height:44px;
-  border-radius:10px;
-  background:linear-gradient(135deg,#06b6d4,#7c3aed);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-weight:700;
-  color:white;
-}
-h1{font-size:16px;margin:0;color:#fff}
-.card{
-  background:var(--card);
-  border-radius:12px;
-  padding:12px;
-  margin:8px;
-  box-shadow:0 6px 18px rgba(2,6,23,0.6);
-}
-textarea,input{
-  width:100%;
-  padding:10px;
-  border-radius:8px;
-  background:var(--glass);
-  border:none;
-  color:white;
-  font-size:16px;
-}
-.styles{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(100px,1fr));
-  gap:10px;
-  max-height:60vh;
-  overflow:auto;
-  padding:6px;
-}
-.style{
-  background:var(--glass);
-  padding:10px;
-  border-radius:10px;
-  cursor:pointer;
-  text-align:center;
-  min-height:48px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  word-break:break-word;
-  transition:transform .12s,background .12s;
-}
-.style:hover{transform:translateY(-3px);background:#243343}
-.gc-btn,.wa-btn{
-  position:fixed;
-  right:18px;
-  width:60px;
-  height:60px;
-  border-radius:50%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  box-shadow:0 8px 24px rgba(0,0,0,0.4);
-  cursor:pointer;
-  z-index:1000;
-}
-.wa-btn{background:#25D366;bottom:18px;}
-.gc-btn{background:#00bcd4;bottom:90px;}
-#chatPage{
-  display:none;
-  flex-direction:column;
-  height:100%;
-  background:#0b1220;
-  overflow:hidden;
-}
-#chatHeader{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  background:#0f172a;
-  padding:12px;
-  font-weight:bold;
-  color:#00ffaa;
-}
-#chatMessages{
-  flex:1;
-  overflow-y:auto;
-  padding:12px;
-  display:flex;
-  flex-direction:column;
-  gap:8px;
-}
-.msg{
-  background:#172033;
-  padding:10px;
-  border-radius:10px;
-  max-width:75%;
-  word-wrap:break-word;
-}
-.me{align-self:flex-end;background:#2563eb;}
-footer{
-  display:flex;
-  padding:10px;
-  background:#0f172a;
-  gap:6px;
-}
-button{
-  padding:10px;
-  border:none;
-  border-radius:8px;
-  font-size:15px;
-  background:#00ffaa;
-  color:#06201b;
-  font-weight:bold;
-}
-.back{cursor:pointer;color:#00ffaa;font-size:20px}
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body, html{width:100%;height:100%;display:flex;justify-content:center;align-items:center;background:#0f172a;font-family:'Poppins',sans-serif;overflow:hidden;color:#fff;}
+  .container{text-align:center;position:relative;z-index:2;}
+  h1{font-size:3em;margin-bottom:10px;color:#10b981;animation:fadeInDown 1s ease forwards;}
+  p{font-size:1.2em;margin-bottom:30px;color:#94a3b8;animation:fadeInUp 1s ease forwards;animation-delay:0.3s;opacity:0;}
+  #countdown{font-size:2em;font-weight:700;margin-bottom:20px;color:#00ffaa;animation:fadeIn 1s ease forwards;animation-delay:0.6s;opacity:0;}
+  /* Animated Background Shapes */
+  .shape{position:absolute;border-radius:50%;opacity:0.15;animation:float 10s infinite;}
+  .shape:nth-child(1){width:120px;height:120px;background:#10b981;top:10%;left:15%;animation-duration:12s;}
+  .shape:nth-child(2){width:200px;height:200px;background:#7c3aed;top:50%;left:70%;animation-duration:15s;}
+  .shape:nth-child(3){width:80px;height:80px;background:#06b6d4;top:80%;left:40%;animation-duration:18s;}
+  .shape:nth-child(4){width:150px;height:150px;background:#facc15;top:30%;left:80%;animation-duration:20s;}
+  @keyframes float{
+    0%{transform:translateY(0) rotate(0deg);}
+    50%{transform:translateY(-40px) rotate(180deg);}
+    100%{transform:translateY(0) rotate(360deg);}
+  }
+  @keyframes fadeInDown{0%{opacity:0;transform:translateY(-30px);}100%{opacity:1;transform:translateY(0);}}
+  @keyframes fadeInUp{0%{opacity:0;transform:translateY(30px);}100%{opacity:1;transform:translateY(0);}}
+  @keyframes fadeIn{0%{opacity:0;}100%{opacity:1;}}
 </style>
 </head>
 <body>
-<div class="app" id="mainApp">
-  <header>
-    <div class="brand">
-      <div class="logo">PB</div>
-      <div><h1>Stylish Text Generator</h1></div>
-    </div>
-    <button id="loginBtn">Login with Google</button>
-  </header>
+  <!-- Background Shapes -->
+  <div class="shape"></div>
+  <div class="shape"></div>
+  <div class="shape"></div>
+  <div class="shape"></div>
 
-  <div class="card">
-    <textarea id="input" placeholder="Type your text here..."></textarea>
+  <div class="container">
+    <h1>🚧 Site Temporarily Disabled 🚧</h1>
+    <p>We are working hard to get live! Stay tuned.</p>
+    <div id="countdown"></div>
   </div>
 
-  <div class="card">
-    <div class="styles" id="stylesList"></div>
-  </div>
-</div>
+  <script>
+    // 30-day Countdown
+    const countdownEl = document.getElementById('countdown');
+    const launchDate = new Date();
+    launchDate.setDate(launchDate.getDate() + 30);
 
-<div class="app" id="chatPage">
-  <div id="chatHeader"><span class="back" id="backBtn">⬅</span> INDEVERYDAY Chat</div>
-  <div id="chatMessages"></div>
-  <footer>
-    <input type="text" id="msgInput" placeholder="Type message...">
-    <button id="sendBtn">Send</button>
-  </footer>
-</div>
-
-<div class="gc-btn" id="gcBtn"><img src="https://cdn-icons-png.flaticon.com/512/134/134914.png" width="30"></div>
-<a class="wa-btn" href="https://wa.me/447877486623?text=Hello" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" width="30"></a>
-
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-<script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyDFPMf8HLMpS6DbZkdCR6T7GAm5sfz-TOw",
-    authDomain: "urbrokhan-f631c.firebaseapp.com",
-    databaseURL: "https://urbrokhan-f631c-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "urbrokhan-f631c",
-    storageBucket: "urbrokhan-f631c.appspot.com",
-    messagingSenderId: "533086015351",
-    appId: "1:533086015351:web:a12328fbc4906e4f5c9b72"
-  };
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.database();
-  const auth = firebase.auth();
-  const provider = new firebase.auth.GoogleAuthProvider();
-
-  const loginBtn = document.getElementById('loginBtn');
-  const gcBtn = document.getElementById('gcBtn');
-  const backBtn = document.getElementById('backBtn');
-  const chatPage = document.getElementById('chatPage');
-  const mainApp = document.getElementById('mainApp');
-  const msgInput = document.getElementById('msgInput');
-  const chatMessages = document.getElementById('chatMessages');
-  const sendBtn = document.getElementById('sendBtn');
-
-  let chatUser = null;
-
-  loginBtn.onclick = () => {
-    auth.signInWithPopup(provider).then(res=>{
-      chatUser = res.user.displayName || "User";
-      loginBtn.style.display="none";
-      alert("Login successful! Now you can open chat.");
-    }).catch(err=>alert("Login failed"));
-  };
-
-  gcBtn.onclick = () => {
-    if(!chatUser){
-      alert("Please login to chat!");
-      return;
+    function updateCountdown(){
+      const now = new Date();
+      const diff = launchDate - now;
+      if(diff <= 0){
+        countdownEl.textContent = "🎉 We are Live Now! 🎉";
+        clearInterval(interval);
+        return;
+      }
+      const days = Math.floor(diff / (1000*60*60*24));
+      const hours = Math.floor((diff / (1000*60*60)) % 24);
+      const minutes = Math.floor((diff / (1000*60)) % 60);
+      const seconds = Math.floor((diff / 1000) % 60);
+      countdownEl.textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`;
     }
-    mainApp.style.display="none";
-    chatPage.style.display="flex";
-  };
-  backBtn.onclick = () => {
-    chatPage.style.display="none";
-    mainApp.style.display="flex";
-  };
-
-  sendBtn.onclick = ()=>{
-    const msg = msgInput.value.trim();
-    if(!msg) return;
-    db.ref("groupChat").push({name:chatUser,message:msg,time:new Date().toLocaleTimeString()});
-    msgInput.value="";
-  };
-
-  db.ref("groupChat").on("child_added", snapshot=>{
-    const data = snapshot.val();
-    const div = document.createElement("div");
-    div.className="msg"+(data.name===chatUser?" me":"");
-    div.innerHTML=`<b>${data.name}</b>: ${data.message}<br><small>${data.time}</small>`;
-    chatMessages.appendChild(div);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-  });
-
-  // Stylish Text Generator
-  const inputEl = document.getElementById('input');
-  const stylesList = document.getElementById('stylesList');
-  const emojis = ['🔥','✨','💫','💖','🌸','⭐','💥','🌟','❤️','💎','💀','🎯','🎉','🥶','⚡','🌈','🌻','🐉','💚','😎'];
-  const fonts = [
-    t=>`<span style="font-family:cursive">${t}</span>`,
-    t=>`<span style="font-family:monospace">${t}</span>`,
-    t=>`<span style="font-family:serif">${t}</span>`,
-    t=>`<span style="font-family:sans-serif">${t}</span>`,
-    t=>`<span style="font-family:Impact">${t}</span>`,
-    t=>`<span style="font-family:Comic Sans MS">${t}</span>`
-  ];
-  function renderStyles(){
-    stylesList.innerHTML="";
-    const val = inputEl.value||"";
-    const allStyles = [
-      t=>t.toUpperCase(), t=>t.toLowerCase(),
-      t=>`♡ ${t} ♡`, t=>`❀ ${t} ❀`,
-      ...emojis.map(e=>t=>`${e} ${t} ${e}`),
-      ...fonts
-    ];
-    allStyles.forEach(fn=>{
-      const div=document.createElement("div");
-      div.className="style";
-      div.innerHTML=fn(val);
-      div.onclick=()=>navigator.clipboard.writeText(div.innerText);
-      stylesList.appendChild(div);
-    });
-  }
-  inputEl.oninput = renderStyles;
-  renderStyles();
-</script>
+    const interval = setInterval(updateCountdown, 1000);
+    updateCountdown();
+  </script>
 </body>
 </html>
