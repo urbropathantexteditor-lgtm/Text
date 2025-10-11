@@ -1,414 +1,170 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>ur bro — Stylish Text & Chat</title>
-
-<!-- Some Google fonts used in previews -->
-<link href="https://fonts.googleapis.com/css2?family=Lobster&family=Pacifico&family=Roboto:wght@300;400;700&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
-
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Stylish Text & Chat</title>
 <style>
-  :root{
-    --bg:#0f172a; --card:#0b1220; --muted:#94a3b8;
-    --accent:#10b981; --glass:#172033;
-  }
-
-  html,body{
-    height:100%;
-    margin:0;
-    font-family:Inter,system-ui,Segoe UI,Roboto,Arial,Helvetica,sans-serif;
-    background:var(--bg);
-    color:#f1f5f9;
-    -webkit-font-smoothing:antialiased;
-    -moz-osx-font-smoothing:grayscale;
-  }
-
-  /* center column */
-  .wrap {
-    height:100%;
-    display:flex;
-    justify-content:center;
-    align-items:flex-start;
-    padding:14px;
-    box-sizing:border-box;
-  }
-
-  .app {
-    width:100%;
-    max-width:540px;
-    height:100%;
-    display:flex;
-    flex-direction:column;
-    gap:12px;
-  }
-
-  header{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:12px;
-    padding:4px 2px;
-  }
-
-  .brand{display:flex;gap:12px;align-items:center}
-  .logo{
-    width:46px;height:46px;border-radius:10px;
-    background:linear-gradient(135deg,#06b6d4,#7c3aed);
-    display:flex;align-items:center;justify-content:center;font-weight:700;color:white;
-    font-family: 'Lobster', cursive;
-  }
-  h1 {font-size:16px;margin:0;font-weight:700}
-  .small{font-size:12px;color:var(--muted)}
-
-  .card{
-    background:var(--card);
-    border-radius:12px;
-    padding:12px;
-    box-shadow:0 6px 20px rgba(2,6,23,0.6);
-  }
-
-  textarea#input{
-    width:100%;
-    min-height:96px;
-    padding:12px;
-    border-radius:8px;
-    background:var(--glass);
-    border:none;color:white;font-size:15px;resize:vertical;
-  }
-
-  .styles{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(110px,1fr));
-    gap:10px;
-    max-height:48vh;
-    overflow:auto;
-    padding:6px;
-  }
-
-  .style{
-    background:var(--glass);
-    padding:10px;border-radius:10px;
-    cursor:pointer;text-align:center;min-height:56px;
-    display:flex;align-items:center;justify-content:center;
-    word-break:break-word;transition:transform .12s,background .12s;
-    user-select:none;
-  }
-  .style:hover{ transform:translateY(-6px); background:#243343; }
-
-  /* floating buttons */
-  .gc-btn, .wa-btn{
-    position:fixed; right:16px; width:56px; height:56px; border-radius:50%;
-    display:flex; align-items:center; justify-content:center; box-shadow:0 10px 30px rgba(0,0,0,0.4); z-index:1200;
-    cursor:pointer;
-  }
-  .wa-btn{ bottom:16px; background:#25D366; }
-  .gc-btn{ bottom:88px; background:#00bcd4; }
-
-  /* CHAT PAGE */
-  #chatPage{
-    display:none;
-    flex-direction:column;
-    flex:1 1 auto;
-    background:#0b1220;
-    border-radius:12px;
-    overflow:hidden;
-    height:100%;
-  }
-  #chatHeader{
-    display:flex;align-items:center;gap:10px;background:#0f172a;padding:12px;font-weight:700;color:#00ffaa;
-  }
-  #chatMessages{
-    flex:1 1 auto; overflow-y:auto; padding:12px; display:flex; flex-direction:column; gap:10px;
-    /* ensure space when keyboard opens on mobile */
-    padding-bottom:16px;
-  }
-  .msg{ background:#172033; padding:10px 12px; border-radius:10px; max-width:78%; word-wrap:break-word; box-shadow:0 2px 6px rgba(0,0,0,0.4);}
-  .msg .meta{ font-size:12px;color:var(--muted); margin-bottom:6px; }
-  .me{ align-self:flex-end; background:#2563eb; color:white; }
-
-  footer.chat-footer{
-    display:flex; gap:8px; padding:8px; background:#0f172a; align-items:center; flex-shrink:0;
-    box-shadow:0 -2px 8px rgba(0,0,0,0.4);
-  }
-  .chat-input{ flex:1; padding:10px; border-radius:10px; border:none; background:#172433; color:#fff; font-size:15px; }
-  .send-btn{ background:#00ffaa; color:#06201b; border:none; padding:10px 14px; border-radius:10px; font-weight:700; }
-
-  /* small screens tweaks */
-  @media (max-width:420px){
-    .styles{grid-template-columns:repeat(auto-fit,minmax(92px,1fr));}
-    .style{min-height:52px;font-size:13px;padding:8px}
-    .brand h1{font-size:15px}
-  }
+:root {
+  --bg:#0f172a; --card:#0b1220; --glass:#172033; --accent:#10b981;
+}
+body {
+  margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;
+  background:var(--bg); color:#f1f5f9; display:flex; justify-content:center;
+  height:100vh; overflow:hidden;
+}
+.app {
+  width:100%; max-width:500px; height:100%; display:flex; flex-direction:column;
+}
+header {
+  display:flex; gap:12px; align-items:center; justify-content:space-between; padding:12px;
+}
+.brand {display:flex; gap:12px; align-items:center;}
+.logo {
+  width:44px;height:44px;border-radius:10px;
+  background:linear-gradient(135deg,#06b6d4,#7c3aed);
+  display:flex;align-items:center;justify-content:center;font-weight:700;color:white;
+}
+h1 {font-size:18px;margin:0;}
+.card {
+  background:var(--card); border-radius:12px; padding:14px; margin:8px;
+  box-shadow:0 6px 18px rgba(2,6,23,0.6);
+}
+textarea {width:100%;min-height:84px;padding:12px;border-radius:8px;
+  background:var(--glass);border:none;color:white;font-size:16px;resize:vertical;}
+.styles {
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(100px,1fr));
+  gap:10px; max-height:50vh; overflow:auto; padding:6px;
+}
+.style {
+  background:var(--glass); padding:10px; border-radius:10px; cursor:pointer;
+  text-align:center; min-height:48px; display:flex; align-items:center;
+  justify-content:center; word-break:break-word; transition:transform .12s, background .12s;
+}
+.style:hover{transform:translateY(-4px);background:#243343;}
+/* Chat */
+#chatPage {display:none;flex-direction:column;height:100%;background:#0b1220;position:relative;}
+#chatHeader {display:flex;align-items:center;gap:10px;background:#0f172a;padding:12px;font-weight:bold;color:#00ffaa;}
+#chatMessages {flex:1; overflow-y:auto; padding:12px; display:flex; flex-direction:column; gap:8px; margin-bottom:60px;}
+.msg {background:#172033;padding:10px;border-radius:10px;max-width:75%;word-wrap:break-word;}
+.me {align-self:flex-end;background:#2563eb;}
+footer {
+  position:fixed; bottom:0; left:0; width:100%; max-width:500px;
+  display:flex; padding:10px; background:#0f172a; gap:6px; box-sizing:border-box;
+}
+input,button {padding:10px;border:none;border-radius:8px;font-size:15px;}
+input {flex:1;background:#1f2937;color:white;}
+button {background:#00ffaa;color:#06201b;font-weight:bold;}
+.back {cursor:pointer;color:#00ffaa;font-size:20px;}
+.gc-btn,.wa-btn {position:fixed;right:18px;width:60px;height:60px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(0,0,0,0.4);cursor:pointer;z-index:1000;}
+.gc-btn {bottom:90px;background:#00bcd4;}
+.wa-btn {bottom:18px;background:#25D366;}
 </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="app" id="mainApp">
 
-      <header>
-        <div class="brand">
-          <div class="logo">PB</div>
-          <div>
-            <h1>ur bro — Stylish Text</h1>
-            <div class="small">No login required for text styles</div>
-          </div>
-        </div>
-
-        <button id="loginBtn" style="background:var(--accent);color:#06201b;border:none;padding:8px 12px;border-radius:10px;font-weight:700;cursor:pointer">
-          Login with Google
-        </button>
-      </header>
-
-      <div class="card">
-        <textarea id="input" placeholder="Type your text here..."></textarea>
-      </div>
-
-      <div class="card">
-        <div class="styles" id="stylesList" aria-live="polite"></div>
-      </div>
-
+<div class="app" id="mainApp">
+  <header>
+    <div class="brand">
+      <div class="logo">PB</div>
+      <h1>Stylish Text Generator</h1>
     </div>
-
-    <!-- Chat page -->
-    <div class="app" id="chatPage" aria-hidden="true">
-      <div id="chatHeader">
-        <span id="backBtn" style="cursor:pointer;color:#00ffaa;font-size:18px">⬅</span>
-        <div style="flex:1">INDEVERYDAY — Group Chat</div>
-        <div id="userLabel" style="font-size:13px;color:var(--muted)"></div>
-      </div>
-
-      <div id="chatMessages" role="log" aria-live="polite"></div>
-
-      <div class="chat-footer" id="chatFooter">
-        <input id="msgInput" class="chat-input" autocomplete="off" placeholder="Type a message...">
-        <button id="sendBtn" class="send-btn">Send</button>
-      </div>
-    </div>
+    <button id="loginBtn">Login with Google</button>
+  </header>
+  <div class="card">
+    <textarea id="input" placeholder="Type your text here..."></textarea>
   </div>
-
-  <!-- Floating actions -->
-  <div class="gc-btn" id="gcBtn" title="Group Chat">
-    <img src="https://cdn-icons-png.flaticon.com/512/134/134914.png" alt="gc" style="width:26px;height:26px">
+  <div class="card">
+    <div class="styles" id="stylesList"></div>
   </div>
-  <a class="wa-btn" href="https://wa.me/447877486623?text=Hello" target="_blank" title="WhatsApp">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="wa" style="width:26px;height:26px">
-  </a>
+</div>
 
-  <!-- Firebase v10 modular -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+<div class="app" id="chatPage">
+  <div id="chatHeader"><span class="back" id="backBtn">⬅</span> INDEVERYDAY Chat</div>
+  <div id="chatMessages"></div>
+  <footer>
+    <input type="text" id="msgInput" placeholder="Type message..."/>
+    <button id="sendBtn">Send</button>
+  </footer>
+</div>
 
-    // ---------- YOUR FIREBASE CONFIG ----------
-    const firebaseConfig = {
-      apiKey: "AIzaSyDFPMf8HLMpS6DbZkdCR6T7GAm5sfz-TOw",
-      authDomain: "urbrokhan-f631c.firebaseapp.com",
-      databaseURL: "https://urbrokhan-f631c-default-rtdb.asia-southeast1.firebasedatabase.app",
-      projectId: "urbrokhan-f631c",
-      storageBucket: "urbrokhan-f631c.appspot.com",
-      messagingSenderId: "533086015351",
-      appId: "1:533086015351:web:a12328fbc4906e4f5c9b72",
-      measurementId: "G-TGT66KJV02"
-    };
-    // ------------------------------------------
+<div class="gc-btn" id="gcBtn" title="Open Group Chat">
+  <img src="https://cdn-icons-png.flaticon.com/512/134/134914.png" style="width:30px;height:30px">
+</div>
+<a class="wa-btn" href="https://wa.me/447877486623?text=Hello" target="_blank">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" style="width:30px;height:30px">
+</a>
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const provider = new GoogleAuthProvider();
-    const db = getDatabase(app);
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
-    // Elements
-    const loginBtn = document.getElementById('loginBtn');
-    const gcBtn = document.getElementById('gcBtn');
-    const backBtn = document.getElementById('backBtn');
-    const mainApp = document.getElementById('mainApp');
-    const chatPage = document.getElementById('chatPage');
-    const userLabel = document.getElementById('userLabel');
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyDFPMf8HLMpS6DbZkdCR6T7GAm5sfz-TOw",
+  authDomain: "urbrokhan-f631c.firebaseapp.com",
+  databaseURL: "https://urbrokhan-f631c-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "urbrokhan-f631c",
+  storageBucket: "urbrokhan-f631c.appspot.com",
+  messagingSenderId: "533086015351",
+  appId: "1:533086015351:web:a12328fbc4906e4f5c9b72"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.database();
 
-    const inputEl = document.getElementById('input');
-    const stylesList = document.getElementById('stylesList');
+const loginBtn = document.getElementById('loginBtn');
+loginBtn.onclick = ()=> {
+  const provider = new firebase.auth.GoogleAuthProvider();
+  auth.signInWithPopup(provider).catch(err=>alert("Login failed"));
+};
 
-    const chatMessages = document.getElementById('chatMessages');
-    const msgInput = document.getElementById('msgInput');
-    const sendBtn = document.getElementById('sendBtn');
+auth.onAuthStateChanged(user=>{
+  if(user) loginBtn.style.display='none';
+  else loginBtn.style.display='block';
+});
 
-    // --- State ---
-    let chatName = localStorage.getItem('chatName') || null;
+/* Chat */
+const gcBtn = document.getElementById('gcBtn');
+const backBtn = document.getElementById('backBtn');
+const chatPage = document.getElementById('chatPage');
+const mainApp = document.getElementById('mainApp');
+const msgInput = document.getElementById('msgInput');
+const chatMessages = document.getElementById('chatMessages');
+const sendBtn = document.getElementById('sendBtn');
 
-    // Auth
-    loginBtn.addEventListener('click', async () => {
-      try {
-        const res = await signInWithPopup(auth, provider);
-        const user = res.user;
-        chatName = user.displayName || user.email || 'User';
-        localStorage.setItem('chatName', chatName);
-        userLabel.textContent = chatName;
-        loginBtn.style.display = 'none';
-        alert('Logged in as ' + chatName);
-      } catch (err) {
-        console.error('Login error', err);
-        alert('Login failed — check popup or browser settings.');
-      }
-    });
+let chatName = localStorage.getItem("chatName");
+if(!chatName){
+  chatName = prompt("Enter your name for chat:");
+  localStorage.setItem("chatName",chatName);
+}
 
-    onAuthStateChanged(auth, user => {
-      if (user) {
-        chatName = user.displayName || user.email || 'User';
-        localStorage.setItem('chatName', chatName);
-        userLabel.textContent = chatName;
-        loginBtn.style.display = 'none';
-      } else {
-        // not logged in
-        // show login button (optional)
-        loginBtn.style.display = '';
-      }
-    });
+gcBtn.onclick = ()=>{
+  if(!auth.currentUser){ alert("Login to chat!"); return; }
+  mainApp.style.display="none";
+  chatPage.style.display="flex";
+};
+backBtn.onclick = ()=>{
+  chatPage.style.display="none";
+  mainApp.style.display="flex";
+};
 
-    // --- Styles / fonts / variants ---
-    const emojiList = ['🔥','✨','💫','💖','🌸','⭐','💥','🌟','❤️','💎','🎯','🎉','🥶','⚡','🌈','🌻','😎','🌺','🌼','🌷'];
-    const symbolList = ['♡','❀','★','✦','✧','❁','☯','☾','✪','❖','☘','✿','✺','✤','✵','❇','✮','✯','✶','✷'];
-    // a variety of font-style functions (preview only)
-    const fontStyles = [
-      t=>`<span style="font-family:Roboto,system-ui;font-size:15px">${t}</span>`,
-      t=>`<span style="font-family:Montserrat,system-ui;font-size:16px;font-weight:700">${t}</span>`,
-      t=>`<span style="font-family:Pacifico, cursive; font-size:18px">${t}</span>`,
-      t=>`<span style="font-family:Lobster, cursive; font-size:18px">${t}</span>`,
-      t=>`<span style="font-family:monospace;font-size:15px">${t}</span>`,
-      t=>`<span style="font-family:Georgia,serif;font-size:16px">${t}</span>`,
-      t=>`<span style="font-family:Verdana,sans-serif;font-size:15px">${t}</span>`,
-      t=>`<span style="font-family:Segoe UI,system-ui;font-size:16px">${t}</span>`,
-      t=>`<span style="font-family:cursive;font-size:17px">${t}</span>`,
-      t=>`<span style="font-family:Roboto,system-ui;font-size:20px;letter-spacing:1px">${t}</span>`,
-      t=>t=>t // fallback (will not be used)
-    ];
+sendBtn.onclick = ()=>{
+  const msg = msgInput.value.trim();
+  if(!msg) return;
+  db.ref("groupChat").push({name:chatName,message:msg,time:new Date().toLocaleTimeString()});
+  msgInput.value="";
+};
 
-    function transformVariants(text){
-      const base = text || '';
-      const fns = [
-        t=>t,
-        t=>t.toUpperCase(),
-        t=>t.toLowerCase(),
-        t=>t.split('').join(' '),
-        t=>`♡ ${t} ♡`,
-        t=>`❀ ${t} ❀`,
-        t=>`★ ${t} ★`,
-        t=>`✦ ${t} ✦`,
-        ...emojiList.map(e=>t=>`${e} ${t} ${e}`),
-        ...symbolList.map(s=>t=>`${s} ${t} ${s}`),
-        ...fontStyles.slice(0,9) // use first 9 font previews
-      ];
-      return fns.map(fn => fn(base));
-    }
-
-    function renderStyles(){
-      stylesList.innerHTML = '';
-      const val = inputEl.value || 'Hello from ur bro';
-      const items = transformVariants(val);
-      items.forEach((out) => {
-        const div = document.createElement('div');
-        div.className = 'style';
-        // if out contains HTML (font preview), set innerHTML; else textContent
-        if (/<span/.test(out)) div.innerHTML = out;
-        else div.textContent = out;
-        div.title = 'Click to copy';
-        div.addEventListener('click', async () => {
-          // copy visible text (use innerText for styled previews)
-          try {
-            await navigator.clipboard.writeText(div.innerText || div.textContent);
-            div.style.transform = 'scale(0.98)';
-            setTimeout(()=>div.style.transform='',120);
-          } catch(e){ console.error('Copy failed', e); alert('Copy failed'); }
-        });
-        stylesList.appendChild(div);
-      });
-    }
-
-    inputEl.addEventListener('input', renderStyles);
-    renderStyles();
-
-    // --- Chat logic (text only) ---
-    // ensure chatName from localStorage if available
-    if(!chatName){
-      const s = localStorage.getItem('chatName');
-      if(s){ chatName = s; userLabel.textContent = chatName; }
-    } else { userLabel.textContent = chatName; }
-
-    // open chat button
-    gcBtn.addEventListener('click', () => {
-      if(!chatName){
-        // prompt to sign in
-        const ok = confirm('You must login with Google to join chat. Sign in now?');
-        if(ok) loginBtn.click();
-        return;
-      }
-      mainApp.style.display = 'none';
-      chatPage.style.display = 'flex';
-      chatPage.setAttribute('aria-hidden','false');
-      // ensure scroll to bottom
-      setTimeout(()=> chatMessages.scrollTop = chatMessages.scrollHeight, 150);
-    });
-
-    backBtn.addEventListener('click', () => {
-      chatPage.style.display = 'none';
-      chatPage.setAttribute('aria-hidden','true');
-      mainApp.style.display = 'flex';
-    });
-
-    // send with button or Enter
-    async function sendMessage(){
-      const m = msgInput.value.trim();
-      if(!m) return;
-      try {
-        await push(ref(db, 'groupChat'), { name: chatName || 'Anonymous', message: m, time: new Date().toLocaleTimeString() });
-        msgInput.value = '';
-        // scroll
-        setTimeout(()=> chatMessages.scrollTop = chatMessages.scrollHeight, 100);
-      } catch(err){
-        console.error('Send failed', err);
-        alert('Send failed');
-      }
-    }
-    sendBtn.addEventListener('click', sendMessage);
-    msgInput.addEventListener('keydown', (e)=>{ if(e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); sendMessage(); } });
-
-    // realtime listen
-    onChildAdded(ref(db, 'groupChat'), (snap) => {
-      const d = snap.val();
-      if(!d) return;
-      const el = document.createElement('div');
-      el.className = 'msg' + (d.name === chatName ? ' me' : '');
-      const meta = `<div class="meta">${escapeHtml(d.name)} • ${escapeHtml(d.time)}</div>`;
-      el.innerHTML = meta + `<div>${escapeHtml(d.message)}</div>`;
-      chatMessages.appendChild(el);
-      // always scroll to bottom
-      setTimeout(()=> chatMessages.scrollTop = chatMessages.scrollHeight, 40);
-    });
-
-    // when input focused on mobile, scroll to bottom after keyboard opens
-    msgInput.addEventListener('focus', () => {
-      setTimeout(()=> chatMessages.scrollTop = chatMessages.scrollHeight, 300);
-    });
-
-    // also on resize (some mobile browsers change viewport when keyboard opens)
-    window.addEventListener('resize', () => {
-      setTimeout(()=> chatMessages.scrollTop = chatMessages.scrollHeight, 200);
-    });
-
-    // small util to avoid XSS in displayed messages
-    function escapeHtml(s){
-      if(!s && s !== 0) return '';
-      return String(s)
-        .replace(/&/g,'&amp;')
-        .replace(/</g,'&lt;')
-        .replace(/>/g,'&gt;')
-        .replace(/"/g,'&quot;')
-        .replace(/'/g,'&#039;');
-    }
-
-    // initial load: scroll bottom if chat visible
-    setTimeout(()=> chatMessages.scrollTop = chatMessages.scrollHeight, 300);
-  </script>
+db.ref("groupChat").on("child_added", snapshot=>{
+  const data = snapshot.val();
+  const div = document.createElement("div");
+  div.className = "msg"+(data.name===chatName?" me":"");
+  div.innerHTML=`<b>${data.name}</b>: ${data.message}<br><small>${data.time}</small>`;
+  chatMessages.appendChild(div);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+});
+</script>
 </body>
 </html>
