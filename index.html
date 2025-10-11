@@ -1,36 +1,44 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>ur bro — Stylish Text Generator</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>ur bro — Stylish Text & Chat</title>
 <style>
   :root{--bg:#0f172a;--card:#0b1220;--muted:#94a3b8;--accent:#10b981;--glass:#172033}
-  body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;background:var(--bg);color:#f1f5f9;display:flex;justify-content:center;padding:18px}
-  .app{width:100%;max-width:500px}
+  body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;background:var(--bg);color:#f1f5f9;display:flex;justify-content:center;padding:18px;height:100vh;overflow:hidden}
+  .app{width:100%;max-width:500px;height:100%;display:flex;flex-direction:column}
   header{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-bottom:12px}
   .brand{display:flex;gap:12px;align-items:center}
   .logo{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,#06b6d4,#7c3aed);display:flex;align-items:center;justify-content:center;font-weight:700;color:white}
   h1{font-size:18px;margin:0}
-  .small{font-size:13px;color:var(--muted)}
   .card{background:var(--card);border-radius:12px;padding:14px;margin-bottom:12px;box-shadow:0 6px 18px rgba(2,6,23,0.6)}
   textarea{width:100%;min-height:84px;padding:12px;border-radius:8px;background:var(--glass);border:none;color:white;font-size:16px;resize:vertical}
   .styles{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:10px;max-height:60vh;overflow:auto;padding:6px}
   .style{background:var(--glass);padding:10px;border-radius:10px;cursor:pointer;text-align:center;min-height:48px;display:flex;align-items:center;justify-content:center;word-break:break-word;transition:transform .12s,background .12s}
   .style:hover{transform:translateY(-4px);background:#243343}
-  .btn{background:var(--accent);color:#06201b;padding:8px 12px;border-radius:8px;border:none;cursor:pointer;font-weight:600;width:100%}
-  .wa-btn{position:fixed;right:18px;bottom:18px;background:#25D366;width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(0,0,0,0.4);z-index:1000}
-  @media (max-width:600px){header{flex-direction:column;align-items:flex-start} .styles{grid-template-columns:repeat(auto-fit,minmax(80px,1fr))}}
+  .wa-btn,.gc-btn{position:fixed;right:18px;bottom:18px;width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(0,0,0,0.4);z-index:1000;cursor:pointer}
+  .wa-btn{background:#25D366;bottom:18px}
+  .gc-btn{background:#00bcd4;bottom:90px}
+  #chatPage{display:none;flex-direction:column;height:100%;background:#0b1220;border-radius:12px;overflow:hidden}
+  #chatHeader{display:flex;align-items:center;gap:10px;background:#0f172a;padding:12px;font-weight:bold;color:#00ffaa}
+  #chatMessages{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px}
+  .msg{background:#172033;padding:10px;border-radius:10px;max-width:75%;word-wrap:break-word}
+  .me{align-self:flex-end;background:#2563eb}
+  footer{display:flex;padding:10px;background:#0f172a;gap:6px}
+  input,button{padding:10px;border:none;border-radius:8px;font-size:15px}
+  input{flex:1;background:#1f2937;color:white}
+  button{background:#00ffaa;color:#06201b;font-weight:bold}
+  .back{cursor:pointer;color:#00ffaa;font-size:20px}
 </style>
 </head>
 <body>
-  <div class="app" id="app">
+  <div class="app" id="mainApp">
     <header>
       <div class="brand">
         <div class="logo">PB</div>
         <div><h1>ur bro — Stylish Text Generator</h1></div>
       </div>
-      <button id="loginBtn" class="btn">Login with Google</button>
     </header>
 
     <div class="card">
@@ -42,15 +50,29 @@
     </div>
   </div>
 
+  <!-- Group Chat Page -->
+  <div class="app" id="chatPage">
+    <div id="chatHeader"><span class="back" id="backBtn">⬅</span> INDEVERYDAY Group Chat</div>
+    <div id="chatMessages"></div>
+    <footer>
+      <input type="text" id="msgInput" placeholder="Type message...">
+      <button id="sendBtn">Send</button>
+    </footer>
+  </div>
+
+  <!-- Floating Buttons -->
+  <div class="gc-btn" id="gcBtn" title="Open Group Chat">
+    <img src="https://cdn-icons-png.flaticon.com/512/134/134914.png" style="width:30px;height:30px">
+  </div>
   <a class="wa-btn" href="https://wa.me/447877486623?text=Hello" target="_blank" title="WhatsApp">
     <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WA" style="width:30px;height:30px">
   </a>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-// ----- Your Firebase Config -----
+/* Firebase Config */
 const firebaseConfig = {
   apiKey: "AIzaSyDFPMf8HLMpS6DbZkdCR6T7GAm5sfz-TOw",
   authDomain: "urbrokhan-f631c.firebaseapp.com",
@@ -61,58 +83,32 @@ const firebaseConfig = {
   appId: "1:533086015351:web:a12328fbc4906e4f5c9b72",
   measurementId: "G-TGT66KJV02"
 };
-
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const provider = new GoogleAuthProvider();
+const db = getDatabase(app);
 
-const loginBtn = document.getElementById('loginBtn');
+/* --- Stylish Text --- */
 const inputEl = document.getElementById('input');
 const stylesList = document.getElementById('stylesList');
-
-loginBtn.addEventListener('click', async () => {
-  try {
-    await signInWithPopup(auth, provider);
-  } catch(err){ console.error(err); alert('Login failed'); }
-});
-
-onAuthStateChanged(auth, user => {
-  if (user) loginBtn.style.display='none';
-});
-
-/* ---------------- Stylish generator ---------------- */
-const emojiList = ['🔥','✨','💫','💖','🌸','⭐','💥','🌟','❤️','💎','💀','🎯','🎉','🥶','⚡','🌈','🌻','🐉','💚','😎','🌺','🍀','🌼','🎀','🦋','🍁','🎵','🎶','🍄','🌹','🍂','🌷','🍉','🍇','🍓','🍊','🍌','🥭','🍍','🍑','🍒','🥥','🥝','🍋','🥕','🌽','🥦','🍆','🥔'];
-const symbolList = ['♡','❀','★','✦','✧','❁','☯','☾','✪','❖','☘','☠','☢','⚡','☃','✈','⚜','❂','❉','✿','✺','❇','✤','✱','✵','✹','✺','✸','✷','❈','❊','❋','❌','⚔','⚙','☂','☁','☄','✌','✎','✏','☑','✒','♛','♚','♞','♟'];
-
+const emojiList = ['🔥','✨','💫','💖','🌸','⭐','💥','🌟','❤️','💎','🎯','🎉','🥶','⚡','🌈','🌻','🐉','💚','😎'];
+const symbolList = ['♡','❀','★','✦','✧','❁','☯','☾','✪','❖','☘','☠','⚡','☃','✈','⚜','❂','❉','✿','✺','❇'];
 const fontStyles = [
   t=>`<span style="font-family:cursive;font-size:18px">${t}</span>`,
   t=>`<span style="font-family:monospace;font-size:17px">${t}</span>`,
   t=>`<span style="font-family:serif;font-size:20px">${t}</span>`,
   t=>`<span style="font-family:sans-serif;font-size:16px">${t}</span>`,
   t=>`<span style="font-family:Impact;font-size:22px">${t}</span>`,
-  t=>`<span style="font-family:Arial Black;font-size:21px">${t}</span>`,
-  t=>`<span style="font-family:Tahoma;font-size:19px">${t}</span>`,
-  t=>`<span style="font-family:Verdana;font-size:18px">${t}</span>`,
-  t=>`<span style="font-family:Georgia;font-size:20px">${t}</span>`,
-  t=>`<span style="font-family:Courier New;font-size:18px">${t}</span>`,
+  t=>`<span style="font-family:Comic Sans MS;font-size:22px">${t}</span>`,
   t=>`<span style="font-family:Lucida Console;font-size:19px">${t}</span>`,
   t=>`<span style="font-family:Trebuchet MS;font-size:18px">${t}</span>`,
   t=>`<span style="font-family:Palatino Linotype;font-size:20px">${t}</span>`,
-  t=>`<span style="font-family:Book Antiqua;font-size:18px">${t}</span>`,
-  t=>`<span style="font-family:Comic Sans MS;font-size:22px">${t}</span>`,
-  t=>`<span style="font-family:Gill Sans;font-size:17px">${t}</span>`,
-  t=>`<span style="font-family:Optima;font-size:20px">${t}</span>`,
-  t=>`<span style="font-family:Segoe Print;font-size:19px">${t}</span>`,
-  t=>`<span style="font-family:Lucida Sans;font-size:18px">${t}</span>`
+  t=>`<span style="font-family:Georgia;font-size:20px">${t}</span>`
 ];
-
 function renderStyles(){
   stylesList.innerHTML='';
   const val = inputEl.value || '';
   const styleFns = [
     t=>t.toUpperCase(), t=>t.toLowerCase(), t=>t.split('').join(' '),
-    t=>`♡ ${t} ♡`, t=>`❀ ${t} ❀`, t=>`★ ${t} ★`, t=>`✦ ${t} ✦`, t=>`✧ ${t} ✧`,
-    t=>`❁ ${t} ❁`, t=>`☯ ${t} ☯`, t=>`☾ ${t} ☽`, t=>`✪ ${t} ✪`, t=>`❖ ${t} ❖`, t=>`☘ ${t} ☘`,
+    t=>`♡ ${t} ♡`, t=>`❀ ${t} ❀`, t=>`★ ${t} ★`, t=>`✦ ${t} ✦`,
     ...emojiList.map(e=>t=>`${e} ${t} ${e}`),
     ...symbolList.map(s=>t=>`${s} ${t} ${s}`),
     ...fontStyles
@@ -121,12 +117,46 @@ function renderStyles(){
     const div=document.createElement('div');
     div.className='style';
     div.innerHTML=fn(val);
-    div.addEventListener('click',()=>navigator.clipboard.writeText(val));
+    div.addEventListener('click',()=>navigator.clipboard.writeText(div.innerText));
     stylesList.appendChild(div);
   });
 }
 inputEl.addEventListener('input', renderStyles);
 renderStyles();
+
+/* --- Group Chat --- */
+const gcBtn=document.getElementById('gcBtn');
+const backBtn=document.getElementById('backBtn');
+const chatPage=document.getElementById('chatPage');
+const mainApp=document.getElementById('mainApp');
+const msgInput=document.getElementById('msgInput');
+const chatMessages=document.getElementById('chatMessages');
+const sendBtn=document.getElementById('sendBtn');
+
+let chatName=localStorage.getItem("chatName");
+if(!chatName){
+  chatName=prompt("Enter your name for chat:");
+  localStorage.setItem("chatName",chatName);
+}
+
+gcBtn.onclick=()=>{ mainApp.style.display="none"; chatPage.style.display="flex"; };
+backBtn.onclick=()=>{ chatPage.style.display="none"; mainApp.style.display="flex"; };
+
+sendBtn.onclick=()=>{
+  const msg=msgInput.value.trim();
+  if(!msg)return;
+  push(ref(db,"groupChat"),{name:chatName,message:msg,time:new Date().toLocaleTimeString()});
+  msgInput.value="";
+};
+
+onChildAdded(ref(db,"groupChat"),snapshot=>{
+  const data=snapshot.val();
+  const div=document.createElement("div");
+  div.className="msg"+(data.name===chatName?" me":"");
+  div.innerHTML=`<b>${data.name}</b>: ${data.message}<br><small>${data.time}</small>`;
+  chatMessages.appendChild(div);
+  chatMessages.scrollTop=chatMessages.scrollHeight;
+});
 </script>
 </body>
 </html>
