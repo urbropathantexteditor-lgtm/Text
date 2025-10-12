@@ -24,6 +24,7 @@
     .card img {width: 100%; height: 160px; object-fit: cover; border-radius: 12px; margin-bottom: 10px;}
     h2 {color: #333; margin-bottom: 15px;}
     #googleSignIn {width: 100%; margin-top: 20px;}
+    #adminMsg {margin-top: 10px; font-weight: 500;}
   </style>
 </head>
 <body>
@@ -45,7 +46,7 @@
   <input id="pdesc" placeholder="Product Description">
   <input type="file" id="pimg" accept="image/*">
   <button id="addProduct" class="btn-primary">Add Product</button>
-  <p id="adminMsg" style="color:green;"></p>
+  <p id="adminMsg"></p>
 
   <h2 style="margin-top:35px">Product List</h2>
   <div id="productList" class="grid"></div>
@@ -72,10 +73,11 @@
     const adminSection = document.getElementById('adminSection');
     const userEmail = document.getElementById('userEmail');
     const logoutBtn = document.getElementById('logoutBtn');
+    const adminMsg = document.getElementById('adminMsg');
 
     document.getElementById('googleSignIn').onclick = () => {
       const provider = new firebase.auth.GoogleAuthProvider();
-      auth.signInWithPopup(provider).catch(e => authMsg.textContent = e.message);
+      auth.signInWithPopup(provider).catch(e => document.getElementById('authMsg').textContent = e.message);
     };
 
     auth.onAuthStateChanged(user => {
@@ -96,36 +98,28 @@
     logoutBtn.onclick = () => auth.signOut();
 
     document.getElementById('addProduct').onclick = async () => {
-      const name = pname.value, price = parseFloat(pprice.value), desc = pdesc.value;
+      adminMsg.textContent = '';
+      const name = pname.value.trim();
+      const price = parseFloat(pprice.value);
+      const desc = pdesc.value.trim();
       const file = pimg.files[0];
-      if (!name || !price || !file) return alert('Please provide name, price, and image');
-      
-      const storageRef = storage.ref('products/' + Date.now() + '_' + file.name);
-      const uploadTask = storageRef.put(file);
 
-      uploadTask.on('state_changed', null, error => {
-        alert('Image upload failed: ' + error.message);
-      }, async () => {
-        const imageUrl = await uploadTask.snapshot.ref.getDownloadURL();
+      if (!name || !price || !file) {
+        adminMsg.style.color = 'red';
+        adminMsg.textContent = 'Please provide Name, Price, and select an Image';
+        return;
+      }
+
+      try {
+        const storageRef = storage.ref('products/' + Date.now() + '_' + file.name);
+        const snapshot = await storageRef.put(file);
+        const imageUrl = await snapshot.ref.getDownloadURL();
+
         await db.collection('products').add({ name, price, desc, image: imageUrl, created: new Date() });
+        adminMsg.style.color = 'green';
         adminMsg.textContent = 'Product added successfully!';
         pname.value = pprice.value = pdesc.value = '';
         pimg.value = '';
         loadProducts();
-      });
-    };
-
-    async function loadProducts() {
-      const list = document.getElementById('productList');
-      list.innerHTML = '';
-      const snap = await db.collection('products').orderBy('created','desc').get();
-      snap.forEach(doc => {
-        const d = doc.data();
-        const card = document.createElement('div');
-        card.className = 'card';
-        card.innerHTML = `<img src="${d.image}"><h4>${d.name}</h4><p>₹${d.price}</p><p>${d.desc||''}</p>`;
-        list.appendChild(card);
-      });
-    }
-  </script></body>
-</html>
+      } catch (error) {
+        adminMsg.style
