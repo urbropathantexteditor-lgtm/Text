@@ -3,36 +3,135 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Teacher Live Stream</title>
+<title>INDEVERYDAY Teaching Platform</title>
 <style>
-  body {font-family: Arial, sans-serif; display:flex; flex-direction:column; align-items:center; padding:20px; background:#f5f7fa;}
-  video {width:80%; max-width:700px; border-radius:15px; margin-top:20px; box-shadow:0 4px 15px rgba(0,0,0,0.2);}
-  button {padding:10px 20px; font-size:16px; border:none; border-radius:25px; background:#007bff; color:white; cursor:pointer; margin-top:20px;}
-  button:hover {opacity:0.9;}
+body{font-family:Arial; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100vh; background:#f5f7fa; margin:0;}
+h1{color:#007bff;}
+button{padding:15px 30px; margin:10px; border:none; border-radius:25px; font-size:18px; cursor:pointer; background:#007bff; color:white;}
+button:hover{opacity:0.9;}
+#teacherPanel, #studentPanel{display:none; width:90%; max-width:800px;}
+video{width:100%; border-radius:15px; margin-top:20px;}
+.live-indicator{color:red; font-weight:bold; margin-top:10px;}
 </style>
 </head>
 <body>
 
-<h1>Teacher Live Stream</h1>
-<button id="goLiveBtn">Go Live</button>
-<video id="teacherVideo" autoplay muted></video>
+<h1>INDEVERYDAY Teaching Platform</h1>
+
+<!-- Initial buttons -->
+<div id="mainButtons">
+  <button onclick="showStudent()">Student</button>
+  <button onclick="showTeacherLogin()">Teacher</button>
+</div>
+
+<!-- Teacher Login -->
+<div id="teacherLogin" style="display:none; margin-top:20px;">
+  <input type="password" id="teacherPass" placeholder="Enter Password" style="padding:10px 15px; font-size:16px; border-radius:15px; border:1px solid #ccc;">
+  <button onclick="teacherLogin()">Login</button>
+</div>
+
+<!-- Teacher Panel -->
+<div id="teacherPanel">
+  <h2>Teacher Panel</h2>
+  <button id="goLiveBtn">Start Live</button>
+  <button id="stopLiveBtn" disabled>Stop Live</button>
+  <div class="live-indicator" id="liveIndicator">Offline</div>
+  <video id="teacherVideo" autoplay muted></video>
+</div>
+
+<!-- Student Panel -->
+<div id="studentPanel">
+  <h2>Student Live Stream</h2>
+  <video id="studentVideo" autoplay controls></video>
+</div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
 <script>
-const goLiveBtn = document.getElementById('goLiveBtn');
-const teacherVideo = document.getElementById('teacherVideo');
-
-goLiveBtn.onclick = async () => {
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-    teacherVideo.srcObject = stream;
-    
-    // Here you would send this stream to students via WebRTC
-    // For demo, just showing teacher preview
-    alert('Live started! Now you can integrate WebRTC to stream to students.');
-  } catch (err) {
-    alert('Error accessing camera/mic: ' + err);
-  }
+const firebaseConfig = {
+  apiKey: "AIzaSyDFPMf8HLMpS6DbZkdCR6T7GAm5sfz-TOw",
+  authDomain: "urbrokhan-f631c.firebaseapp.com",
+  databaseURL: "https://urbrokhan-f631c-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "urbrokhan-f631c",
+  storageBucket: "urbrokhan-f631c.appspot.com",
+  messagingSenderId: "533086015351",
+  appId: "1:533086015351:web:a12328fbc4906e4f5c9b72",
+  measurementId: "G-TGT66KJV02"
 };
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const storage = firebase.storage();
+
+// Show panels
+function showStudent(){
+  document.getElementById('mainButtons').style.display='none';
+  document.getElementById('studentPanel').style.display='block';
+}
+function showTeacherLogin(){
+  document.getElementById('mainButtons').style.display='none';
+  document.getElementById('teacherLogin').style.display='block';
+}
+
+// Teacher login
+function teacherLogin(){
+  const pass = document.getElementById('teacherPass').value;
+  if(pass==='1234'){
+    document.getElementById('teacherLogin').style.display='none';
+    document.getElementById('teacherPanel').style.display='block';
+    initTeacherPanel();
+  } else {
+    alert('Incorrect Password');
+  }
+}
+
+// Teacher Panel
+let mediaRecorder, teacherStream, live=false;
+const teacherVideo = document.getElementById('teacherVideo');
+const goLiveBtn = document.getElementById('goLiveBtn');
+const stopLiveBtn = document.getElementById('stopLiveBtn');
+const liveIndicator = document.getElementById('liveIndicator');
+
+function initTeacherPanel(){
+  goLiveBtn.onclick = async ()=>{
+    teacherStream = await navigator.mediaDevices.getUserMedia({video:true, audio:true});
+    teacherVideo.srcObject = teacherStream;
+    mediaRecorder = new MediaRecorder(teacherStream,{mimeType:'video/webm; codecs=vp8'});
+    mediaRecorder.start(3000);
+    live=true;
+    liveIndicator.textContent='Live 🔴';
+    goLiveBtn.disabled=true;
+    stopLiveBtn.disabled=false;
+
+    mediaRecorder.ondataavailable = async (event)=>{
+      if(event.data.size>0 && live){
+        const timestamp = Date.now();
+        const fileRef = storage.ref().child(`liveChunks/chunk_${timestamp}.webm`);
+        await fileRef.put(event.data);
+        const url = await fileRef.getDownloadURL();
+        await db.ref('live/latestChunk').set(url);
+      }
+    };
+  };
+
+  stopLiveBtn.onclick = ()=>{
+    mediaRecorder.stop();
+    teacherStream.getTracks().forEach(t=>t.stop());
+    live=false;
+    liveIndicator.textContent='Offline';
+    goLiveBtn.disabled=false;
+    stopLiveBtn.disabled=true;
+  };
+}
+
+// Student Panel
+const studentVideo = document.getElementById('studentVideo');
+db.ref('live/latestChunk').on('value', snapshot=>{
+  const url = snapshot.val();
+  if(url) studentVideo.src = url;
+});
 </script>
 
 </body>
