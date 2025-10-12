@@ -3,66 +3,101 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Site Temporarily Disabled</title>
+<title>Phone OTP Login</title>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js"></script>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
-  *{margin:0;padding:0;box-sizing:border-box;}
-  body, html{width:100%;height:100%;display:flex;justify-content:center;align-items:center;background:#0f172a;font-family:'Poppins',sans-serif;overflow:hidden;color:#fff;}
-  .container{text-align:center;position:relative;z-index:2;}
-  h1{font-size:3em;margin-bottom:10px;color:#10b981;animation:fadeInDown 1s ease forwards;}
-  p{font-size:1.2em;margin-bottom:30px;color:#94a3b8;animation:fadeInUp 1s ease forwards;animation-delay:0.3s;opacity:0;}
-  #countdown{font-size:2em;font-weight:700;margin-bottom:20px;color:#00ffaa;animation:fadeIn 1s ease forwards;animation-delay:0.6s;opacity:0;}
-  /* Animated Background Shapes */
-  .shape{position:absolute;border-radius:50%;opacity:0.15;animation:float 10s infinite;}
-  .shape:nth-child(1){width:120px;height:120px;background:#10b981;top:10%;left:15%;animation-duration:12s;}
-  .shape:nth-child(2){width:200px;height:200px;background:#7c3aed;top:50%;left:70%;animation-duration:15s;}
-  .shape:nth-child(3){width:80px;height:80px;background:#06b6d4;top:80%;left:40%;animation-duration:18s;}
-  .shape:nth-child(4){width:150px;height:150px;background:#facc15;top:30%;left:80%;animation-duration:20s;}
-  @keyframes float{
-    0%{transform:translateY(0) rotate(0deg);}
-    50%{transform:translateY(-40px) rotate(180deg);}
-    100%{transform:translateY(0) rotate(360deg);}
-  }
-  @keyframes fadeInDown{0%{opacity:0;transform:translateY(-30px);}100%{opacity:1;transform:translateY(0);}}
-  @keyframes fadeInUp{0%{opacity:0;transform:translateY(30px);}100%{opacity:1;transform:translateY(0);}}
-  @keyframes fadeIn{0%{opacity:0;}100%{opacity:1;}}
+  body{font-family:sans-serif;background:#0f172a;color:white;display:flex;justify-content:center;align-items:center;height:100vh;margin:0}
+  .container{background:#1f2937;padding:20px;border-radius:12px;width:90%;max-width:400px;text-align:center}
+  input{width:80%;padding:10px;margin:10px 0;border-radius:8px;border:none;font-size:16px}
+  button{padding:10px 20px;background:#10b981;border:none;border-radius:8px;color:white;font-size:16px;cursor:pointer}
+  #recaptcha-container{margin:10px 0;}
+  .success{color:#10b981;font-weight:bold;margin-top:10px}
+  .phone-wrapper{display:flex;align-items:center;justify-content:center;gap:5px;}
+  .country-code{padding:10px;border-radius:8px;background:#111827;color:white;font-weight:bold}
 </style>
 </head>
 <body>
-  <!-- Background Shapes -->
-  <div class="shape"></div>
-  <div class="shape"></div>
-  <div class="shape"></div>
-  <div class="shape"></div>
 
-  <div class="container">
-    <h1>🚧 Site Temporarily Disabled 🚧</h1>
-    <p>We are working hard to get live! Stay tuned.</p>
-    <div id="countdown"></div>
+<div class="container">
+  <h2>Login with Phone OTP</h2>
+  <div class="phone-wrapper">
+    <div class="country-code">+91</div>
+    <input type="tel" id="phoneNumber" placeholder="Enter 10-digit number" maxlength="10" pattern="[0-9]{10}" inputmode="numeric">
+  </div>
+  <div id="recaptcha-container"></div>
+  <button id="sendOTP">Send OTP</button>
+
+  <div id="otpSection" style="display:none;">
+    <input type="tel" id="otpCode" placeholder="Enter OTP" maxlength="6" inputmode="numeric"><br>
+    <button id="verifyOTP">Verify OTP</button>
   </div>
 
-  <script>
-    // 30-day Countdown
-    const countdownEl = document.getElementById('countdown');
-    const launchDate = new Date();
-    launchDate.setDate(launchDate.getDate() + 30);
+  <div id="message" class="success"></div>
+</div>
 
-    function updateCountdown(){
-      const now = new Date();
-      const diff = launchDate - now;
-      if(diff <= 0){
-        countdownEl.textContent = "🎉 We are Live Now! 🎉";
-        clearInterval(interval);
-        return;
-      }
-      const days = Math.floor(diff / (1000*60*60*24));
-      const hours = Math.floor((diff / (1000*60*60)) % 24);
-      const minutes = Math.floor((diff / (1000*60)) % 60);
-      const seconds = Math.floor((diff / 1000) % 60);
-      countdownEl.textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+<script>
+  // Your Firebase config
+  const firebaseConfig = {
+    apiKey: "AIzaSyDFPMf8HLMpS6DbZkdCR6T7GAm5sfz-TOw",
+    authDomain: "urbrokhan-f631c.firebaseapp.com",
+    databaseURL: "https://urbrokhan-f631c-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "urbrokhan-f631c",
+    storageBucket: "urbrokhan-f631c.appspot.com",
+    messagingSenderId: "533086015351",
+    appId: "1:533086015351:web:a12328fbc4906e4f5c9b72",
+    measurementId: "G-TGT66KJV02"
+  };
+  
+  const app = firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+
+  // Render reCAPTCHA
+  window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+    size: 'normal',
+    callback: () => { console.log('reCAPTCHA solved'); }
+  });
+  recaptchaVerifier.render();
+
+  const sendOTP = document.getElementById('sendOTP');
+  const verifyOTP = document.getElementById('verifyOTP');
+  const phoneInput = document.getElementById('phoneNumber');
+
+  let confirmationResult;
+
+  sendOTP.addEventListener('click', () => {
+    const phoneNumber = phoneInput.value.trim();
+    if(phoneNumber.length !== 10 || isNaN(phoneNumber)) {
+      alert('Enter a valid 10-digit Indian phone number');
+      return;
     }
-    const interval = setInterval(updateCountdown, 1000);
-    updateCountdown();
-  </script>
+    auth.signInWithPhoneNumber('+91' + phoneNumber, window.recaptchaVerifier)
+      .then(result => {
+        confirmationResult = result;
+        document.getElementById('otpSection').style.display = 'block';
+        document.getElementById('message').innerText = 'OTP sent!';
+      })
+      .catch(error => {
+        console.error(error);
+        alert('Error sending OTP: ' + error.message);
+      });
+  });
+
+  verifyOTP.addEventListener('click', () => {
+    const otpCode = document.getElementById('otpCode').value.trim();
+    if(!otpCode){ alert('Enter OTP'); return; }
+
+    confirmationResult.confirm(otpCode)
+      .then(result => {
+        const user = result.user;
+        document.getElementById('message').innerText = 'Login successful! Welcome, ' + user.phoneNumber;
+      })
+      .catch(error => {
+        console.error(error);
+        alert('Invalid OTP');
+      });
+  });
+</script>
+
 </body>
 </html>
