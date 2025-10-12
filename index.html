@@ -3,41 +3,70 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Phone OTP Login</title>
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js"></script>
+<title>Email Login — Firebase</title>
 <style>
-  body{font-family:sans-serif;background:#0f172a;color:white;display:flex;justify-content:center;align-items:center;height:100vh;margin:0}
-  .container{background:#1f2937;padding:20px;border-radius:12px;width:90%;max-width:400px;text-align:center}
-  input{width:80%;padding:10px;margin:10px 0;border-radius:8px;border:none;font-size:16px}
-  button{padding:10px 20px;background:#10b981;border:none;border-radius:8px;color:white;font-size:16px;cursor:pointer}
-  #recaptcha-container{margin:10px 0;}
-  .success{color:#10b981;font-weight:bold;margin-top:10px}
-  .phone-wrapper{display:flex;align-items:center;justify-content:center;gap:5px;}
-  .country-code{padding:10px;border-radius:8px;background:#111827;color:white;font-weight:bold}
+  body {
+    background: #0f172a;
+    color: #f1f5f9;
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+  }
+  .container {
+    background: #0b1220;
+    padding: 30px;
+    border-radius: 15px;
+    text-align: center;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.6);
+  }
+  input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: none;
+    margin: 10px 0;
+    font-size: 16px;
+  }
+  button {
+    width: 100%;
+    padding: 12px;
+    background: #10b981;
+    border: none;
+    color: #fff;
+    font-weight: bold;
+    font-size: 16px;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  button:hover {
+    background: #0f9b6c;
+  }
+  .message {
+    margin-top: 15px;
+    color: #00ffaa;
+  }
 </style>
 </head>
 <body>
 
 <div class="container">
-  <h2>Login with Phone OTP</h2>
-  <div class="phone-wrapper">
-    <div class="country-code">+91</div>
-    <input type="tel" id="phoneNumber" placeholder="Enter 10-digit number" maxlength="10" pattern="[0-9]{10}" inputmode="numeric">
-  </div>
-  <div id="recaptcha-container"></div>
-  <button id="sendOTP">Send OTP</button>
-
-  <div id="otpSection" style="display:none;">
-    <input type="tel" id="otpCode" placeholder="Enter OTP" maxlength="6" inputmode="numeric"><br>
-    <button id="verifyOTP">Verify OTP</button>
-  </div>
-
-  <div id="message" class="success"></div>
+  <h2>Login with Email</h2>
+  <input type="email" id="emailInput" placeholder="Enter your email" required>
+  <button id="sendLinkBtn">Send Verification Link</button>
+  <div class="message" id="message"></div>
 </div>
 
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js"></script>
+
 <script>
-  // Your Firebase config
+  // Firebase configuration
   const firebaseConfig = {
     apiKey: "AIzaSyDFPMf8HLMpS6DbZkdCR6T7GAm5sfz-TOw",
     authDomain: "urbrokhan-f631c.firebaseapp.com",
@@ -48,55 +77,55 @@
     appId: "1:533086015351:web:a12328fbc4906e4f5c9b72",
     measurementId: "G-TGT66KJV02"
   };
-  
+
+  // Initialize Firebase
   const app = firebase.initializeApp(firebaseConfig);
   const auth = firebase.auth();
 
-  // Render reCAPTCHA
-  window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-    size: 'normal',
-    callback: () => { console.log('reCAPTCHA solved'); }
-  });
-  recaptchaVerifier.render();
+  const sendLinkBtn = document.getElementById("sendLinkBtn");
+  const emailInput = document.getElementById("emailInput");
+  const messageEl = document.getElementById("message");
 
-  const sendOTP = document.getElementById('sendOTP');
-  const verifyOTP = document.getElementById('verifyOTP');
-  const phoneInput = document.getElementById('phoneNumber');
+  // Action code settings for email link
+  const actionCodeSettings = {
+    url: window.location.href, // Redirect back to this page
+    handleCodeInApp: true
+  };
 
-  let confirmationResult;
-
-  sendOTP.addEventListener('click', () => {
-    const phoneNumber = phoneInput.value.trim();
-    if(phoneNumber.length !== 10 || isNaN(phoneNumber)) {
-      alert('Enter a valid 10-digit Indian phone number');
+  sendLinkBtn.addEventListener("click", () => {
+    const email = emailInput.value.trim();
+    if (!email) {
+      messageEl.textContent = "Please enter a valid email!";
       return;
     }
-    auth.signInWithPhoneNumber('+91' + phoneNumber, window.recaptchaVerifier)
-      .then(result => {
-        confirmationResult = result;
-        document.getElementById('otpSection').style.display = 'block';
-        document.getElementById('message').innerText = 'OTP sent!';
+
+    auth.sendSignInLinkToEmail(email, actionCodeSettings)
+      .then(() => {
+        window.localStorage.setItem('emailForSignIn', email);
+        messageEl.textContent = "Verification link sent! Check your email.";
       })
       .catch(error => {
         console.error(error);
-        alert('Error sending OTP: ' + error.message);
+        messageEl.textContent = "Error sending link: " + error.message;
       });
   });
 
-  verifyOTP.addEventListener('click', () => {
-    const otpCode = document.getElementById('otpCode').value.trim();
-    if(!otpCode){ alert('Enter OTP'); return; }
-
-    confirmationResult.confirm(otpCode)
+  // Check if user clicked the email link
+  if (auth.isSignInWithEmailLink(window.location.href)) {
+    let email = window.localStorage.getItem('emailForSignIn');
+    if (!email) {
+      email = window.prompt('Please provide your email for confirmation');
+    }
+    auth.signInWithEmailLink(email, window.location.href)
       .then(result => {
-        const user = result.user;
-        document.getElementById('message').innerText = 'Login successful! Welcome, ' + user.phoneNumber;
+        window.localStorage.removeItem('emailForSignIn');
+        messageEl.textContent = "Login successful! Welcome " + result.user.email;
       })
       .catch(error => {
         console.error(error);
-        alert('Invalid OTP');
+        messageEl.textContent = "Error verifying link: " + error.message;
       });
-  });
+  }
 </script>
 
 </body>
