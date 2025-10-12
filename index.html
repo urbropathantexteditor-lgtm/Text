@@ -1,58 +1,38 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>INDEVERYDAY - Admin Panel</title>
+  <title>INDEVERYDAY Group Chat</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
-    body {font-family: 'Roboto', sans-serif; background: linear-gradient(135deg, #f5f7fa, #c3cfe2); margin: 0; padding: 0;}
-    header {background: #fff; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border-bottom-left-radius: 15px; border-bottom-right-radius: 15px;}
-    .brand {font-weight: 700; font-size: 24px; color: #333;}
-    nav button {margin-left: 10px; padding: 10px 18px; border-radius: 25px; border: none; cursor: pointer; font-weight: 500; transition: 0.3s;}
-    nav button:hover {opacity: 0.85;}
-    .container {max-width: 950px; margin: 40px auto; padding: 25px; background: #fff; border-radius: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.1);}
-    .hidden {display: none;}
-    input, textarea {width: 100%; padding: 14px; margin: 10px 0; border: 1px solid #ccc; border-radius: 12px; font-size: 16px; outline: none; transition: 0.3s;}
-    input:focus, textarea:focus {border-color: #007bff; box-shadow: 0 0 8px rgba(0,123,255,0.2);}
-    button.btn-primary {background: linear-gradient(45deg, #007bff, #00d4ff); color: white; border-radius: 25px; font-size: 16px; padding: 12px 20px; border: none; cursor: pointer; transition: 0.3s;}
-    button.btn-primary:hover {opacity: 0.9;}
-    button.btn-secondary {background: #f0f0f0; color: #333; border-radius: 25px; padding: 12px 20px; border: none; cursor: pointer; transition: 0.3s;}
-    button.btn-secondary:hover {opacity: 0.9;}
-    .grid {display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; margin-top: 25px;}
-    .card {background: #f9f9f9; border-radius: 15px; padding: 15px; text-align: center; box-shadow: 0 6px 15px rgba(0,0,0,0.08); transition: 0.3s;}
-    .card:hover {transform: translateY(-5px); box-shadow: 0 12px 25px rgba(0,0,0,0.15);}
-    .card img {width: 100%; height: 160px; object-fit: cover; border-radius: 12px; margin-bottom: 10px;}
-    h2 {color: #333; margin-bottom: 15px;}
-    #googleSignIn {width: 100%; margin-top: 20px;}
-    #adminMsg {margin-top: 10px; font-weight: 500;}
+    body {font-family: 'Roboto', sans-serif; background: #f5f7fa; margin: 0; padding: 0; display: flex; flex-direction: column; height: 100vh;}
+    header {background: #007bff; color: white; padding: 20px; text-align: center; font-size: 24px; font-weight: 700;}
+    #chatContainer {flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 10px;}
+    .message {background: #fff; padding: 10px 15px; border-radius: 15px; max-width: 70%; box-shadow: 0 2px 8px rgba(0,0,0,0.1);}
+    .msg-sender {font-weight: 700; margin-bottom: 5px;}
+    #inputContainer {display: flex; padding: 10px 20px; background: #eee; border-top: 1px solid #ccc;}
+    #msgInput {flex: 1; padding: 10px 15px; border-radius: 25px; border: 1px solid #ccc; outline: none; font-size: 16px;}
+    #sendBtn {padding: 10px 20px; margin-left: 10px; border: none; border-radius: 25px; background: #007bff; color: white; font-weight: 500; cursor: pointer; transition: 0.3s;}
+    #sendBtn:hover {opacity: 0.9;}
   </style>
 </head>
 <body>
-  <header>
-    <div class="brand">INDEVERYDAY Admin</div>
-    <div>
-      <span id="userEmail">Not signed in</span>
-      <button id="logoutBtn" class="btn-secondary hidden">Logout</button>
-    </div>
-  </header>  <div class="container">
-    <section id="authSection">
-      <h2>Admin Login</h2>
-      <button id="googleSignIn" class="btn-primary">Sign in with Google</button>
-      <p id="authMsg" style="color:red;"></p>
-    </section><section id="adminSection" class="hidden">
-  <h2>Add Product (Admin)</h2>
-  <input id="pname" placeholder="Product Name">
-  <input id="pprice" placeholder="Price (₹)" type="number">
-  <input id="pdesc" placeholder="Product Description">
-  <input type="file" id="pimg" accept="image/*">
-  <button id="addProduct" class="btn-primary">Add Product</button>
-  <p id="adminMsg"></p>
 
-  <h2 style="margin-top:35px">Product List</h2>
-  <div id="productList" class="grid"></div>
-</section>
+  <header>INDEVERYDAY Group Chat</header>
 
-  </div>  <!-- Firebase SDK -->  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>  <script>
+  <div id="chatContainer"></div>
+
+  <div id="inputContainer">
+    <input type="text" id="msgInput" placeholder="Type a message...">
+    <button id="sendBtn">Send</button>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+  <script>
     const firebaseConfig = {
       apiKey: "AIzaSyDFPMf8HLMpS6DbZkdCR6T7GAm5sfz-TOw",
       authDomain: "urbrokhan-f631c.firebaseapp.com",
@@ -65,61 +45,30 @@
     };
 
     firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-    const storage = firebase.storage();
+    const db = firebase.database();
 
-    const authSection = document.getElementById('authSection');
-    const adminSection = document.getElementById('adminSection');
-    const userEmail = document.getElementById('userEmail');
-    const logoutBtn = document.getElementById('logoutBtn');
-    const adminMsg = document.getElementById('adminMsg');
+    const chatContainer = document.getElementById('chatContainer');
+    const msgInput = document.getElementById('msgInput');
+    const sendBtn = document.getElementById('sendBtn');
 
-    document.getElementById('googleSignIn').onclick = () => {
-      const provider = new firebase.auth.GoogleAuthProvider();
-      auth.signInWithPopup(provider).catch(e => document.getElementById('authMsg').textContent = e.message);
+    // Send message
+    sendBtn.onclick = () => {
+      const msg = msgInput.value.trim();
+      if (!msg) return;
+      const newMsg = { sender: 'Guest', text: msg, time: Date.now() };
+      db.ref('groupChat').push(newMsg);
+      msgInput.value = '';
     };
 
-    auth.onAuthStateChanged(user => {
-      if (user) {
-        userEmail.textContent = user.email;
-        authSection.classList.add('hidden');
-        adminSection.classList.remove('hidden');
-        logoutBtn.classList.remove('hidden');
-        loadProducts();
-      } else {
-        authSection.classList.remove('hidden');
-        adminSection.classList.add('hidden');
-        logoutBtn.classList.add('hidden');
-        userEmail.textContent = 'Not signed in';
-      }
+    // Listen for new messages
+    db.ref('groupChat').on('child_added', snapshot => {
+      const msg = snapshot.val();
+      const msgDiv = document.createElement('div');
+      msgDiv.className = 'message';
+      msgDiv.innerHTML = `<div class="msg-sender">${msg.sender}</div><div>${msg.text}</div>`;
+      chatContainer.appendChild(msgDiv);
+      chatContainer.scrollTop = chatContainer.scrollHeight;
     });
-
-    logoutBtn.onclick = () => auth.signOut();
-
-    document.getElementById('addProduct').onclick = async () => {
-      adminMsg.textContent = '';
-      const name = pname.value.trim();
-      const price = parseFloat(pprice.value);
-      const desc = pdesc.value.trim();
-      const file = pimg.files[0];
-
-      if (!name || !price || !file) {
-        adminMsg.style.color = 'red';
-        adminMsg.textContent = 'Please provide Name, Price, and select an Image';
-        return;
-      }
-
-      try {
-        const storageRef = storage.ref('products/' + Date.now() + '_' + file.name);
-        const snapshot = await storageRef.put(file);
-        const imageUrl = await snapshot.ref.getDownloadURL();
-
-        await db.collection('products').add({ name, price, desc, image: imageUrl, created: new Date() });
-        adminMsg.style.color = 'green';
-        adminMsg.textContent = 'Product added successfully!';
-        pname.value = pprice.value = pdesc.value = '';
-        pimg.value = '';
-        loadProducts();
-      } catch (error) {
-        adminMsg.style
+  </script>
+</body>
+</html>
