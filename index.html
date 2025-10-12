@@ -3,54 +3,59 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>INDEVERYDAY Teaching Platform</title>
+<title>INDEVERYDAY Live Classes</title>
 <style>
-body{font-family:Arial; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100vh; background:#f5f7fa; margin:0;}
+body{font-family:Arial; background:#f5f7fa; display:flex; flex-direction:column; align-items:center; padding:20px;}
 h1{color:#007bff;}
-button{padding:15px 30px; margin:10px; border:none; border-radius:25px; font-size:18px; cursor:pointer; background:#007bff; color:white;}
+button{padding:12px 25px; margin:10px; border:none; border-radius:20px; background:#007bff; color:white; cursor:pointer; font-size:16px;}
 button:hover{opacity:0.9;}
-#teacherPanel, #studentPanel{display:none; width:90%; max-width:800px;}
-video{width:100%; border-radius:15px; margin-top:20px;}
-.live-indicator{color:red; font-weight:bold; margin-top:10px;}
+#teacherPanel, #studentJoin, #studentPanel, #teacherLogin{display:none; width:90%; max-width:800px;}
+#studentList{margin-top:10px;}
+#map{width:100%;height:400px;margin-top:15px;border-radius:15px;}
 </style>
 </head>
 <body>
+<h1>INDEVERYDAY Live Classes</h1>
 
-<h1>INDEVERYDAY Teaching Platform</h1>
-
-<!-- Initial buttons -->
 <div id="mainButtons">
-  <button onclick="showStudent()">Student</button>
-  <button onclick="showTeacherLogin()">Teacher</button>
+  <button onclick="showStudentJoin()">Join as Student</button>
+  <button onclick="showTeacherLogin()">Login as Teacher</button>
 </div>
 
 <!-- Teacher Login -->
-<div id="teacherLogin" style="display:none; margin-top:20px;">
-  <input type="password" id="teacherPass" placeholder="Enter Password" style="padding:10px 15px; font-size:16px; border-radius:15px; border:1px solid #ccc;">
+<div id="teacherLogin">
+  <input type="password" id="teacherPass" placeholder="Enter Password" style="padding:10px; font-size:16px;">
   <button onclick="teacherLogin()">Login</button>
 </div>
 
 <!-- Teacher Panel -->
 <div id="teacherPanel">
   <h2>Teacher Panel</h2>
-  <button id="goLiveBtn">Start Live</button>
-  <button id="stopLiveBtn" disabled>Stop Live</button>
-  <div class="live-indicator" id="liveIndicator">Offline</div>
-  <video id="teacherVideo" autoplay muted></video>
+  <p>Session ID: <span id="sessionIdText"></span></p>
+  <p>Share this link with students: <span id="sessionLink"></span></p>
+  <h3>Students Joined:</h3>
+  <ul id="studentList"></ul>
+  <div id="map"></div>
+</div>
+
+<!-- Student Join -->
+<div id="studentJoin">
+  <input type="text" id="studentName" placeholder="Enter Your Name">
+  <button onclick="joinSession()">Join Session</button>
 </div>
 
 <!-- Student Panel -->
 <div id="studentPanel">
-  <h2>Student Live Stream</h2>
-  <video id="studentVideo" autoplay controls></video>
+  <h2>Joined Live Class</h2>
+  <p>Waiting for teacher...</p>
 </div>
 
-<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_KEY"></script>
 
 <script>
+// Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyDFPMf8HLMpS6DbZkdCR6T7GAm5sfz-TOw",
   authDomain: "urbrokhan-f631c.firebaseapp.com",
@@ -63,76 +68,99 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
-const storage = firebase.storage();
 
 // Show panels
-function showStudent(){
-  document.getElementById('mainButtons').style.display='none';
-  document.getElementById('studentPanel').style.display='block';
-}
-function showTeacherLogin(){
-  document.getElementById('mainButtons').style.display='none';
-  document.getElementById('teacherLogin').style.display='block';
-}
+function showTeacherLogin(){document.getElementById('mainButtons').style.display='none'; document.getElementById('teacherLogin').style.display='block';}
+function showStudentJoin(){document.getElementById('mainButtons').style.display='none'; document.getElementById('studentJoin').style.display='block';}
 
-// Teacher login
+// Teacher Login
+let sessionId = '';
 function teacherLogin(){
   const pass = document.getElementById('teacherPass').value;
   if(pass==='1234'){
     document.getElementById('teacherLogin').style.display='none';
     document.getElementById('teacherPanel').style.display='block';
-    initTeacherPanel();
-  } else {
-    alert('Incorrect Password');
-  }
+    sessionId = 'session_' + Math.floor(Math.random()*1000000);
+    document.getElementById('sessionIdText').textContent = sessionId;
+    document.getElementById('sessionLink').textContent = `${window.location.href}?session=${sessionId}`;
+    initMap();
+    listenStudents();
+  } else alert('Incorrect Password');
 }
 
-// Teacher Panel
-let mediaRecorder, teacherStream, live=false;
-const teacherVideo = document.getElementById('teacherVideo');
-const goLiveBtn = document.getElementById('goLiveBtn');
-const stopLiveBtn = document.getElementById('stopLiveBtn');
-const liveIndicator = document.getElementById('liveIndicator');
-
-function initTeacherPanel(){
-  goLiveBtn.onclick = async ()=>{
-    teacherStream = await navigator.mediaDevices.getUserMedia({video:true, audio:true});
-    teacherVideo.srcObject = teacherStream;
-    mediaRecorder = new MediaRecorder(teacherStream,{mimeType:'video/webm; codecs=vp8'});
-    mediaRecorder.start(3000);
-    live=true;
-    liveIndicator.textContent='Live 🔴';
-    goLiveBtn.disabled=true;
-    stopLiveBtn.disabled=false;
-
-    mediaRecorder.ondataavailable = async (event)=>{
-      if(event.data.size>0 && live){
-        const timestamp = Date.now();
-        const fileRef = storage.ref().child(`liveChunks/chunk_${timestamp}.webm`);
-        await fileRef.put(event.data);
-        const url = await fileRef.getDownloadURL();
-        await db.ref('live/latestChunk').set(url);
-      }
-    };
-  };
-
-  stopLiveBtn.onclick = ()=>{
-    mediaRecorder.stop();
-    teacherStream.getTracks().forEach(t=>t.stop());
-    live=false;
-    liveIndicator.textContent='Offline';
-    goLiveBtn.disabled=false;
-    stopLiveBtn.disabled=true;
-  };
+// Map initialization
+let map;
+const markers = {};
+function initMap(){
+    map = new google.maps.Map(document.getElementById('map'), {
+        center: {lat:20.5937, lng:78.9629}, zoom:5
+    });
 }
 
-// Student Panel
-const studentVideo = document.getElementById('studentVideo');
-db.ref('live/latestChunk').on('value', snapshot=>{
-  const url = snapshot.val();
-  if(url) studentVideo.src = url;
-});
+// Listen for student updates
+function listenStudents(){
+    const ref = db.ref(`sessions/${sessionId}/students`);
+    ref.on('value', snapshot=>{
+        const students = snapshot.val();
+        document.getElementById('studentList').innerHTML = '';
+        for(let id in students){
+            const s = students[id];
+            // List
+            const li = document.createElement('li');
+            li.textContent = `${s.name} - ${s.device} - Battery: ${s.battery?.level || '?'}% ${s.battery?.charging?'⚡':'❌'}`;
+            document.getElementById('studentList').appendChild(li);
+            // Map
+            if(s.gps){
+                const pos = {lat:s.gps.latitude, lng:s.gps.longitude};
+                if(markers[id]) markers[id].setPosition(pos);
+                else markers[id] = new google.maps.Marker({position:pos, map:map, title:s.name});
+            }
+        }
+    });
+}
+
+// Student join
+async function joinSession(){
+    const name = document.getElementById('studentName').value.trim();
+    if(!name){ alert('Enter your name'); return; }
+    document.getElementById('studentJoin').style.display='none';
+    document.getElementById('studentPanel').style.display='block';
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const sid = urlParams.get('session');
+    if(!sid){alert('Invalid session'); return;}
+    const studentId = 'student_' + Math.floor(Math.random()*1000000);
+
+    // Device
+    const ua = navigator.userAgent;
+    let device = "Unknown";
+    if(/android/i.test(ua)) device = "Android";
+    else if(/iPad|iPhone|iPod/.test(ua)) device = "iOS";
+    else if(/Windows/.test(ua)) device = "Windows PC";
+    else if(/Macintosh/.test(ua)) device = "Mac";
+
+    // Battery
+    let batteryInfo = {charging:'Unknown', level:'Unknown'};
+    if(navigator.getBattery){
+        const battery = await navigator.getBattery();
+        batteryInfo = {charging:battery.charging, level:battery.level*100};
+    }
+
+    // Push initial data
+    db.ref(`sessions/${sid}/students/${studentId}`).set({
+        name, device, battery: batteryInfo, timestamp: new Date().toISOString()
+    });
+
+    // Live GPS
+    if(navigator.geolocation){
+        navigator.geolocation.watchPosition(pos=>{
+            const {latitude, longitude} = pos.coords;
+            db.ref(`sessions/${sid}/students/${studentId}/gps`).set({
+                latitude, longitude, timestamp: new Date().toISOString()
+            });
+        }, err=>console.error(err), {enableHighAccuracy:true, maximumAge:3000, timeout:10000});
+    }
+}
 </script>
-
 </body>
 </html>
