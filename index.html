@@ -1,132 +1,111 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Email Login — Firebase</title>
-<style>
-  body {
-    background: #0f172a;
-    color: #f1f5f9;
-    font-family: Arial, sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
-  }
-  .container {
-    background: #0b1220;
-    padding: 30px;
-    border-radius: 15px;
-    text-align: center;
-    width: 90%;
-    max-width: 400px;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.6);
-  }
-  input {
-    width: 100%;
-    padding: 12px;
-    border-radius: 8px;
-    border: none;
-    margin: 10px 0;
-    font-size: 16px;
-  }
-  button {
-    width: 100%;
-    padding: 12px;
-    background: #10b981;
-    border: none;
-    color: #fff;
-    font-weight: bold;
-    font-size: 16px;
-    border-radius: 8px;
-    cursor: pointer;
-  }
-  button:hover {
-    background: #0f9b6c;
-  }
-  .message {
-    margin-top: 15px;
-    color: #00ffaa;
-  }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>INDEVERYDAY - Admin Panel</title>
+  <style>
+    body {font-family: Arial, sans-serif; background: #f5f6fa; margin: 0; padding: 0;}
+    header {background: #fff; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1);}
+    .brand {font-weight: bold; font-size: 20px; color: #333;}
+    nav button {margin-left: 10px; padding: 8px 12px; border-radius: 6px; border: none; cursor: pointer;}
+    .container {max-width: 900px; margin: 30px auto; padding: 20px; background: #fff; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);}
+    .hidden {display: none;}
+    input, textarea {width: 100%; padding: 10px; margin: 6px 0; border: 1px solid #ccc; border-radius: 6px;}
+    button.btn-primary {background: #007bff; color: white;}
+    button.btn-secondary {background: #f0f0f0;}
+    .grid {display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; margin-top: 20px;}
+    .card {background: #fff; border: 1px solid #ddd; border-radius: 10px; padding: 10px; text-align: center;}
+    .card img {width: 100%; height: 150px; object-fit: cover; border-radius: 8px;}
+  </style>
 </head>
 <body>
+  <header>
+    <div class="brand">INDEVERYDAY Admin</div>
+    <div>
+      <span id="userEmail">Not signed in</span>
+      <button id="logoutBtn" class="btn-secondary hidden">Logout</button>
+    </div>
+  </header>  <div class="container">
+    <section id="authSection">
+      <h2>Admin Login</h2>
+      <button id="googleSignIn" class="btn-primary">Sign in with Google</button>
+      <p id="authMsg" style="color:red;"></p>
+    </section><section id="adminSection" class="hidden">
+  <h2>Add Product (Admin)</h2>
+  <input id="pname" placeholder="Product Name">
+  <input id="pprice" placeholder="Price (₹)" type="number">
+  <input id="pimg" placeholder="Image URL">
+  <textarea id="pdesc" placeholder="Product Description"></textarea>
+  <button id="addProduct" class="btn-primary">Add Product</button>
+  <p id="adminMsg" style="color:green;"></p>
 
-<div class="container">
-  <h2>Login with Email</h2>
-  <input type="email" id="emailInput" placeholder="Enter your email" required>
-  <button id="sendLinkBtn">Send Verification Link</button>
-  <div class="message" id="message"></div>
-</div>
+  <h2 style="margin-top:30px">Product List</h2>
+  <div id="productList" class="grid"></div>
+</section>
 
-<!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js"></script>
+  </div>  <!-- Firebase SDK -->  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDFPMf8HLMpS6DbZkdCR6T7GAm5sfz-TOw",
+      authDomain: "urbrokhan-f631c.firebaseapp.com",
+      databaseURL: "https://urbrokhan-f631c-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "urbrokhan-f631c",
+      storageBucket: "urbrokhan-f631c.appspot.com",
+      messagingSenderId: "533086015351",
+      appId: "1:533086015351:web:a12328fbc4906e4f5c9b72",
+      measurementId: "G-TGT66KJV02"
+    };
 
-<script>
-  // Firebase configuration
-  const firebaseConfig = {
-    apiKey: "AIzaSyDFPMf8HLMpS6DbZkdCR6T7GAm5sfz-TOw",
-    authDomain: "urbrokhan-f631c.firebaseapp.com",
-    databaseURL: "https://urbrokhan-f631c-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "urbrokhan-f631c",
-    storageBucket: "urbrokhan-f631c.appspot.com",
-    messagingSenderId: "533086015351",
-    appId: "1:533086015351:web:a12328fbc4906e4f5c9b72",
-    measurementId: "G-TGT66KJV02"
-  };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
 
-  // Initialize Firebase
-  const app = firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
+    const authSection = document.getElementById('authSection');
+    const adminSection = document.getElementById('adminSection');
+    const userEmail = document.getElementById('userEmail');
+    const logoutBtn = document.getElementById('logoutBtn');
 
-  const sendLinkBtn = document.getElementById("sendLinkBtn");
-  const emailInput = document.getElementById("emailInput");
-  const messageEl = document.getElementById("message");
+    document.getElementById('googleSignIn').onclick = () => {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      auth.signInWithPopup(provider).catch(e => authMsg.textContent = e.message);
+    };
 
-  // Action code settings for email link
-  const actionCodeSettings = {
-    url: window.location.href, // Redirect back to this page
-    handleCodeInApp: true
-  };
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        userEmail.textContent = user.email;
+        authSection.classList.add('hidden');
+        adminSection.classList.remove('hidden');
+        logoutBtn.classList.remove('hidden');
+        loadProducts();
+      } else {
+        authSection.classList.remove('hidden');
+        adminSection.classList.add('hidden');
+        logoutBtn.classList.add('hidden');
+        userEmail.textContent = 'Not signed in';
+      }
+    });
 
-  sendLinkBtn.addEventListener("click", () => {
-    const email = emailInput.value.trim();
-    if (!email) {
-      messageEl.textContent = "Please enter a valid email!";
-      return;
-    }
+    logoutBtn.onclick = () => auth.signOut();
 
-    auth.sendSignInLinkToEmail(email, actionCodeSettings)
-      .then(() => {
-        window.localStorage.setItem('emailForSignIn', email);
-        messageEl.textContent = "Verification link sent! Check your email.";
-      })
-      .catch(error => {
-        console.error(error);
-        messageEl.textContent = "Error sending link: " + error.message;
+    document.getElementById('addProduct').onclick = async () => {
+      const name = pname.value, price = parseFloat(pprice.value), image = pimg.value, desc = pdesc.value;
+      if (!name || !price || !image) return alert('All fields required');
+      await db.collection('products').add({ name, price, image, desc, created: new Date() });
+      adminMsg.textContent = 'Product added successfully!';
+      pname.value = pprice.value = pimg.value = pdesc.value = '';
+      loadProducts();
+    };
+
+    async function loadProducts() {
+      const list = document.getElementById('productList');
+      list.innerHTML = '';
+      const snap = await db.collection('products').orderBy('created','desc').get();
+      snap.forEach(doc => {
+        const d = doc.data();
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `<img src="${d.image}"><h4>${d.name}</h4><p>₹${d.price}</p><p>${d.desc||''}</p>`;
+        list.appendChild(card);
       });
-  });
-
-  // Check if user clicked the email link
-  if (auth.isSignInWithEmailLink(window.location.href)) {
-    let email = window.localStorage.getItem('emailForSignIn');
-    if (!email) {
-      email = window.prompt('Please provide your email for confirmation');
     }
-    auth.signInWithEmailLink(email, window.location.href)
-      .then(result => {
-        window.localStorage.removeItem('emailForSignIn');
-        messageEl.textContent = "Login successful! Welcome " + result.user.email;
-      })
-      .catch(error => {
-        console.error(error);
-        messageEl.textContent = "Error verifying link: " + error.message;
-      });
-  }
-</script>
-
-</body>
+  </script></body>
 </html>
