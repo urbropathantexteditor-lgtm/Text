@@ -42,8 +42,8 @@
   <h2>Add Product (Admin)</h2>
   <input id="pname" placeholder="Product Name">
   <input id="pprice" placeholder="Price (₹)" type="number">
-  <input id="pimg" placeholder="Image URL">
-  <textarea id="pdesc" placeholder="Product Description"></textarea>
+  <input id="pdesc" placeholder="Product Description">
+  <input type="file" id="pimg" accept="image/*">
   <button id="addProduct" class="btn-primary">Add Product</button>
   <p id="adminMsg" style="color:green;"></p>
 
@@ -51,7 +51,7 @@
   <div id="productList" class="grid"></div>
 </section>
 
-  </div>  <!-- Firebase SDK -->  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>  <script>
+  </div>  <!-- Firebase SDK -->  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>  <script>
     const firebaseConfig = {
       apiKey: "AIzaSyDFPMf8HLMpS6DbZkdCR6T7GAm5sfz-TOw",
       authDomain: "urbrokhan-f631c.firebaseapp.com",
@@ -66,6 +66,7 @@
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
+    const storage = firebase.storage();
 
     const authSection = document.getElementById('authSection');
     const adminSection = document.getElementById('adminSection');
@@ -95,12 +96,23 @@
     logoutBtn.onclick = () => auth.signOut();
 
     document.getElementById('addProduct').onclick = async () => {
-      const name = pname.value, price = parseFloat(pprice.value), image = pimg.value, desc = pdesc.value;
-      if (!name || !price || !image) return alert('All fields required');
-      await db.collection('products').add({ name, price, image, desc, created: new Date() });
-      adminMsg.textContent = 'Product added successfully!';
-      pname.value = pprice.value = pimg.value = pdesc.value = '';
-      loadProducts();
+      const name = pname.value, price = parseFloat(pprice.value), desc = pdesc.value;
+      const file = pimg.files[0];
+      if (!name || !price || !file) return alert('Please provide name, price, and image');
+      
+      const storageRef = storage.ref('products/' + Date.now() + '_' + file.name);
+      const uploadTask = storageRef.put(file);
+
+      uploadTask.on('state_changed', null, error => {
+        alert('Image upload failed: ' + error.message);
+      }, async () => {
+        const imageUrl = await uploadTask.snapshot.ref.getDownloadURL();
+        await db.collection('products').add({ name, price, desc, image: imageUrl, created: new Date() });
+        adminMsg.textContent = 'Product added successfully!';
+        pname.value = pprice.value = pdesc.value = '';
+        pimg.value = '';
+        loadProducts();
+      });
     };
 
     async function loadProducts() {
