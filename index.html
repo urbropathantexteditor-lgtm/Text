@@ -1,156 +1,286 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>NewFollower.in — Products</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --bg:#0f172a;
-    --card:#1e293b;
-    --accent:#10b981;
-    --accent2:#facc15;
-    --text:#f1f5f9;
-    --btn:#3b82f6;
-  }
-  *{box-sizing:border-box;margin:0;padding:0;font-family:'Poppins',sans-serif;}
-  body{background:linear-gradient(135deg,#1e3a8a,#f43f5e);min-height:100vh;color:var(--text);}
-  header{display:flex;justify-content:space-between;align-items:center;padding:12px 20px;background:rgba(0,0,0,0.3);backdrop-filter:blur(5px);}
-  header h1{color:white;font-size:24px;}
-  header button{background:var(--btn);color:white;padding:8px 16px;border:none;border-radius:8px;cursor:pointer;font-weight:600;transition:.3s;}
-  header button:hover{background:var(--accent2);}
-  .container{padding:20px;display:flex;flex-wrap:wrap;gap:20px;justify-content:center;}
-  .card{background:var(--card);border-radius:12px;padding:12px;width:220px;display:flex;flex-direction:column;align-items:center;transition:.3s;position:relative;}
-  .card img{width:180px;height:180px;border-radius:12px;object-fit:cover;margin-bottom:10px;}
-  .card h3{color:white;margin-bottom:6px;text-align:center;}
-  .card p{color:var(--accent2);margin-bottom:10px;text-align:center;}
-  .card button{padding:6px 12px;border:none;border-radius:8px;background:var(--accent);color:black;cursor:pointer;font-weight:600;transition:.3s;}
-  .card button:hover{background:var(--btn);color:white;}
-  #adminPanel{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);justify-content:center;align-items:center;z-index:1000;}
-  #adminPanel .panel{background:var(--card);padding:20px;border-radius:12px;width:90%;max-width:400px;display:flex;flex-direction:column;gap:10px;animation:slideDown 0.6s;}
-  #adminPanel input, #adminPanel textarea{padding:8px;border-radius:6px;border:none;font-size:14px;width:100%;}
-  #adminPanel input[type="file"]{padding:3px;}
-  #adminPanel button{background:var(--accent2);color:black;padding:8px;font-weight:600;cursor:pointer;border:none;border-radius:8px;transition:.3s;}
-  #adminPanel button:hover{background:var(--btn);color:white;}
-  #logoutBtn{position:absolute;top:15px;right:15px;background:red;}
-  @keyframes slideDown{from{transform:translateY(-50px);opacity:0}to{transform:translateY(0);opacity:1}}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NewFollower.in — Admin Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --accent: #10b981;
+      --accent2: #facc15;
+      --text: #f1f5f9;
+      --btn: #3b82f6;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+    }
+    body {
+      background: linear-gradient(135deg, #1e3a8a, #f43f5e);
+      min-height: 100vh;
+      color: var(--text);
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 20px;
+      background: rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(5px);
+    }
+    header h1 {
+      color: white;
+      font-size: 24px;
+    }
+    header button {
+      background: var(--btn);
+      color: white;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: .3s;
+    }
+    header button:hover {
+      background: var(--accent2);
+    }
+    .container {
+      padding: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+    }
+    .card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 12px;
+      width: 220px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: .3s;
+      position: relative;
+    }
+    .card img {
+      width: 180px;
+      height: 180px;
+      border-radius: 12px;
+      object-fit: cover;
+      margin-bottom: 10px;
+    }
+    .card h3 {
+      color: white;
+      margin-bottom: 6px;
+      text-align: center;
+    }
+    .card p {
+      color: var(--accent2);
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    .card button {
+      padding: 6px 12px;
+      border: none;
+      border-radius: 8px;
+      background: var(--accent);
+      color: black;
+      cursor: pointer;
+      font-weight: 600;
+      transition: .3s;
+    }
+    .card button:hover {
+      background: var(--btn);
+      color: white;
+    }
+    #adminPanel {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    #adminPanel .panel {
+      background: var(--card);
+      padding: 20px;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 400px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      animation: slideDown 0.6s;
+    }
+    #adminPanel input,
+    #adminPanel textarea {
+      padding: 8px;
+      border-radius: 6px;
+      border: none;
+      font-size: 14px;
+      width: 100%;
+    }
+    #adminPanel input[type="file"] {
+      padding: 3px;
+    }
+    #adminPanel button {
+      background: var(--accent2);
+      color: black;
+      padding: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      border-radius: 8px;
+      transition: .3s;
+    }
+    #adminPanel button:hover {
+      background: var(--btn);
+      color: white;
+    }
+    #logoutBtn {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: red;
+    }
+    @keyframes slideDown {
+      from {
+        transform: translateY(-50px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+  </style>
 </head>
 <body>
-<header>
-  <h1>NewFollower.in</h1>
-  <button id="loginBtn">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" style="width:20px;margin-right:6px;vertical-align:middle;">
-    Admin Login
-  </button>
-</header>
+  <header>
+    <h1>NewFollower.in</h1>
+    <button id="loginBtn">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" style="width:20px;margin-right:6px;vertical-align:middle;">
+      Admin Login
+    </button>
+  </header>
 
-<div class="container" id="productsContainer">
-  <!-- Products will load here -->
-</div>
-
-<!-- Admin Panel -->
-<div id="adminPanel">
-  <div class="panel">
-    <h2>Admin Panel</h2>
-    <input type="text" id="prodName" placeholder="Product Name">
-    <textarea id="prodDesc" placeholder="Description"></textarea>
-    <input type="number" id="prodPrice" placeholder="Price (₹)">
-    <input type="file" id="prodImg">
-    <button id="addProductBtn">Add Product</button>
-    <button id="logoutBtn">Logout</button>
+  <div class="container" id="productsContainer">
+    <!-- Products will load here -->
   </div>
-</div>
 
-<!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <!-- Admin Panel -->
+  <div id="adminPanel">
+    <div class="panel">
+      <h2>Admin Panel</h2>
+      <input type="text" id="prodName" placeholder="Product Name">
+      <textarea id="prodDesc" placeholder="Description"></textarea>
+      <input type="number" id="prodPrice" placeholder="Price (₹)">
+      <input type="file" id="prodImg">
+      <button id="addProductBtn">Add Product</button>
+      <button id="logoutBtn">Logout</button>
+    </div>
+  </div>
 
-<script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyDFPMf8HLMpS6DbZkdCR6T7GAm5sfz-TOw",
-    authDomain: "urbrokhan-f631c.firebaseapp.com",
-    databaseURL: "https://urbrokhan-f631c-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "urbrokhan-f631c",
-    storageBucket: "urbrokhan-f631c.appspot.com",
-    messagingSenderId: "533086015351",
-    appId: "1:533086015351:web:a12328fbc4906e4f5c9b72",
-    measurementId: "G-TGT66KJV02"
-  };
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.database();
-  const storage = firebase.storage();
-  const auth = firebase.auth();
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 
-  const loginBtn = document.getElementById('loginBtn');
-  const adminPanel = document.getElementById('adminPanel');
-  const logoutBtn = document.getElementById('logoutBtn');
-  const addProductBtn = document.getElementById('addProductBtn');
-  const productsContainer = document.getElementById('productsContainer');
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDFPMf8HLMpS6DbZkdCR6T7GAm5sfz-TOw",
+      authDomain: "urbrokhan-f631c.firebaseapp.com",
+      databaseURL: "https://urbrokhan-f631c-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "urbrokhan-f631c",
+      storageBucket: "urbrokhan-f631c.appspot.com",
+      messagingSenderId: "533086015351",
+      appId: "1:533086015351:web:a12328fbc4906e4f5c9b72",
+      measurementId: "G-TGT66KJV02"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    const storage = firebase.storage();
+    const auth = firebase.auth();
 
-  // Admin login via Google (only allowed email)
-  loginBtn.onclick = async () => {
-    const provider = new firebase.auth.GoogleAuthProvider();
-    try {
-      const result = await auth.signInWithPopup(provider);
-      const user = result.user;
-      if(user.email === 'abdullakhan.tt1@gmail.com'){
-        alert('Login successful');
-        adminPanel.style.display = 'flex';
-        loginBtn.style.display = 'none';
-      } else {
-        alert('Access denied. Only admin allowed.');
-        auth.signOut();
+    const loginBtn = document.getElementById('loginBtn');
+    const adminPanel = document.getElementById('adminPanel');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const addProductBtn = document.getElementById('addProductBtn');
+    const productsContainer = document.getElementById('productsContainer');
+
+    // Admin login via Google (only allowed email)
+    loginBtn.onclick = async () => {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      try {
+        const result = await auth.signInWithPopup(provider);
+        const user = result.user;
+        if (user.email === 'abdullakhan.tt1@gmail.com') {
+          alert('Login successful');
+          adminPanel.style.display = 'flex';
+          loginBtn.style.display = 'none';
+        } else {
+          alert('Access denied. Only admin allowed.');
+          auth.signOut();
+        }
+      } catch (err) {
+        console.error(err);
+        alert('Login failed');
       }
-    } catch(err){console.error(err); alert('Login failed');}
-  };
+    };
 
-  logoutBtn.onclick = ()=>{
-    auth.signOut();
-    adminPanel.style.display='none';
-    loginBtn.style.display='inline-block';
-  };
+    logoutBtn.onclick = () => {
+      auth.signOut();
+      adminPanel.style.display = 'none';
+      loginBtn.style.display = 'inline-block';
+    };
 
-  // Add product
-  addProductBtn.onclick = ()=>{
-    const name = document.getElementById('prodName').value;
-    const desc = document.getElementById('prodDesc').value;
-    const price = document.getElementById('prodPrice').value;
-    const imgFile = document.getElementById('prodImg').files[0];
+    // Add product
+    addProductBtn.onclick = () => {
+      const name = document.getElementById('prodName').value;
+      const desc = document.getElementById('prodDesc').value;
+      const price = document.getElementById('prodPrice').value;
+      const imgFile = document.getElementById('prodImg').files[0];
 
-    if(!name || !desc || !price || !imgFile){alert('All fields required'); return;}
+      if (!name || !desc || !price || !imgFile) {
+        alert('All fields required');
+        return;
+      }
 
-    const storageRef = storage.ref('products/'+imgFile.name);
-    storageRef.put(imgFile).then(snapshot=>{
-      snapshot.ref.getDownloadURL().then(url=>{
-        const newProdRef = db.ref('products').push();
-        newProdRef.set({name,desc,price,img:url});
-        alert('Product added successfully');
-        document.getElementById('prodName').value='';
-        document.getElementById('prodDesc').value='';
-        document.getElementById('prodPrice').value='';
-        document.getElementById('prodImg').value='';
+      const storageRef = storage.ref('products/' + imgFile.name);
+      storageRef.put(imgFile).then(snapshot => {
+        snapshot.ref.getDownloadURL().then(url => {
+          const newProdRef = db.ref('products').push();
+          newProdRef.set({ name, desc, price, img: url });
+          alert('Product added successfully');
+          document.getElementById('prodName').value = '';
+          document.getElementById('prodDesc').value = '';
+          document.getElementById('prodPrice').value = '';
+          document.getElementById('prodImg').value = '';
+        });
       });
-    });
-  };
+    };
 
-  // Load products
-  db.ref('products').on('child_added', snapshot=>{
-    const data = snapshot.val();
-    const div = document.createElement('div');
-    div.className='card';
-    div.innerHTML = `
-      <img src="${data.img}">
-      <h3>${data.name}</h3>
-      <p>₹${data.price}</p>
-      <p>${data.desc}</p>
-      <button onclick="alert('Scan QR to pay ₹${data.price}: 6207801231@ybl')">Buy</button>
-    `;
-    productsContainer.appendChild(div);
-  });
-</script>
-</body>
-</html>
+    // Load products
+    db.ref('products').on('child_added', snapshot => {
+      const data = snapshot.val();
+      const div = document.createElement('div');
+      div.className = 'card';
+      div.innerHTML = `
+        <img src="${data.img}">
+        <h3>${data.name}</h3>
+        <p>₹${data.price}</p>
+        <p>${data.desc}</p>
+        <button onclick="alert('Scan QR to pay ₹${data.price}: 6207801231@ybl')">Buy</button>
+      `;
+     0
