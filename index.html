@@ -1,1 +1,232 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>APKFire — Push Notifications (FCM)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg:#0f172a;--card:#0b1220;--muted:#94a3b8;--accent:#10b981}
+    body{margin:0;font-family:Inter,system-ui,Arial;background:var(--bg);color:#f1f5f9;display:flex;justify-content:center;padding:24px}
+    .app{width:100%;max-width:920px}
+    header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px}
+    .logo{display:flex;gap:12px;align-items:center}
+    .logo .badge{width:44px;height:44;border-radius:10px;background:linear-gradient(135deg,#06b6d4,#7c3aed);display:flex;align-items:center;justify-content:center;font-weight:700}
+    h1{font-size:18px;margin:0}
+    .small{color:var(--muted);font-size:13px}
+    .card{background:var(--card);padding:14px;border-radius:12px;box-shadow:0 10px 28px rgba(2,6,23,0.6);margin-bottom:12px}
+    .row{display:flex;gap:12px;flex-wrap:wrap}
+    button{padding:8px 12px;border-radius:8px;border:none;cursor:pointer;font-weight:700}
+    .btn-primary{background:var(--accent);color:#06201b}
+    .btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted)}
+    .tokenBox{background:#071025;padding:8px;border-radius:8px;word-break:break-all;color:#cfeee3}
+    .notifList{display:flex;flex-direction:column;gap:10px}
+    .notifItem{background:#071827;padding:10px;border-radius:10px}
+    .badgeCount{background:#dc263f;padding:6px 8px;border-radius:999px;font-weight:700}
+    .muted{color:var(--muted)}
+    pre{white-space:pre-wrap;word-break:break-word}
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="logo">
+        <div class="badge">APK</div>
+        <div>
+          <h1>APKFire — Push Notifications</h1>
+          <div class="small">Using Firebase Cloud Messaging (Web Push)</div>
+        </div>
+      </div>
 
+      <div style="display:flex;gap:10px;align-items:center">
+        <div class="small muted">Unread</div>
+        <div id="unreadBadge" class="badgeCount" style="display:none">0</div>
+      </div>
+    </header>
+
+    <div class="card">
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <button id="requestPerm" class="btn-primary">Enable Notifications</button>
+        <button id="showToken" class="btn-ghost">Show Token</button>
+        <button id="copyToken" class="btn-ghost">Copy Token</button>
+      </div>
+
+      <div style="margin-top:12px" class="muted">Notes: Must be served over HTTPS (or localhost). After enabling, you'll get a token — use Firebase Console → Cloud Messaging to send web push messages to that token.</div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin:0 0 8px 0">FCM Registration Token</h3>
+      <div id="token" class="tokenBox">No token yet — click "Enable Notifications".</div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin:0 0 8px 0">Received messages (live)</h3>
+      <div id="messages" class="notifList">
+        <div class="muted">No messages yet.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin:0 0 8px 0">How to send a test message (Firebase Console)</h3>
+      <ol class="muted">
+        <li>Open Firebase Console → Project → Cloud Messaging → Send your first message.</li>
+        <li>For Target select "Single device" and paste the token shown above (or use "Topic" if you implement topic subscriptions).</li>
+        <li>Choose Web as platform and send. The browser must be open (or service worker will show a notification even when closed).</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- Firebase modular SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+    import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-messaging.js";
+
+    // ---------- YOUR FIREBASE CONFIG (APKFire) ----------
+    const firebaseConfig = {
+      apiKey: "AIzaSyDbfZThbqfr8AsYKV-jA5xcrGdasFaxF3Y",
+      authDomain: "apkfire-7414a.firebaseapp.com",
+      projectId: "apkfire-7414a",
+      storageBucket: "apkfire-7414a.firebasestorage.app",
+      messagingSenderId: "1075073598665",
+      appId: "1:1075073598665:web:a75f2400cced513d00b918",
+      measurementId: "G-N5B4WMGW5P"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const messaging = getMessaging(app);
+
+    // ======= IMPORTANT =======
+    // 1) Replace this with your Web Push certificate public key (VAPID public key)
+    //    Go to Firebase Console > Project Settings > Cloud Messaging > Web Push certificates
+    //    and copy the "Key pair" -> "Public key" (starts with 'B...').
+    // 2) Paste it below in VAPID_KEY.
+    const VAPID_KEY = "BKrs0ZGjq9fdWb5H4RlCWo9L0U4vAxVGH0UjbVJ0MepmBBgWjfgiPZug8m_eSyG1HYeyR5YVAyUV9YQ_l6DJ-Yg";
+
+    // DOM elements
+    const requestPermBtn = document.getElementById('requestPerm');
+    const tokenDiv = document.getElementById('token');
+    const messagesDiv = document.getElementById('messages');
+    const unreadBadge = document.getElementById('unreadBadge');
+    const showTokenBtn = document.getElementById('showToken');
+    const copyTokenBtn = document.getElementById('copyToken');
+
+    let currentToken = null;
+    let unread = 0;
+
+    function setUnread(n){
+      unread = n;
+      if(unread <= 0){ unreadBadge.style.display='none'; }
+      else { unreadBadge.style.display='inline-block'; unreadBadge.textContent = unread; }
+    }
+
+    // Request permission and get token
+    requestPermBtn.addEventListener('click', async ()=>{
+      try {
+        const perm = await Notification.requestPermission();
+        if (perm !== 'granted') {
+          alert('Notification permission not granted.');
+          return;
+        }
+        // register service worker (must be at root /firebase-messaging-sw.js)
+        const swRegistration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+        console.log('Service worker registered:', swRegistration);
+
+        // get FCM token
+        const tok = await getToken(messaging, { vapidKey: VAPID_KEY, serviceWorkerRegistration: swRegistration });
+        if (tok) {
+          currentToken = tok;
+          tokenDiv.textContent = tok;
+          alert('FCM token obtained (copy it to Firebase Console to send a message).');
+        } else {
+          tokenDiv.textContent = 'No registration token available. Try again.';
+        }
+      } catch (err) {
+        console.error('Error getting permission or token', err);
+        alert('Error: ' + (err?.message || err));
+      }
+    });
+
+    // Show token (if obtained earlier)
+    showTokenBtn.addEventListener('click', ()=> {
+      tokenDiv.textContent = currentToken || 'No token yet. Click "Enable Notifications".';
+    });
+
+    copyTokenBtn.addEventListener('click', async ()=>{
+      try {
+        if(!currentToken) return alert('No token to copy.');
+        await navigator.clipboard.writeText(currentToken);
+        alert('Token copied to clipboard');
+      } catch(e){ alert('Copy failed'); }
+    });
+
+    // Handle incoming messages when page is in foreground
+    onMessage(messaging, (payload) => {
+      console.log('Message received. ', payload);
+      // payload.notification contains title/body when message sent via FCM
+      const title = payload?.notification?.title || payload?.data?.title || 'Notification';
+      const body = payload?.notification?.body || payload?.data?.body || JSON.stringify(payload?.data || {});
+      addMessageToUI({title, body, ts: Date.now()});
+    });
+
+    // Add message UI and increment unread
+    function addMessageToUI({title, body, ts}){
+      // remove "no messages" placeholder if present
+      if(messagesDiv.children.length === 1 && messagesDiv.children[0].classList.contains('muted')){
+        messagesDiv.innerHTML = '';
+      }
+      const item = document.createElement('div');
+      item.className = 'notifItem';
+      item.innerHTML = `<div style="font-weight:700">${escapeHtml(title)}</div>
+                        <div class="muted" style="margin-top:6px">${escapeHtml(body)}</div>
+                        <div class="muted" style="margin-top:6px;font-size:12px">${new Date(ts).toLocaleString()}</div>`;
+      messagesDiv.prepend(item);
+      setUnread(unread + 1);
+    }
+
+    // small sanitize
+    function escapeHtml(s){ if(!s) return ''; return String(s).replace(/[&<>"]/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c])); }
+
+    // show service worker / browser state
+    (async function init(){
+      // if service worker already registered and token stored in localStorage, show it
+      try {
+        const stored = localStorage.getItem('fcm_token');
+        if(stored) { currentToken = stored; tokenDiv.textContent = stored; }
+      } catch(e){}
+    })();
+
+    // OPTIONAL: when you get a token, you may want to persist it to your backend for sending later.
+    // Here we listen for token changes (rare) - using getToken above obtains token once per session.
+
+    // When you obtain token, store locally
+    // (Add this after token obtained)
+    async function storeTokenLocally(tok){
+      currentToken = tok;
+      tokenDiv.textContent = tok;
+      try{ localStorage.setItem('fcm_token', tok); }catch(e){}
+    }
+
+    // Small wrapper: when getToken resolves inside button handler, call storeTokenLocally
+    // (we'll redefine the button listener to use storeTokenLocally)
+    requestPermBtn.addEventListener('click', async ()=>{
+      try {
+        const perm = await Notification.requestPermission();
+        if (perm !== 'granted') { alert('Notification permission not granted.'); return; }
+        const swRegistration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+        const tok = await getToken(messaging, { vapidKey: VAPID_KEY, serviceWorkerRegistration: swRegistration });
+        if (tok) {
+          await storeTokenLocally(tok);
+          alert('FCM token obtained. Copy it and use Firebase Console → Cloud Messaging → Single device target to test.');
+        } else {
+          tokenDiv.textContent = 'No registration token available. Try again.';
+        }
+      } catch (err) {
+        console.error(err);
+        alert('Error: ' + (err?.message || err));
+      }
+    }, { once: true });
+
+  </script>
+</body>
+</html>
